@@ -1,3 +1,5 @@
+package com.project.stockexchangeappbenchmark;
+
 import java.sql.*;
 import org.postgresql.Driver;
 
