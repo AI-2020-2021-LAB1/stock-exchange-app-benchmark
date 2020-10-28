@@ -35,9 +35,11 @@ public class BenchmarkMain {
 
     public static String getPersonData(String name) throws IOException{
 
-        HttpURLConnection connection = (HttpURLConnection) new URL("https://gorest.co.in/public-api/users/" + name).openConnection();
-
+        HttpURLConnection connection = (HttpURLConnection) new URL("http://193.33.111.196:5431").openConnection();
         connection.setRequestMethod("GET");
+        String auth = "admin:admin";
+        byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes());
+        connection.setRequestProperty("Authorization", "Basic " + new String(encodedAuth));
 
         int responseCode = connection.getResponseCode();
         if(responseCode == 200){
