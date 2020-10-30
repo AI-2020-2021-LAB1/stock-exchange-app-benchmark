@@ -1,3 +1,5 @@
+package com.project.stockexchangeappbenchmark;
+
 import java.math.BigDecimal;
 import java.sql.*;
 
@@ -19,7 +21,7 @@ public class PostgreSQL {
              ResultSet rs = st.executeQuery("SELECT * FROM USERS ");
 
             while (rs.next()) {
-                System.out.print("ID: " + rs.getString(1) + " "); 
+                System.out.print("ID: " + rs.getString(1) + " ");
                 System.out.print("FirstName: " + rs.getString(2) + " ");
                 System.out.print("LastName:  " + rs.getString(3) + " ");
                 System.out.print("E-mail: " + rs.getString(4) + " ");
