@@ -41,12 +41,12 @@ public class PostgreSQL {
         try (Connection con = DriverManager.getConnection(url, user, password);
             PreparedStatement ps = con.prepareStatement(query)){
             ps.setLong(1, 40);
-            ps.setString(2, "Andrzej");
-            ps.setString(3, "Nowak");
-            ps.setString(4, "andrzej@nowak.pl");
-            ps.setString(5, "qMFO4Xg5akqboi975OevPL8YmK8EcS4M5.$2a$10$Vx4LEAl9zn3IqkXG6");
+            ps.setString(2, "Chris");
+            ps.setString(3, "Lesniak");
+            ps.setString(4, "koronakielce@scyzoryki.pl");
+            ps.setString(5, "qMFO4Xg5akqAoi975OFvPL8YmK8EcS4M5.$2a$10$Vx4LEAl9zn3IqkXG6");
             ps.setString(6, "USER");
-            ps.setInt(7, 990);
+            ps.setInt(7, 997);
             ps.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex);
