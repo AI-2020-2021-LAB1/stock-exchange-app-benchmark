@@ -1,6 +1,6 @@
-package com.project.stockexchangeappbenchmark;
+package com.project.benchmark.algorithm;
 
-import com.project.stockexchangeappbenchmark.service.BackendService;
+import com.project.benchmark.algorithm.service.BackendService;
 import org.apache.http.HttpException;
 
 import javax.xml.bind.ValidationException;
@@ -13,32 +13,6 @@ import java.util.Base64;
 import java.util.Scanner;
 
 public class BenchmarkMain {
-
-    public static void main(String[] args) throws IOException, ValidationException, HttpException {
-
-        new BackendService().login();
-        new BackendService().loginRestEasy();
-//        new BackendService().registerRestEasy();
-//        Scanner scanner = new Scanner(System.in);
-//
-//        System.out.println("(Type 'get' or 'set' now.)");
-//        String getOrSet = scanner.nextLine();
-//        if("get".equalsIgnoreCase(getOrSet)){
-//            System.out.println("Whose info do you want to get?");
-//            System.out.println("(Type a person's name now.)");
-//            String name = scanner.nextLine();
-//            String jsonString = getPersonData(name);
-//            //JSONObject jsonObject = new JSONObject(jsonString);
-//        }
-//        else if("set".equalsIgnoreCase(getOrSet)){
-//            System.out.println("Whose info do you want to set?");
-//            System.out.println("(Type a person's name now.)");
-//            String name = scanner.nextLine();
-//            setPersonData(name);
-//        }
-//
-//        scanner.close();
-    }
 
     public static String getPersonData(String name) throws IOException{
 

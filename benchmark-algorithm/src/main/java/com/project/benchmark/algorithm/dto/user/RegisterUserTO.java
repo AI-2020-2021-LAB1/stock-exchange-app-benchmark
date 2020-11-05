@@ -1,4 +1,4 @@
-package com.project.stockexchangeappbenchmark.dto.user;
+package com.project.benchmark.algorithm.dto.user;
 
 import lombok.Getter;
 import lombok.Setter;
