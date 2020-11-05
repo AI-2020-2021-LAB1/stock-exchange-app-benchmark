@@ -1,8 +1,8 @@
-package com.project.stockexchangeappbenchmark.service;
+package com.project.benchmark.algorithm.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.stockexchangeappbenchmark.dto.user.RegisterUserTO;
+import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
 import javax.ws.rs.client.Client;

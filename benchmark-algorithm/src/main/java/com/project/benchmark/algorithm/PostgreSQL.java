@@ -1,19 +1,9 @@
-package com.project.stockexchangeappbenchmark;
+package com.project.benchmark.algorithm;
 
 import java.math.BigDecimal;
 import java.sql.*;
 
 public class PostgreSQL {
-
-    public static void main(String[] args) throws ClassNotFoundException {
-        Class.forName("org.postgresql.Driver");
-        String url = "jdbc:postgresql://193.33.111.196:5431/postgres"; String user = "admin";
-        //String url = "jdbc:postgresql://localhost:5432/postgres"; String user = "postgres";
-        String password = "admin";
-        //insert(url, user, password);
-        select(url, user, password);
-
-    }
 
     public static void select(String url, String user, String password){
         try{ Connection con = DriverManager.getConnection(url, user, password);
