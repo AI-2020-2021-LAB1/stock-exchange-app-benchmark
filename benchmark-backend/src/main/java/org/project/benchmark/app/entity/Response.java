@@ -39,12 +39,9 @@ public class Response {
     @Column(nullable = false,name="users_logged_in")
     private Integer usersLoggedIn;
 
-    @Column(nullable = false,name = "measurement_1")
-    private BigDecimal measurement1;
+    @Column(nullable = false,name = "request_response_time")
+    private BigDecimal requestResponseTime;
 
-    @Column(nullable = false,name = "measurement_2")
-    private BigDecimal measurement2;
-
-    @Column(nullable = false,name = "measurement_3")
-    private BigDecimal measurement3;
+    @Column(nullable = false,name = "operation_time")
+    private BigDecimal operationTime;
 }
