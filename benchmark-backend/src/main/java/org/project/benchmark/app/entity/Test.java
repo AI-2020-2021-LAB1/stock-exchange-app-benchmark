@@ -19,7 +19,7 @@ public class Test {
     @GeneratedValue(generator = "TEST_SEQUENCE")
     private Long id;
 
-    @ManyToOne(targetEntity = Configuration.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(targetEntity = Configuration.class, cascade = {CascadeType.ALL})
     @JoinColumn(name = "configuration_id", nullable = false, updatable = false, referencedColumnName = "ID")
     private Configuration configuration;
 
