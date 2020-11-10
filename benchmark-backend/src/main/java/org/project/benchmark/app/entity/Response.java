@@ -19,7 +19,7 @@ public class Response {
     @GeneratedValue(generator = "RESPONSE_SEQUENCE")
     private Long id;
 
-    @ManyToOne(targetEntity = Test.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(targetEntity = Test.class, cascade = {CascadeType.ALL})
     @JoinColumn(name = "test_id", nullable = false, updatable = false, referencedColumnName = "ID")
     private Test test;
 
