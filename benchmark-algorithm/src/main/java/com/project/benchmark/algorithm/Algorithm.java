@@ -9,7 +9,7 @@ public class Algorithm{
     
      public static void main(String []args){
          
-         {//Coby nie przeliczać tego w "if" - możnaby do funkcji
+         {//Coby nie przeliczać tego w "if" - możnaby do funkcji //odpowiada za obliczenie poszczególnych progów (1-33, 34-66 itd.)
              algPercentages[1] = algPercentages[0] + algPercentages[1];
              algPercentages[2] = algPercentages[1] + algPercentages[2];
              algPercentages[3] = algPercentages[2] + algPercentages[3];
