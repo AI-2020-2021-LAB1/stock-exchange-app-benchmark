@@ -6,6 +6,7 @@ import com.project.benchmark.algorithm.internal.BenchmarkConfiguration;
 import com.project.benchmark.algorithm.internal.ResponseTO;
 import lombok.RequiredArgsConstructor;
 import org.project.benchmark.app.entity.Configuration;
+import org.project.benchmark.app.entity.MethodType;
 import org.project.benchmark.app.entity.Response;
 import org.project.benchmark.app.entity.Test;
 import org.project.benchmark.app.repository.ConfigurationRepository;
@@ -114,6 +115,7 @@ public class BenchmarkService {
     private Response buildResponse(ResponseTO res, Long testId) {
         Test test = testRepository.getOne(testId);
         Response response = mapper.convertValue(res, Response.class);
+        response.setMethodType(MethodType.valueOf(res.getMethodType()));
         response.setTest(test);
         return response;
     }
