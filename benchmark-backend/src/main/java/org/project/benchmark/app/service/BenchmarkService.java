@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PreDestroy;
+import javax.persistence.EntityNotFoundException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,7 @@ public class BenchmarkService {
 
     public void stopBenchmark(Long testId) {
         if(!benchmarks.containsKey(testId) || !queues.containsKey(testId)) {
-            throw new RuntimeException(); //TODO: change exception type
+            throw new EntityNotFoundException("Test isn't running");
         }
         BenchmarkLauncher launcher = benchmarks.get(testId);
         boolean success = launcher.stop();
@@ -67,7 +68,7 @@ public class BenchmarkService {
 
     public void forceStopBenchmark(Long testId) {
         if(!benchmarks.containsKey(testId) || !queues.containsKey(testId)) {
-            throw new RuntimeException(); //TODO: change exception type
+            throw new EntityNotFoundException("Test isn't running");
         }
         BenchmarkLauncher launcher = benchmarks.get(testId);
         boolean success = launcher.forceStop();
