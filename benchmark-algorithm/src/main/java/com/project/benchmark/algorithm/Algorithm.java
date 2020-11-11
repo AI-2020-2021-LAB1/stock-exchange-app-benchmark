@@ -22,7 +22,7 @@ public class Algorithm{
          
         //Wczytywanie danych z komunikatu.
         
-        if (register == false) System.out.println("Rejestracja");   //Rejestracja
+        if (register == true) System.out.println("Rejestracja");   //Rejestracja
         else System.out.println("Logowanie");   //Logowanie
         
         while (numOfOperations > 0){
