@@ -1,7 +1,9 @@
 package com.project.benchmark.algorithm.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.project.benchmark.algorithm.dto.response.ResponseTO;
+import com.project.benchmark.algorithm.dto.user.LoginUserResponseTO;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
 import org.apache.http.HttpHeaders;
@@ -19,7 +21,7 @@ public class UserService extends BackendCoreService{
 
     private static final String loginURL = "http://193.33.111.196:8000/oauth/token";
     private static final String registerURL = "http://193.33.111.196:8000/api/register";
-    public void login(LoginUserTO user) {
+    public ResponseTO<String> login(LoginUserTO user) throws JsonProcessingException {
 
         Form form1 = new Form().param("username", user.getUsername());
         form1.param("password", user.getPassword());
@@ -29,14 +31,18 @@ public class UserService extends BackendCoreService{
         byte[] encodedAuth = createBasicAuthentication();
 
         Client client = ClientBuilder.newClient();
+        Instant begin = Instant.now();
         try(Response response = client
                 .target(loginURL).request()
                 .accept(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN)
                 .header(HttpHeaders.AUTHORIZATION, "Basic " + new String(encodedAuth))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
                 .post(Entity.form(form1))) {
-            String value = response.readEntity(String.class);
-            System.out.println(value);
+            Instant end = Instant.now();
+            long time = Duration.between(begin, end).toMillis();
+            var params = new EndpointParameters(registerURL, time, "POST");
+            ResponseTO<LoginUserResponseTO> res = resolveData(response, params, LoginUserResponseTO.class);
+            return res.copy(LoginUserResponseTO::getAccessToken);
         } finally {
             client.close();
         }
