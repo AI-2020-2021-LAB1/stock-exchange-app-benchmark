@@ -15,4 +15,10 @@
     </modules>
     <name>stock-exchange-app-benchmark</name>
     <description>PRz AI Stock Exchange Application 20/21</description>
+
+    <properties>
+        <java.version>11</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
 </project>

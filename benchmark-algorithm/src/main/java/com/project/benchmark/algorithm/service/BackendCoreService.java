@@ -1,23 +1,12 @@
 package com.project.benchmark.algorithm.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.benchmark.algorithm.dto.response.ErrorTO;
 import com.project.benchmark.algorithm.dto.response.ParametersTO;
 import com.project.benchmark.algorithm.dto.response.ResponseTO;
-import com.project.benchmark.algorithm.dto.user.LoginUserTO;
-import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.time.Duration;
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Base64;
 
