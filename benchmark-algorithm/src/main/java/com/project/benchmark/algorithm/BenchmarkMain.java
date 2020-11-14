@@ -1,9 +1,5 @@
 package com.project.benchmark.algorithm;
 
-import com.project.benchmark.algorithm.service.BackendService;
-import org.apache.http.HttpException;
-
-import javax.xml.bind.ValidationException;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
