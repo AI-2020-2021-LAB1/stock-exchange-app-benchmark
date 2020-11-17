@@ -3,6 +3,7 @@ package com.project.benchmark.algorithm.dto.response;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 @Getter
@@ -18,7 +19,9 @@ public class ResponseTO<T> {
         newRes.setParams(params);
         newRes.setSuccess(success);
         newRes.setError(error);
-        newRes.setData(mapper.apply(data));
+        if(Objects.nonNull(data)) {
+            newRes.setData(mapper.apply(data));
+        }
         return newRes;
     }
 }
