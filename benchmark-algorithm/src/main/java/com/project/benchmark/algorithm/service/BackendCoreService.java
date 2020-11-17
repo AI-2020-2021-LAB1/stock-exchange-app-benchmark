@@ -4,12 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.project.benchmark.algorithm.dto.base.PageParams;
 import com.project.benchmark.algorithm.dto.response.ErrorTO;
 import com.project.benchmark.algorithm.dto.response.ParametersTO;
 import com.project.benchmark.algorithm.dto.response.ResponseTO;
 import com.project.benchmark.algorithm.utils.QueryString;
 import org.apache.http.HttpStatus;
+import org.jboss.resteasy.util.HttpResponseCodes;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
@@ -25,7 +27,7 @@ public abstract class BackendCoreService {
 
     private final static String BUSINESS_LOGIC_EXECUTION_TIME_HEADER = "Execution-Time-Business-Logic";
 
-    protected final ObjectMapper mapper = new ObjectMapper();
+    protected final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     protected final byte[] createBasicAuthentication() {
         String auth = "clientId:clientSecret";
@@ -52,8 +54,15 @@ public abstract class BackendCoreService {
             dto.setData(mapper.readValue(json, expectedClazz));
             dto.setSuccess(true);
         } else {
-            dto.setError(mapper.readValue(json, ErrorTO.class));
-            dto.setSuccess(false);
+            try {
+                dto.setSuccess(false);
+                dto.setError(mapper.readValue(json, ErrorTO.class));
+            } catch (JsonProcessingException e) { //not authorized
+                ErrorTO error = new ErrorTO();
+                error.setStatus(res.getStatus());
+                error.setMessage("Unable to get error");
+                dto.setError(error);
+            }
         }
         return dto;
     }
@@ -115,4 +124,16 @@ public abstract class BackendCoreService {
         map.put("sort", sort);
     }
 
+    /**
+     * Automatically put single path param to url.
+     * Conversion: {name} => value
+     * @param url URL to convert
+     * @param name path param name
+     * @param value value inserted to URL
+     * @return new URL with filled path param
+     */
+    protected final String pathParam(String url, String name, String value) {
+        String template = String.format("{%s}", name);
+        return url.replace(template, value);
+    }
 }
