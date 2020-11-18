@@ -57,4 +57,14 @@ public class AdminStockServiceTest {
         newStock.setOwners(Collections.singletonList(owner));
         return newStock;
     }
+
+    @Test
+    public void removeStockTest() throws JsonProcessingException {
+        String auth = login();
+        assertNotNull(auth);
+        Integer stockId = 40; //put there correct stock id (for example from previous test)
+        ResponseTO<Void> response = stockService.removeStock(stockId, auth);
+        assertNull(response.getError());
+        assertEquals(Integer.valueOf(200), response.getParams().getStatus());
+    }
 }
