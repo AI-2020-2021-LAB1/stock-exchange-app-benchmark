@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.project.benchmark.algorithm.dto.order.OrderFiltersTO;
 import com.project.benchmark.algorithm.dto.response.ResponseTO;
 import com.project.benchmark.algorithm.dto.order.OrderTO;
-import com.project.benchmark.algorithm.dto.stock.StockTO;
 import com.project.benchmark.algorithm.endpoints.Endpoints;
 import org.apache.http.HttpHeaders;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
