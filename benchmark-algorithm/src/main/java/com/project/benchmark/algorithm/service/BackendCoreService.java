@@ -51,20 +51,35 @@ public abstract class BackendCoreService {
         ResponseTO<T> dto = generateResponse(res, p);
         String json = res.readEntity(String.class);
         if (dto.getParams().getStatus().equals(HttpStatus.SC_OK)) {
-            dto.setData(mapper.readValue(json, expectedClazz));
+            if(Void.class.equals(expectedClazz)) {
+                dto.setData(null);
+            } else {
+                dto.setData(mapper.readValue(json, expectedClazz));
+            }
             dto.setSuccess(true);
         } else {
             try {
                 dto.setSuccess(false);
                 dto.setError(mapper.readValue(json, ErrorTO.class));
-            } catch (JsonProcessingException e) { //not authorized
-                ErrorTO error = new ErrorTO();
-                error.setStatus(res.getStatus());
-                error.setMessage("Unable to get error");
+            } catch (JsonProcessingException e) { //not authorized or access denied or server error (!)
+                ErrorTO error = resolveAuthenticationError(res);
                 dto.setError(error);
             }
         }
         return dto;
+    }
+
+    private ErrorTO resolveAuthenticationError(Response res) {
+        ErrorTO error = new ErrorTO();
+        error.setStatus(res.getStatus());
+        if(res.getStatus() == HttpResponseCodes.SC_UNAUTHORIZED) {
+            error.setMessage("Unauthorized");
+        } else if (res.getStatus() == HttpResponseCodes.SC_FORBIDDEN) {
+            error.setMessage("Access denied");
+        } else {
+            error.setMessage("Unable to get error");
+        }
+        return error;
     }
 
     private <T> ResponseTO<T> generateResponse(Response res, EndpointParameters p) {
@@ -75,7 +90,10 @@ public abstract class BackendCoreService {
         params.setRequestResponseTime(p.getRequestResponseTime());
         params.setEndpoint(p.getEndpoint());
         params.setMethod(p.getMethod());
-        params.setOperationTime(Double.parseDouble(res.getHeaderString(BUSINESS_LOGIC_EXECUTION_TIME_HEADER)));
+        try {
+            params.setOperationTime(Double.parseDouble(res.getHeaderString(BUSINESS_LOGIC_EXECUTION_TIME_HEADER)));
+        } catch(Exception ignored) {
+        }
         dto.setParams(params);
         return dto;
     }
