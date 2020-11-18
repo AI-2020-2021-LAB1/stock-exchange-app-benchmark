@@ -5,6 +5,7 @@ import com.project.benchmark.algorithm.dto.response.ResponseTO;
 import com.project.benchmark.algorithm.dto.stock.NewStockOwnerTO;
 import com.project.benchmark.algorithm.dto.stock.NewStockTO;
 import com.project.benchmark.algorithm.dto.stock.NewStockUserTO;
+import com.project.benchmark.algorithm.dto.stock.StockTO;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
 import com.project.benchmark.algorithm.service.UserService;
 import org.junit.Before;
@@ -64,6 +65,20 @@ public class AdminStockServiceTest {
         assertNotNull(auth);
         Integer stockId = 40; //put there correct stock id (for example from previous test)
         ResponseTO<Void> response = stockService.removeStock(stockId, auth);
+        assertNull(response.getError());
+        assertEquals(Integer.valueOf(200), response.getParams().getStatus());
+    }
+
+    @Test
+    public void updateStockTest() throws JsonProcessingException {
+        String auth = login();
+        assertNotNull(auth);
+        Integer stockId = 40; //put there correct stock id (for example from previous test)
+        StockTO stock = new StockTO();
+        stock.setId(stockId);
+        stock.setName("abcAbc@bc");
+        stock.setAbbreviation("abc");
+        ResponseTO<Void> response = stockService.updateStock(stock, auth);
         assertNull(response.getError());
         assertEquals(Integer.valueOf(200), response.getParams().getStatus());
     }
