@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class NewStockUserTO {
+public class StockUserTO {
     private String email;
     private String firstName;
     private Integer id;

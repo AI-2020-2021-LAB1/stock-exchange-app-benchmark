@@ -2,8 +2,10 @@ package com.project.benchmark.algorithm.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.project.benchmark.algorithm.dto.base.PageParams;
 import com.project.benchmark.algorithm.dto.response.ErrorTO;
@@ -27,7 +29,9 @@ public abstract class BackendCoreService {
 
     private final static String BUSINESS_LOGIC_EXECUTION_TIME_HEADER = "Execution-Time-Business-Logic";
 
-    protected final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    protected final ObjectMapper mapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     protected final byte[] createBasicAuthentication() {
         String auth = "clientId:clientSecret";
