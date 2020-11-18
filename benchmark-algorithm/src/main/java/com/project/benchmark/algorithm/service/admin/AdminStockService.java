@@ -3,12 +3,14 @@ package com.project.benchmark.algorithm.service.admin;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.benchmark.algorithm.dto.response.ResponseTO;
 import com.project.benchmark.algorithm.dto.stock.NewStockTO;
+import com.project.benchmark.algorithm.dto.stock.StockTO;
 import com.project.benchmark.algorithm.endpoints.Endpoints;
 import com.project.benchmark.algorithm.service.BackendCoreService;
 import com.project.benchmark.algorithm.service.EndpointParameters;
 import com.project.benchmark.algorithm.service.StockService;
 import org.apache.http.HttpHeaders;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -54,6 +56,26 @@ public class AdminStockService extends StockService {
             Instant end = Instant.now();//stop measuring time
             long time = Duration.between(begin, end).toMillis();//calculate time
             var params = new EndpointParameters(url, time, "DELETE");//additional info
+            return resolveData(response, params, Void.class);//get full data
+        } finally {
+            client.close();
+        }
+    }
+
+    public ResponseTO<Void> updateStock(StockTO stock, String authorization) throws JsonProcessingException {
+        Client client = ClientBuilder.newClient();
+        String url = this.pathParam(STOCK_DELETE, "id", stock.getId().toString());
+        String json = mapper.writeValueAsString(stock);
+        WebTarget target = client.target(url);
+        //request-response time start
+        Instant begin = Instant.now();
+        try (Response response = target.request()
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + authorization)//token
+                .method(HttpMethod.PATCH, Entity.json(json))) {
+            Instant end = Instant.now();//stop measuring time
+            long time = Duration.between(begin, end).toMillis();//calculate time
+            var params = new EndpointParameters(url, time, "PATCH");//additional info
             return resolveData(response, params, Void.class);//get full data
         } finally {
             client.close();
