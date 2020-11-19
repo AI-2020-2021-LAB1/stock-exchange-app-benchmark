@@ -5,9 +5,12 @@ import com.project.benchmark.algorithm.dto.base.PageParams;
 import com.project.benchmark.algorithm.dto.base.SortParams;
 import com.project.benchmark.algorithm.dto.response.ResponseTO;
 import com.project.benchmark.algorithm.dto.stock.StockFiltersTO;
+import com.project.benchmark.algorithm.dto.stock.StockIndexFiltersTO;
+import com.project.benchmark.algorithm.dto.stock.StockIndexTO;
 import com.project.benchmark.algorithm.dto.stock.StockTO;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
 import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -46,6 +49,16 @@ public class StockServiceTest extends TestCase {
         int randomStockId = getStocks(auth).getData()
                 .stream().mapToInt(StockTO::getId).findAny().orElseThrow();
         ResponseTO<StockTO> response = stockService.getStockById(randomStockId, auth);
+        assertNull(response.getError());
+        assertNotNull(response.getData());
+    }
+
+    public void testGetStockIndexes() throws IOException {
+        String auth = login();
+        assertNotNull(auth);
+        int randomStockId = getStocks(auth).getData()
+                .stream().mapToInt(StockTO::getId).findAny().orElseThrow();
+        ResponseTO<List<StockIndexTO>> response = stockService.getStockIndexes(randomStockId, new StockIndexFiltersTO(), auth);
         assertNull(response.getError());
         assertNotNull(response.getData());
     }
