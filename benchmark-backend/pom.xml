@@ -10,7 +10,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>stock-exchange-app-benchmark</artifactId>
+    <artifactId>benchmark-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>benchmark-backend</name>
     <description>Benchmark server implementation</description>
