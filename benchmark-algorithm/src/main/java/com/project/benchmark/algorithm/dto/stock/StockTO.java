@@ -1,8 +1,10 @@
 package com.project.benchmark.algorithm.dto.stock;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class StockTO {
     private String abbreviation;
     private Long amount;

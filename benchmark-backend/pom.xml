@@ -76,7 +76,7 @@
     </dependencies>
 
     <build>
-        <finalName>stock-exchange-app-benchmark</finalName>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

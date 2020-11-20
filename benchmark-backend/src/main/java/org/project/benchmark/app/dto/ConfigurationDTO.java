@@ -2,10 +2,7 @@ package org.project.benchmark.app.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
@@ -14,7 +11,8 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @ApiModel(description = "Configuration object stored in database.")
 public class ConfigurationDTO {
 
