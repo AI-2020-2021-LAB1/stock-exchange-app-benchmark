@@ -6,6 +6,8 @@ import com.project.benchmark.algorithm.dto.base.SortParams;
 import com.project.benchmark.algorithm.dto.order.OrderFiltersTO;
 import com.project.benchmark.algorithm.dto.response.ResponseTO;
 import com.project.benchmark.algorithm.dto.order.OrderTO;
+import com.project.benchmark.algorithm.dto.transaction.TransactionFiltersTO;
+import com.project.benchmark.algorithm.dto.transaction.TransactionTO;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
 import junit.framework.TestCase;
 
@@ -46,6 +48,16 @@ public class OrderServiceTest extends TestCase {
         int randomOrderId = getOrders(auth).getData()
                 .stream().mapToInt(OrderTO::getId).findAny().orElseThrow();
         ResponseTO<OrderTO> response = orderService.getOrderById(randomOrderId, auth);
+        assertNull(response.getError());
+        assertNotNull(response.getData());
+    }
+
+    public void testGetOrderTransactions() throws IOException {
+        String auth = login();
+        assertNotNull(auth);
+        int randomOrderId = getOrders(auth).getData()
+                .stream().mapToInt(OrderTO::getId).findAny().orElseThrow();
+        ResponseTO<List<TransactionTO>> response = orderService.getOrderTransactions(randomOrderId, new TransactionFiltersTO(), auth);
         assertNull(response.getError());
         assertNotNull(response.getData());
     }
