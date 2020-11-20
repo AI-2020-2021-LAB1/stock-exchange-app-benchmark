@@ -1,13 +1,11 @@
 package com.project.benchmark.algorithm;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.sql.Timestamp;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 public class Test {
     private long id;

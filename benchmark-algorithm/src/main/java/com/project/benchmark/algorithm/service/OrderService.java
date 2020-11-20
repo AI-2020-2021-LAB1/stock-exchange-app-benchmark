@@ -40,7 +40,8 @@ public class OrderService extends BackendCoreService {
             Instant end = Instant.now();//stop measuring time
             long time = Duration.between(begin, end).toMillis();//calculate time
             var params = new EndpointParameters(ORDER_GET_ALL, time, "GET");//additional info
-            return resolveData(response, params, new TypeReference<>() {});//get full data
+            return resolveData(response, params, new TypeReference<>() {
+            });//get full data
         } finally {
             client.close();
         }

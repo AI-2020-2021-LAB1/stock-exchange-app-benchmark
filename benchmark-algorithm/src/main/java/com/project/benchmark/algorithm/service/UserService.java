@@ -1,7 +1,6 @@
 package com.project.benchmark.algorithm.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.project.benchmark.algorithm.dto.response.ResponseTO;
 import com.project.benchmark.algorithm.dto.user.LoginUserResponseTO;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
@@ -17,10 +16,11 @@ import javax.ws.rs.core.Response;
 import java.time.Duration;
 import java.time.Instant;
 
-public class UserService extends BackendCoreService{
+public class UserService extends BackendCoreService {
 
     private static final String loginURL = "http://193.33.111.196:8000/oauth/token";
     private static final String registerURL = "http://193.33.111.196:8000/api/register";
+
     public ResponseTO<String> login(LoginUserTO user) throws JsonProcessingException {
 
         Form form1 = new Form().param("username", user.getUsername());
@@ -32,7 +32,7 @@ public class UserService extends BackendCoreService{
 
         Client client = ClientBuilder.newClient();
         Instant begin = Instant.now();
-        try(Response response = client
+        try (Response response = client
                 .target(loginURL).request()
                 .accept(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN)
                 .header(HttpHeaders.AUTHORIZATION, "Basic " + new String(encodedAuth))
