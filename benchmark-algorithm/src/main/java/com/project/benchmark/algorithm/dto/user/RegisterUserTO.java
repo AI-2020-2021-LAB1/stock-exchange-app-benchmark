@@ -1,10 +1,8 @@
 package com.project.benchmark.algorithm.dto.user;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class RegisterUserTO {
     private String email;
     private String password;

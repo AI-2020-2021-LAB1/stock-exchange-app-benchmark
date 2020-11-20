@@ -34,6 +34,7 @@ public class BenchmarkLauncher {
 
     /**
      * Start Benchmark algorithm with configuration provided in constructor
+     *
      * @param responseQueueRef - reference to existing queue. Benchmark threads will add there
      *                         new response results
      * @return true if started successfully, false when another user has already started it
@@ -56,12 +57,13 @@ public class BenchmarkLauncher {
     /**
      * Request stop to benchmark.
      * All started algorithms will be finished before stop
+     *
      * @return true if stopped successfully, false when another user has already stopped it
      */
     public boolean stop() {
         lock.lock();
         try {
-            if(started) {
+            if (started) {
                 started = false;
                 internalStop();
                 return true;
@@ -75,12 +77,13 @@ public class BenchmarkLauncher {
     /**
      * Force stop to benchmark.
      * All started algorithms will be stopped just after finishing algorithm step
+     *
      * @return true if stopped successfully, false when another user has already stopped it
      */
     public boolean forceStop() {
         lock.lock();
         try {
-            if(started) {
+            if (started) {
                 started = false;
                 internalForceStop();
                 return true;

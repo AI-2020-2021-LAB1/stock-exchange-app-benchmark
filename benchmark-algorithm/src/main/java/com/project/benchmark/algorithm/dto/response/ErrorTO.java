@@ -1,12 +1,10 @@
 package com.project.benchmark.algorithm.dto.response;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.Map;
 
-@Getter
-@Setter
+@Data
 public class ErrorTO {
     private String message;
     private Integer status;
