@@ -1,12 +1,13 @@
 package com.project.benchmark.algorithm.dto.transaction;
 
-import lombok.Data;
-
 import com.project.benchmark.algorithm.dto.order.OrderTO;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.OffsetDateTime;
 
-@Data
+@Getter
+@Setter
 public class TransactionTO {
     private long amount;
     private OrderTO buyingOrder;

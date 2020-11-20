@@ -1,11 +1,13 @@
 package com.project.benchmark.algorithm.dto.order;
 
 import com.project.benchmark.algorithm.dto.base.PageParams;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.OffsetDateTime;
 
-@Data
+@Getter
+@Setter
 public class OrderFiltersTO {
     private String abbreviation;
     private boolean active;

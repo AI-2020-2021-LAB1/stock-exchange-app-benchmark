@@ -1,11 +1,13 @@
 package com.project.benchmark.algorithm.dto.response;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
 import java.util.function.Function;
 
-@Data
+@Getter
+@Setter
 public class ResponseTO<T> {
     private T data;
     private ErrorTO error;
