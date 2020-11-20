@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.project.benchmark.app.util.DateIsAfterNow;
 
-import javax.validation.constraints.Future;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
@@ -27,7 +27,7 @@ public class TestDTO {
     private OffsetDateTime startDate;
 
     @ApiModelProperty(notes = "The test's end date.")
-    @Future
+    @DateIsAfterNow
     private OffsetDateTime endDate;
 
     @ApiModelProperty(notes = "Configuration's object related with this test.")
