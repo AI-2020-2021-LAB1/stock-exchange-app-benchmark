@@ -74,16 +74,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     public void deleteConfiguration(Long id) {
         Configuration configuration = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Configuration not found"));
-        configuration.setArchived(true);
-        if(!testRepository.findTestByConfigurationId(id).isEmpty()) {
-            testRepository.findTestByConfigurationId(id).forEach(test -> {
-                testRepository.delete(test);
-                if (!responseRepository.findResponseByTestId(id).isEmpty()){
-                    responseRepository.findResponseByTestId(test.getId()).forEach(responseRepository::delete);
-                }
-            });
-        }
-        repository.save(configuration);
+        repository.delete(configuration);
     }
 
 
