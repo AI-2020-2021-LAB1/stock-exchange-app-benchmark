@@ -1,5 +1,6 @@
 package com.project.benchmark.algorithm.dto.response;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,5 +11,5 @@ import java.util.Map;
 public class ErrorTO {
     private String message;
     private Integer status;
-    private Map<String, String> errors;
+    private JsonNode errors;
 }
