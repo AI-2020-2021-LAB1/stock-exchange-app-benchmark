@@ -69,26 +69,6 @@ public class AdminStockService extends StockService {
         }
     }
 
-    public ResponseTO<Void> updateStock(StockTO stock, String authorization) throws JsonProcessingException {
-        Client client = ClientBuilder.newClient();
-        String url = this.pathParam(STOCK_DELETE, "id", stock.getId().toString());
-        String json = mapper.writeValueAsString(stock);
-        WebTarget target = client.target(url);
-        //request-response time start
-        Instant begin = Instant.now();
-        try (Response response = target.request()
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + authorization)//token
-                .method(HttpMethod.PATCH, Entity.json(json))) {
-            Instant end = Instant.now();//stop measuring time
-            long time = Duration.between(begin, end).toMillis();//calculate time
-            var params = new EndpointParameters(url, time, "PATCH");//additional info
-            return resolveData(response, params, Void.class);//get full data
-        } finally {
-            client.close();
-        }
-    }
-
     public ResponseTO<List<StockOwnerTO>> getStockOwners(Integer stockId, StockOwnersFiltersTO filters, String authorization) throws IOException {
         Client client = ClientBuilder.newClient();
         String url = this.pathParam(STOCK_OWNED, "id", stockId.toString());
