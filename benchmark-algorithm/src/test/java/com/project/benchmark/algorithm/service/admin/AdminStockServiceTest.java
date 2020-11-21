@@ -71,20 +71,6 @@ public class AdminStockServiceTest {
     }
 
     @Test
-    public void updateStockTest() throws JsonProcessingException {
-        String auth = login();
-        assertNotNull(auth);
-        Integer stockId = 40; //put there correct stock id (for example from previous test)
-        StockTO stock = new StockTO();
-        stock.setId(stockId);
-        stock.setName("abcAbc@bc");
-        stock.setAbbreviation("abc");
-        ResponseTO<Void> response = stockService.updateStock(stock, auth);
-        assertNull(response.getError());
-        assertEquals(Integer.valueOf(200), response.getParams().getStatus());
-    }
-
-    @Test
     public void getStockOwnersTest() throws IOException {
         String auth = login();
         assertNotNull(auth);
