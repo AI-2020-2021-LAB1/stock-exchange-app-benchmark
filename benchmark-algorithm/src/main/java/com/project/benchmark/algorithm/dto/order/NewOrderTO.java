@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 
 @Getter
 @Setter
-public class OrderTO {
+public class NewOrderTO {
     private Long amount;
     private OffsetDateTime dateClosing;
     private OffsetDateTime dateCreation;

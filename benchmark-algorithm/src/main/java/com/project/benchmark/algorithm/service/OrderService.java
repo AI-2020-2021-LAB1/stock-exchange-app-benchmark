@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.project.benchmark.algorithm.dto.order.OrderFiltersTO;
 import com.project.benchmark.algorithm.dto.response.ResponseTO;
 import com.project.benchmark.algorithm.dto.order.OrderTO;
+import com.project.benchmark.algorithm.dto.transaction.TransactionFiltersTO;
+import com.project.benchmark.algorithm.dto.transaction.TransactionTO;
 import com.project.benchmark.algorithm.endpoints.Endpoints;
 import org.apache.http.HttpHeaders;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
@@ -23,6 +25,7 @@ public class OrderService extends BackendCoreService {
 
     private static final String ORDER_GET_ALL = Endpoints.address + Endpoints.API_ORDER;
     private static final String ORDER_SINGLE = Endpoints.address + Endpoints.API_ORDER + "/{id}";
+    private static final String ORDER_TRANSACTIONS = Endpoints.address + Endpoints.API_ORDER +"/{id}/transactions";
 
     public ResponseTO<List<OrderTO>> getOrders(OrderFiltersTO filters, String authorization) throws IOException {
         Client client = ClientBuilder.newClient();
@@ -62,6 +65,27 @@ public class OrderService extends BackendCoreService {
             long time = Duration.between(begin, end).toMillis();//calculate time
             var params = new EndpointParameters(url, time, "GET");//additional info
             return resolveData(response, params, OrderTO.class);//get full data
+        } finally {
+            client.close();
+        }
+    }
+
+    public ResponseTO<List<TransactionTO>> getOrderTransactions(Integer orderId, TransactionFiltersTO filters, String authorization) throws IOException {
+        Client client = ClientBuilder.newClient();
+        String url = this.pathParam(ORDER_TRANSACTIONS, "id", orderId.toString());
+
+        ResteasyWebTarget target = (ResteasyWebTarget) client.target(url);
+        target.queryParams(this.convertToMap(filters, TransactionFiltersTO.class));
+        //request-response time start
+        Instant begin = Instant.now();
+        try (Response response = target.request()
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + authorization)//token
+                .get()) {
+            Instant end = Instant.now();//stop measuring time
+            long time = Duration.between(begin, end).toMillis();//calculate time
+            var params = new EndpointParameters(url, time, "GET");//additional info
+            return resolveData(response, params, new TypeReference<>() {});
         } finally {
             client.close();
         }
