@@ -13,7 +13,6 @@ import org.mockito.quality.Strictness;
 import org.project.benchmark.app.dto.ConfigurationDTO;
 import org.project.benchmark.app.entity.Configuration;
 import org.project.benchmark.app.repository.ConfigurationRepository;
-import org.project.benchmark.app.repository.TestRepository;
 import org.project.benchmark.app.service.ConfigurationServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -39,10 +38,6 @@ public class ConfigurationApiTest {
 
     @Mock
     ConfigurationRepository configurationRepository;
-
-    @Mock
-    TestRepository testRepository;
-
     @Mock
     ObjectMapper mapper;
 

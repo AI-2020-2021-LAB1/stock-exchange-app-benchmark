@@ -5,6 +5,7 @@ import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import org.project.benchmark.app.dto.ErrorResponse;
 import org.project.benchmark.app.dto.ResponseDTO;
+import org.project.benchmark.app.repository.specification.ResponseSpecification;
 import org.project.benchmark.app.service.ResponseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,10 +27,43 @@ public class ResponseController {
     private final ObjectMapper mapper;
 
     @GetMapping
-    @ApiOperation(value = "Page response.")
-    @ApiResponses(@ApiResponse(code = 200, message = " Successfully paged responses."))
-    public Page<ResponseDTO> getResponses(@ApiIgnore Pageable pageable) {
-        return responseService.getResponses(pageable)
+    @ApiOperation(value = "Page and filter response.")
+    @ApiResponses(@ApiResponse(code = 200, message = " Successfully paged and filter responses."))
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+                    value = "Results page you want to retrieve (0..N).", defaultValue = "0"),
+            @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+                    value = "Number of records per page.", defaultValue = "20"),
+            @ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query",
+                    value = "Sorting criteria in the format: property(,asc|desc). " +
+                            "Default sort order is ascending. Multiple sort criteria are supported."),
+            @ApiImplicitParam(name = "testId", dataType = "integer", paramType = "query",
+                    value = "Filtering criteria for field `testId` (omitted if null)"),
+            @ApiImplicitParam(name = "endpoint", dataType = "string", paramType = "query",
+                    value = "Filtering criteria for field `endpoint`. (omitted if null)"),
+            @ApiImplicitParam(name = "statusCode", dataType = "integer", paramType = "query",
+                    value = "Filtering criteria for field `statusCode`. (omitted if null)"),
+            @ApiImplicitParam(name = "methodType", dataType = "string", paramType = "query",
+                    value = "Filtering criteria for field `methodType`. (omitted if null)"),
+            @ApiImplicitParam(name = "responseDate<", dataType = "date", paramType = "query",
+                    value = "Filtering criteria for field `responseDate`. (omitted if null)"),
+            @ApiImplicitParam(name = "responseDate>", dataType = "date", paramType = "query",
+                    value = "Filtering criteria for field `responseDate`. (omitted if null)"),
+            @ApiImplicitParam(name = "usersLoggedIn>", dataType = "integer", paramType = "query",
+                    value = "Filtering criteria for field `usersLoggedIn`. (omitted if null)"),
+            @ApiImplicitParam(name = "usersLoggedIn<", dataType = "integer", paramType = "query",
+                    value = "Filtering criteria for field `usersLoggedIn`. (omitted if null)"),
+            @ApiImplicitParam(name = "requestResponseTime<", dataType = "integer", paramType = "query",
+                    value = "Filtering criteria for field `requestResponseTime`. (omitted if null)"),
+            @ApiImplicitParam(name = "requestResponseTime>", dataType = "integer", paramType = "query",
+                    value = "Filtering criteria for field `requestResponseTime`. (omitted if null)"),
+            @ApiImplicitParam(name = "operationTime<", dataType = "integer", paramType = "query",
+                    value = "Filtering criteria for field `operationTime`. (omitted if null)"),
+            @ApiImplicitParam(name = "operationTime>", dataType = "integer", paramType = "query",
+                    value = "Filtering criteria for field `operationTime`. (omitted if null)"),
+    })
+    public Page<ResponseDTO> getResponses(@ApiIgnore Pageable pageable, ResponseSpecification responseSpecification) {
+        return responseService.getResponses(pageable,responseSpecification)
                 .map(response -> mapper.convertValue(response,ResponseDTO.class));
     }
 
