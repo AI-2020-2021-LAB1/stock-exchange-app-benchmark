@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.project.benchmark.algorithm.dto.base.PageParams;
 import com.project.benchmark.algorithm.dto.base.SortParams;
-import com.project.benchmark.algorithm.dto.response.ResponseTO;
+import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
 import com.project.benchmark.algorithm.dto.stock.StockTO;
+import com.project.benchmark.algorithm.internal.ResponseTO;
 import com.project.benchmark.algorithm.service.StockService;
 import com.project.benchmark.algorithm.dto.stock.StockFiltersTO;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
@@ -28,6 +30,8 @@ public class Algorithm {
     static String lastName;
     static String email;
     static String password;
+
+    private static final LinkedBlockingQueue<ResponseTO> responseQueue = new LinkedBlockingQueue<>();
 
     private static String encodePassword(String password) { return new BCryptPasswordEncoder().encode(password); }
 
@@ -70,24 +74,24 @@ public class Algorithm {
         body.setPassword(password);
         body.setFirstName(firstName);
         body.setLastName(lastName);
-        UserService userService = new UserService();
+        UserService userService = new UserService(responseQueue);
         userService.register(body);
     }
 
-    private static String login() throws JsonProcessingException {
+    private static String login() {
         LoginUserTO user = new LoginUserTO();
         user.setUsername(email);
         user.setPassword(password);
-        UserService userService = new UserService();
+        UserService userService = new UserService(responseQueue);
         return userService.login(user).getData();
     }
 
-    private static ResponseTO<List<StockTO>> getStocks(String auth) throws IOException {
+    private static ResponseDataTO<List<StockTO>> getStocks(String auth) {
         StockFiltersTO filters = new StockFiltersTO();
         SortParams sort = new SortParams("name", true);
         PageParams params = new PageParams(0, 20, Collections.singletonList(sort));
-        StockService stockService = new StockService();
-        return stockService.getStocks(filters, auth);
+        StockService stockService = new StockService(auth, responseQueue);
+        return stockService.getStocks(filters);
     }
 
     public static void main(String[] args) throws IOException {

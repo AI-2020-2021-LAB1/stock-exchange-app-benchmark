@@ -3,14 +3,16 @@ package com.project.benchmark.algorithm.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.project.benchmark.algorithm.dto.order.OrderFiltersTO;
-import com.project.benchmark.algorithm.dto.response.ResponseTO;
+import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
 import com.project.benchmark.algorithm.dto.order.OrderTO;
 import com.project.benchmark.algorithm.dto.transaction.TransactionFiltersTO;
 import com.project.benchmark.algorithm.dto.transaction.TransactionTO;
 import com.project.benchmark.algorithm.endpoints.Endpoints;
+import com.project.benchmark.algorithm.internal.ResponseTO;
 import org.apache.http.HttpHeaders;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -20,6 +22,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class OrderService extends BackendCoreService {
 
@@ -27,68 +30,49 @@ public class OrderService extends BackendCoreService {
     private static final String ORDER_SINGLE = Endpoints.address + Endpoints.API_ORDER + "/{id}";
     private static final String ORDER_TRANSACTIONS = Endpoints.address + Endpoints.API_ORDER +"/{id}/transactions";
 
-    public ResponseTO<List<OrderTO>> getOrders(OrderFiltersTO filters, String authorization) throws IOException {
-        Client client = ClientBuilder.newClient();
-        ResteasyWebTarget target = (ResteasyWebTarget) client.target(ORDER_GET_ALL);
-        //generate query params
-        var queryParams = convertToMap(filters, OrderFiltersTO.class);
-        //save params
-        target.queryParams(queryParams);
-        //request-response time start
-        Instant begin = Instant.now();
-        try (Response response = target.request()
-                .accept(MediaType.APPLICATION_JSON)//return data
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + authorization)//token
-                .get()) {
-            Instant end = Instant.now();//stop measuring time
-            long time = Duration.between(begin, end).toMillis();//calculate time
-            var params = new EndpointParameters(ORDER_GET_ALL, time, "GET");//additional info
-            return resolveData(response, params, new TypeReference<>() {
-            });//get full data
-        } finally {
-            client.close();
-        }
+    public OrderService(String authorization, LinkedBlockingQueue<ResponseTO> queue) {
+        super(authorization, queue);
     }
 
-    public ResponseTO<OrderTO> getOrderById(Integer id, String authorization) throws JsonProcessingException {
+    public ResponseDataTO<List<OrderTO>> getOrders(OrderFiltersTO filters) {
+        var queryParams = convertToMap(filters, OrderFiltersTO.class);
+        return manageInvocation(
+                ORDER_GET_ALL,
+                HttpMethod.GET,
+                new TypeReference<>() {},
+                target -> target.queryParams(queryParams).request()
+                        .accept(MediaType.APPLICATION_JSON)//return data
+                        .header(HttpHeaders.AUTHORIZATION, fullAuth)//token
+                        .buildGet()
+        );
+    }
+
+    public ResponseDataTO<OrderTO> getOrderById(Integer id) throws JsonProcessingException {
         //convert {id} to proper value
         String url = pathParam(ORDER_SINGLE, "id", id.toString());
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(url);
-        //request-response time start
-        Instant begin = Instant.now();
-        try (Response response = target.request()
-                .accept(MediaType.APPLICATION_JSON)//return data
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + authorization)//token
-                .get()) {
-            Instant end = Instant.now();//stop measuring time
-            long time = Duration.between(begin, end).toMillis();//calculate time
-            var params = new EndpointParameters(url, time, "GET");//additional info
-            return resolveData(response, params, OrderTO.class);//get full data
-        } finally {
-            client.close();
-        }
+        return manageInvocation(
+                url,
+                HttpMethod.GET,
+                OrderTO.class,
+                target -> target.request()
+                        .accept(MediaType.APPLICATION_JSON)//return data
+                        .header(HttpHeaders.AUTHORIZATION, fullAuth)//token
+                        .buildGet()
+        );
     }
 
-    public ResponseTO<List<TransactionTO>> getOrderTransactions(Integer orderId, TransactionFiltersTO filters, String authorization) throws IOException {
-        Client client = ClientBuilder.newClient();
+    public ResponseDataTO<List<TransactionTO>> getOrderTransactions(Integer orderId, TransactionFiltersTO filters) throws IOException {
         String url = this.pathParam(ORDER_TRANSACTIONS, "id", orderId.toString());
-
-        ResteasyWebTarget target = (ResteasyWebTarget) client.target(url);
-        target.queryParams(this.convertToMap(filters, TransactionFiltersTO.class));
-        //request-response time start
-        Instant begin = Instant.now();
-        try (Response response = target.request()
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + authorization)//token
-                .get()) {
-            Instant end = Instant.now();//stop measuring time
-            long time = Duration.between(begin, end).toMillis();//calculate time
-            var params = new EndpointParameters(url, time, "GET");//additional info
-            return resolveData(response, params, new TypeReference<>() {});
-        } finally {
-            client.close();
-        }
+        return manageInvocation(url,
+                HttpMethod.GET,
+                new TypeReference<>() {},
+                target -> target
+                        .queryParams(this.convertToMap(filters, TransactionFiltersTO.class))
+                        .request()
+                        .accept(MediaType.APPLICATION_JSON_TYPE)
+                        .header(HttpHeaders.AUTHORIZATION, fullAuth)//token
+                        .buildGet()
+        );
     }
 
 }
