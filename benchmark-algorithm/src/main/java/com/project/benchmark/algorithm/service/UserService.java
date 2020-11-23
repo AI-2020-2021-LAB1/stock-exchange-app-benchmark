@@ -5,6 +5,7 @@ import com.project.benchmark.algorithm.dto.response.ResponseTO;
 import com.project.benchmark.algorithm.dto.user.LoginUserResponseTO;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
+import com.project.benchmark.algorithm.endpoints.Endpoints;
 import org.apache.http.HttpHeaders;
 
 import javax.ws.rs.client.Client;
@@ -18,8 +19,8 @@ import java.time.Instant;
 
 public class UserService extends BackendCoreService {
 
-    private static final String loginURL = "http://193.33.111.196:8000/oauth/token";
-    private static final String registerURL = "http://193.33.111.196:8000/api/register";
+    private static final String loginURL = Endpoints.address +"/oauth/token";
+    private static final String registerURL = Endpoints.address + Endpoints.API_REGISTER;
 
     public ResponseTO<String> login(LoginUserTO user) throws JsonProcessingException {
 
