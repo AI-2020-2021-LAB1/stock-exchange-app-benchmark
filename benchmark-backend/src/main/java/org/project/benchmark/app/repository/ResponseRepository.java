@@ -3,10 +3,12 @@ package org.project.benchmark.app.repository;
 import org.project.benchmark.app.entity.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,6 +19,10 @@ public interface ResponseRepository extends JpaRepository<Response, Long>,
 
     @Override
     <S extends Response> S save(S s);
+
+    @Override
+    Page<Response> findAll(@Nullable Specification<Response> var1, Pageable var2);
+
 
     @Query("SELECT r FROM Response r WHERE r.test.id = :testId ORDER BY r.responseDate desc")
     List<Response> findResponseByTestId(@Param("testId") Long testId);

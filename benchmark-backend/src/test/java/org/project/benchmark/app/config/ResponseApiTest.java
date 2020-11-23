@@ -16,11 +16,11 @@ import org.project.benchmark.app.entity.Response;
 import org.project.benchmark.app.repository.ResponseRepository;
 import org.project.benchmark.app.repository.TestRepository;
 import org.project.benchmark.app.service.ResponseServiceImpl;
-import org.project.benchmark.app.service.TestServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
@@ -39,9 +39,6 @@ public class ResponseApiTest {
     @InjectMocks
     ResponseServiceImpl responseService;
 
-    @InjectMocks
-    TestServiceImpl testService;
-
     @Mock
     ResponseRepository responseRepository;
 
@@ -52,7 +49,7 @@ public class ResponseApiTest {
     @Test
     void shouldReturnResponseFromTestEntity() {
         Long id = 1L;
-        Response response = createCustomResponse(id);
+        Response response = createCustomResponse(id,id);
         when(responseRepository.findById(id)).thenReturn(Optional.of(response));
         assertResponse(responseService.getResponseByID(id), response);
     }
@@ -67,9 +64,9 @@ public class ResponseApiTest {
     @Test
     void shouldReturnAllResponses() {
         List<Response> responseList = Arrays.asList(
-                createCustomResponse(1L),
-                createCustomResponse(2L),
-                createCustomResponse(3L));
+                createCustomResponse(1L,1L),
+                createCustomResponse(2L,1L),
+                createCustomResponse(3L,1L));
         when(responseRepository.findAll()).thenReturn(responseList);
         List<Response> output = responseService.getAllResponses();
         assertEquals(responseList.size(), output.size());
@@ -79,15 +76,18 @@ public class ResponseApiTest {
     }
 
     @Test
-    void shouldPageResponses() {
+    void shouldPageAndFilterResponses() {
         List<Response> responseList = Arrays.asList(
-                createCustomResponse(1L),
-                createCustomResponse(2L),
-                createCustomResponse(3L));
+                createCustomResponse(1L,1L),
+                createCustomResponse(2L,2L),
+                createCustomResponse(3L,1L));
         Pageable pageable = PageRequest.of(0,20);
-        when(responseRepository.findAll(Mockito.eq(pageable)))
+        Specification<Response> responseSpecification =
+                (Specification<Response>) (root, criteriaQuery, criteriaBuilder) ->
+                        criteriaBuilder.equal(root.get("testId"), 3L);
+        when(responseRepository.findAll(Mockito.any(Specification.class), Mockito.eq(pageable)))
                 .thenReturn(new PageImpl<>(responseList, pageable, responseList.size()));
-        Page<Response> output = responseService.getResponses(pageable);
+        Page<Response> output = responseService.getResponses(pageable,responseSpecification);
         assertEquals(responseList.size(), output.getNumberOfElements());
         for (int i=0; i<responseList.size(); i++) {
             assertResponse(output.getContent().get(i), responseList.get(i));
@@ -97,7 +97,7 @@ public class ResponseApiTest {
     @Test
     void shouldDeleteResponse() {
         Long id = 1L;
-        Response response = createCustomResponse(1L);
+        Response response = createCustomResponse(id,id);
         when(responseRepository.findById(id)).thenReturn(Optional.of(response));
         assertAll(() -> responseService.deleteResponse(id));
     }
@@ -116,9 +116,9 @@ public class ResponseApiTest {
         org.project.benchmark.app.entity.Test test = createCustomTest(1L);
         when(testRepository.findById(1L)).thenReturn(Optional.of(test));
         List<Response> responseList = Arrays.asList(
-                createCustomResponse(1L),
-                createCustomResponse(2L),
-                createCustomResponse(3L));
+                createCustomResponse(1L,1L),
+                createCustomResponse(2L,1L),
+                createCustomResponse(3L,1L));
         Pageable pageable = PageRequest.of(0,20);
         when(responseRepository.findResponseByTestId(1L)).thenReturn(responseList);
         when(responseRepository.findResponseByTestId(Mockito.anyLong(),Mockito.eq(pageable)))
@@ -130,10 +130,10 @@ public class ResponseApiTest {
         }
     }
 
-    private static Response createCustomResponse(Long id) {
+    private static Response createCustomResponse(Long id,Long testId) {
         return Response.builder()
                 .id(id)
-                .test(createCustomTest(1L))
+                .test(createCustomTest(testId))
                 .endpoint(RandomString.make())
                 .statusCode(200)
                 .methodType(MethodType.GET)
