@@ -7,6 +7,8 @@ import com.project.benchmark.algorithm.service.UserService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.concurrent.LinkedBlockingQueue;
+
 import static org.junit.Assert.*;
 
 public class UserServiceTest {
@@ -15,7 +17,7 @@ public class UserServiceTest {
 
     @BeforeClass
     public static void initialize() {
-        userService = new UserService();
+        userService = new UserService(new LinkedBlockingQueue<>());
     }
 
     @Test

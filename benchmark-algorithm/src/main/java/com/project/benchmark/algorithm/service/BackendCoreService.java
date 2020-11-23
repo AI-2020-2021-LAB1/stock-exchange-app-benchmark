@@ -5,23 +5,39 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.project.benchmark.algorithm.dto.base.PageParams;
 import com.project.benchmark.algorithm.dto.response.ErrorTO;
 import com.project.benchmark.algorithm.dto.response.ParametersTO;
-import com.project.benchmark.algorithm.dto.response.ResponseTO;
+import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
+import com.project.benchmark.algorithm.dto.transaction.TransactionFiltersTO;
+import com.project.benchmark.algorithm.internal.ResponseTO;
 import com.project.benchmark.algorithm.utils.QueryString;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
+import org.jboss.resteasy.util.HttpResponseCodes;
+import org.springframework.util.StringUtils;
 
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Base64;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public abstract class BackendCoreService {
@@ -32,13 +48,90 @@ public abstract class BackendCoreService {
             .registerModule(new JavaTimeModule())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    protected final byte[] createBasicAuthentication() {
+    protected final String fullAuth;
+    private final LinkedBlockingQueue<ResponseTO> queue;
+
+    public BackendCoreService(String authorization, LinkedBlockingQueue<ResponseTO> queue) {
+        fullAuth = "Bearer " + authorization;
+        this.queue = queue;
+    }
+
+    public BackendCoreService(LinkedBlockingQueue<ResponseTO> queue) {
+        fullAuth = "Basic " + new String(createBasicAuthentication());
+        this.queue = queue;
+    }
+
+    protected <T> ResponseDataTO<T> manageInvocation(String url, String method, TypeReference<T> ref, Function<ResteasyWebTarget, Invocation> func) {
+        Client client = ClientBuilder.newClient();
+        ResteasyWebTarget target = (ResteasyWebTarget) client.target(url);
+        final Invocation inv = func.apply(target);
+        Instant begin = Instant.now();
+        try (Response response = inv.invoke()) {
+            Instant end = Instant.now();//stop measuring time
+            long time = Duration.between(begin, end).toMillis();//calculate time
+            var params = new EndpointParameters(url, time, method);//additional info
+            ResponseDataTO<T> res = resolveData(response, params, ref);//get full data
+            try {
+                queue.put(buildResponse(res));
+            } catch (InterruptedException ignored) {
+            }
+            return res;
+        } catch (IOException e) {
+            return null;
+        } finally {
+            client.close();
+        }
+    }
+
+    protected <T> ResponseDataTO<T> manageInvocation(String url, String method, Class<T> clazz, Function<ResteasyWebTarget, Invocation> func) {
+        return manageInvocation(url, method, clazz, func, null);
+    }
+
+    protected <T> ResponseDataTO<T> manageInvocation(String url, String method, Class<T> clazz, Function<ResteasyWebTarget, Invocation> func, String tag) {
+        Client client = ClientBuilder.newClient();
+        ResteasyWebTarget target = (ResteasyWebTarget) client.target(url);
+        if(tag != null) {
+            target.queryParam("tag", tag);
+        }
+        final Invocation inv = func.apply(target);
+        Instant begin = Instant.now();
+        try (Response response = inv.invoke()) {
+            Instant end = Instant.now();//stop measuring time
+            long time = Duration.between(begin, end).toMillis();//calculate time
+            var params = new EndpointParameters(url, time, method);//additional info
+            ResponseDataTO<T> res = resolveData(response, params, clazz);//get full data
+            try {
+                queue.put(buildResponse(res));
+            } catch (InterruptedException ignored) {
+            }
+            return res;
+        } catch (IOException e) {
+            return null;
+        } finally {
+            client.close();
+        }
+    }
+
+    private ResponseTO buildResponse(ResponseDataTO<?> res) {
+        ResponseTO response = new ResponseTO();
+        ParametersTO params = res.getParams();
+        response.setStatusCode(params.getStatus());
+        response.setResponseDate(params.getResponseDate());
+        response.setRequestResponseTime(BigDecimal.valueOf(params.getRequestResponseTime()));
+        response.setOperationTime(BigDecimal.valueOf(params.getOperationTime()));
+        response.setEndpoint(params.getEndpoint());
+        response.setMethodType(params.getMethod());
+        response.setUsersLoggedIn(0);//TODO: how to calc this?
+        return response;
+    }
+
+    private byte[] createBasicAuthentication() {
         String auth = "clientId:clientSecret";
         return Base64.getEncoder().encode(auth.getBytes());
     }
 
-    protected final <T> ResponseTO<T> resolveData(Response res, EndpointParameters p, TypeReference<T> expectedClazz) throws IOException {
-        ResponseTO<T> dto = generateResponse(res, p);
+    protected final <T> ResponseDataTO<T> resolveData(Response res, EndpointParameters p, TypeReference<T> expectedClazz) throws IOException {
+        ResponseDataTO<T> dto = generateResponse(res, p);
         String json = res.readEntity(String.class);
         if (dto.getParams().getStatus().equals(HttpStatus.SC_OK)) {
             dto.setData(resolveData(json, expectedClazz));
@@ -50,8 +143,8 @@ public abstract class BackendCoreService {
         return dto;
     }
 
-    protected final <T> ResponseTO<T> resolveData(Response res, EndpointParameters p, Class<T> expectedClazz) throws JsonProcessingException {
-        ResponseTO<T> dto = generateResponse(res, p);
+    protected final <T> ResponseDataTO<T> resolveData(Response res, EndpointParameters p, Class<T> expectedClazz) throws JsonProcessingException {
+        ResponseDataTO<T> dto = generateResponse(res, p);
         String json = res.readEntity(String.class);
         if (dto.getParams().getStatus().equals(HttpStatus.SC_OK)) {
             if(Void.class.equals(expectedClazz)) {
@@ -85,8 +178,8 @@ public abstract class BackendCoreService {
         return error;
     }
 
-    private <T> ResponseTO<T> generateResponse(Response res, EndpointParameters p) {
-        ResponseTO<T> dto = new ResponseTO<>();
+    private <T> ResponseDataTO<T> generateResponse(Response res, EndpointParameters p) {
+        ResponseDataTO<T> dto = new ResponseDataTO<>();
         ParametersTO params = new ParametersTO();
         params.setResponseDate(OffsetDateTime.now());
         params.setStatus(res.getStatus());

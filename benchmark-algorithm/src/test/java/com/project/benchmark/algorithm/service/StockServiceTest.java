@@ -1,64 +1,73 @@
 package com.project.benchmark.algorithm.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.benchmark.algorithm.dto.base.PageParams;
 import com.project.benchmark.algorithm.dto.base.SortParams;
-import com.project.benchmark.algorithm.dto.response.ResponseTO;
+import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
 import com.project.benchmark.algorithm.dto.stock.StockFiltersTO;
 import com.project.benchmark.algorithm.dto.stock.StockIndexFiltersTO;
 import com.project.benchmark.algorithm.dto.stock.StockIndexTO;
 import com.project.benchmark.algorithm.dto.stock.StockTO;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
-import junit.framework.TestCase;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
-public class StockServiceTest extends TestCase {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-    StockService stockService = new StockService();
-    UserService userService = new UserService();
+public class StockServiceTest {
 
-    private String login() throws JsonProcessingException {
+    StockService stockService;
+    UserService userService;
+
+    @Before
+    public void setUp() {
+        userService = new UserService(new LinkedBlockingQueue<>());
+        String auth = login();
+        assertNotNull(auth);
+        stockService = new StockService(auth, new LinkedBlockingQueue<>());
+    }
+
+    private String login() {
         LoginUserTO user = new LoginUserTO();
         user.setUsername("MarcinNajman@gmail.pl");
         user.setPassword("MarcinNajman.gmail.pl1");
         return userService.login(user).getData();
     }
 
-    private ResponseTO<List<StockTO>> getStocks(String auth) throws IOException {
+    private ResponseDataTO<List<StockTO>> getStocks() {
         StockFiltersTO filters = new StockFiltersTO();
         SortParams sort = new SortParams("name", true);
         PageParams params = new PageParams(0, 20, Collections.singletonList(sort));
-        return stockService.getStocks(filters, auth);
+        filters.setPageParams(params);
+        return stockService.getStocks(filters);
     }
 
-    public void testGetStocks() throws IOException {
-        String auth = login();
-        assertNotNull(auth);
-        var response = getStocks(auth);
+    @Test
+    public void testGetStocks() {
+        var response = getStocks();
         assertNull(response.getError());
         assertNotNull(response.getData());
     }
 
-    public void testGetStockById() throws IOException {
-        String auth = login();
-        assertNotNull(auth);
-        int randomStockId = getStocks(auth).getData()
+    @Test
+    public void testGetStockById() {
+        int randomStockId = getStocks().getData()
                 .stream().mapToInt(StockTO::getId).findAny().orElseThrow();
-        ResponseTO<StockTO> response = stockService.getStockById(randomStockId, auth);
+        ResponseDataTO<StockTO> response = stockService.getStockById(randomStockId);
         assertNull(response.getError());
         assertNotNull(response.getData());
     }
 
+    @Test
     public void testGetStockIndexes() throws IOException {
-        String auth = login();
-        assertNotNull(auth);
-        int randomStockId = getStocks(auth).getData()
+        int randomStockId = getStocks().getData()
                 .stream().mapToInt(StockTO::getId).findAny().orElseThrow();
-        ResponseTO<List<StockIndexTO>> response = stockService.getStockIndexes(randomStockId, new StockIndexFiltersTO(), auth);
+        ResponseDataTO<List<StockIndexTO>> response = stockService.getStockIndexes(randomStockId, new StockIndexFiltersTO());
         assertNull(response.getError());
         assertNotNull(response.getData());
     }
