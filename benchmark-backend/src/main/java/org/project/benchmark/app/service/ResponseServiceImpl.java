@@ -6,6 +6,7 @@ import org.project.benchmark.app.repository.ResponseRepository;
 import org.project.benchmark.app.repository.TestRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +27,8 @@ public class ResponseServiceImpl implements ResponseService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Response> getResponses(Pageable pageable) {
-        return responseRepository.findAll(pageable);
+    public Page<Response> getResponses(Pageable pageable, Specification<Response> specification) {
+        return responseRepository.findAll(specification, pageable);
     }
 
     @Override

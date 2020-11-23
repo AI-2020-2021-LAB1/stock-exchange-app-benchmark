@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.project.benchmark.app.dto.ConfigurationDTO;
 import org.project.benchmark.app.entity.Configuration;
 import org.project.benchmark.app.repository.ConfigurationRepository;
-import org.project.benchmark.app.repository.ResponseRepository;
-import org.project.benchmark.app.repository.TestRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,8 +21,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     private final ConfigurationRepository repository;
     private final ObjectMapper mapper;
-    private final TestRepository testRepository;
-    private final ResponseRepository responseRepository;
 
     @Override
     @Transactional(readOnly = true)
