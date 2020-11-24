@@ -76,7 +76,7 @@ public class Algorithm extends  BackendCoreService {
         body.setFirstName(firstName);
         body.setLastName(lastName);
         UserService userService = new UserService(responseQueue);
-        userService.register(body);
+        userService.register(body, null);
     }
 
     private static String login() {
