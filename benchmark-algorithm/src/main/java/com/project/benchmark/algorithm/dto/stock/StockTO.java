@@ -12,4 +12,5 @@ public class StockTO {
     private Integer id;
     private String name;
     private Double priceChangeRatio;
+    private String tag;
 }
