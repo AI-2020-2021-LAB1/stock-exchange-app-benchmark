@@ -43,7 +43,7 @@ public class UserService extends BackendCoreService {
         return res.copy(LoginUserResponseTO::getAccessToken);
     }
 
-    public ResponseDataTO<RegisterUserTO> register(RegisterUserTO user) throws JsonProcessingException {
+    public ResponseDataTO<RegisterUserTO> register(RegisterUserTO user, String tag) throws JsonProcessingException {
         String jsonString = mapper.writeValueAsString(user);
 
         return manageInvocation(
@@ -54,7 +54,8 @@ public class UserService extends BackendCoreService {
                         .accept(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, fullAuth)
                         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                        .buildPost(Entity.json(jsonString))
+                        .buildPost(Entity.json(jsonString)),
+                tag
         );
     }
 }
