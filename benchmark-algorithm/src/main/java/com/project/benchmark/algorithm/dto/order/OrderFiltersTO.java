@@ -10,7 +10,7 @@ import java.util.Date;
 @Setter
 public class OrderFiltersTO {
     private String abbreviation;
-    private boolean active;
+    private Boolean active;
     private Long amount;
     @QueryString("amount<")
     private Long amountLess;
