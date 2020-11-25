@@ -10,20 +10,15 @@ import com.project.benchmark.algorithm.dto.base.PageParams;
 import com.project.benchmark.algorithm.dto.response.ErrorTO;
 import com.project.benchmark.algorithm.dto.response.ParametersTO;
 import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
-import com.project.benchmark.algorithm.dto.transaction.TransactionFiltersTO;
 import com.project.benchmark.algorithm.internal.ResponseTO;
 import com.project.benchmark.algorithm.utils.QueryString;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.util.HttpResponseCodes;
-import org.springframework.util.StringUtils;
 
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -33,12 +28,10 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public abstract class BackendCoreService {
@@ -216,8 +209,10 @@ public abstract class BackendCoreService {
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             try {
+                field.setAccessible(true);
                 if (field.getType().equals(PageParams.class)) {
                     convertPageParams(map, (PageParams) field.get(object));
+                    continue;
                 }
                 String name = field.getName();
                 var ann = field.getAnnotation(QueryString.class);
@@ -225,7 +220,9 @@ public abstract class BackendCoreService {
                     name = ann.value();
                 }
                 Object o = field.get(object);
-                map.add(name, o);
+                if(o != null) {
+                    map.add(name, o);
+                }
             } catch (IllegalAccessException ignored) {
             }
         }
@@ -233,12 +230,20 @@ public abstract class BackendCoreService {
     }
 
     private void convertPageParams(MultivaluedMap<String, Object> map, PageParams params) {
-        map.add("page", params.getPage());
-        map.add("size", params.getSize());
-        List<Object> sort = params.getSort().stream()
-                .map(s -> s.getName() + "," + (s.isAsc() ? "asc" : "desc"))
-                .collect(Collectors.toList());
-        map.put("sort", sort);
+        if(params != null) {
+            if(params.getPage() != null) {
+                map.add("page", params.getPage());
+            }
+            if(params.getSize() != null) {
+                map.add("size", params.getSize());
+            }
+            if(params.getSort() != null) {
+                List<Object> sort = params.getSort().stream()
+                        .map(s -> s.getName() + "," + (s.isAsc() ? "asc" : "desc"))
+                        .collect(Collectors.toList());
+                map.put("sort", sort);
+            }
+        }
     }
 
     /**
