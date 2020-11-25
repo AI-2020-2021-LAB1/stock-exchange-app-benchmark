@@ -8,14 +8,14 @@ import java.util.function.Function;
 
 @Getter
 @Setter
-public class ResponseTO<T> {
+public class ResponseDataTO<T> {
     private T data;
     private ErrorTO error;
     private boolean success;
     private ParametersTO params;
 
-    public <U> ResponseTO<U> copy(Function<T, U> mapper) {
-        ResponseTO<U> newRes = new ResponseTO<>();
+    public <U> ResponseDataTO<U> copy(Function<T, U> mapper) {
+        ResponseDataTO<U> newRes = new ResponseDataTO<>();
         newRes.setParams(params);
         newRes.setSuccess(success);
         newRes.setError(error);

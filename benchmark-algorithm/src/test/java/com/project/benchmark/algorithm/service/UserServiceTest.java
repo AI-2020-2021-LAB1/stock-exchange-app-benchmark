@@ -1,4 +1,4 @@
-package org.project.benchmark.algorithm.service;
+package com.project.benchmark.algorithm.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
@@ -6,6 +6,8 @@ import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
 import com.project.benchmark.algorithm.service.UserService;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.junit.Assert.*;
 
@@ -15,13 +17,12 @@ public class UserServiceTest {
 
     @BeforeClass
     public static void initialize() {
-        userService = new UserService();
+        userService = new UserService(new LinkedBlockingQueue<>());
     }
 
     @Test
-    public void loginTest() throws JsonProcessingException {
-        //LoginUserTO user = new LoginUserTO("MarcinNajman@gmail.pl", "MarcinNajman.gmail.pl1");
-        LoginUserTO user = new LoginUserTO("admin@admin.pl", "Admin!23");
+    public void loginTest() {
+        LoginUserTO user = new LoginUserTO("MarcinNajman@gmail.pl", "MarcinNajman.gmail.pl1");
         userService.login(user);
     }
 

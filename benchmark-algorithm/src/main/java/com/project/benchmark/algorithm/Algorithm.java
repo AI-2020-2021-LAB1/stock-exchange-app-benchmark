@@ -9,33 +9,31 @@ import java.util.concurrent.ThreadLocalRandom;
 import com.project.benchmark.algorithm.dto.base.PageParams;
 import com.project.benchmark.algorithm.dto.base.SortParams;
 import com.project.benchmark.algorithm.dto.response.ResponseTO;
-import com.project.benchmark.algorithm.dto.stock.*;
-import com.project.benchmark.algorithm.service.BackendCoreService;
+import com.project.benchmark.algorithm.dto.stock.StockTO;
 import com.project.benchmark.algorithm.service.StockService;
+import com.project.benchmark.algorithm.dto.stock.StockFiltersTO;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
 import com.project.benchmark.algorithm.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
-import com.project.benchmark.algorithm.service.admin.AdminStockService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-public class Algorithm extends  BackendCoreService {
+public class Algorithm {
 
     static int algPercentages[] = {33, 33, 24, 10, 30, 70, 30, 70, 15, 70, 15, 50, 50};
     static int numOfOperations = 20;
     static int moneyAmount = 1000;
     static boolean register = false;
-    static List<String> firstName;
-    static List<String> lastName;
-    static List<String> email;
-    static List<String> password;
-    AdminStockService stockService;
+    static String firstName;
+    static String lastName;
+    static String email;
+    static String password;
 
     private static String encodePassword(String password) { return new BCryptPasswordEncoder().encode(password); }
 
     public static void generateUserData (){
         String www="password";
-        password.add(encodePassword(www));
+        password = (String) encodePassword(www);
         int leftLimitUpp = 65; // letter 'A'
         int rightLimitUpp = 90; // letter 'Z'
         int leftLimitLow = 97; // letter 'a'
@@ -50,7 +48,7 @@ public class Algorithm extends  BackendCoreService {
             randomLimitedInt = leftLimitLow + (int) (new Random().nextFloat() * (rightLimitLow - leftLimitLow + 1));
             bufferFirstName.append((char) randomLimitedInt);
         }
-        firstName.add(bufferFirstName.toString());
+        firstName = bufferFirstName.toString();
 
         StringBuilder bufferSecondName = new StringBuilder(targetStringLength);
         randomLimitedInt = leftLimitUpp + (int) (new Random().nextFloat() * (rightLimitUpp - leftLimitUpp + 1));
@@ -59,13 +57,13 @@ public class Algorithm extends  BackendCoreService {
             randomLimitedInt = leftLimitLow + (int) (new Random().nextFloat() * (rightLimitLow - leftLimitLow + 1));
             bufferSecondName.append((char) randomLimitedInt);
         }
-        lastName.add(bufferSecondName.toString());
+        lastName = bufferSecondName.toString();
 
-        email.add("benchmark_" + firstName + "_" + lastName + "_" +"@gmail.com");
+        email = firstName + lastName + "@gmail.pl";
 
     }
 
-    private static void register(String email, String password, String firstName, String lastName) throws JsonProcessingException {
+    private static void register() throws JsonProcessingException {
         generateUserData();
         RegisterUserTO body = new RegisterUserTO();
         body.setEmail(email);
@@ -76,18 +74,10 @@ public class Algorithm extends  BackendCoreService {
         userService.register(body);
     }
 
-    private static String login(String email, String password) throws JsonProcessingException {
+    private static String login() throws JsonProcessingException {
         LoginUserTO user = new LoginUserTO();
         user.setUsername(email);
         user.setPassword(password);
-        UserService userService = new UserService();
-        return userService.login(user).getData();
-    }
-
-    private static String loginAdmin() throws JsonProcessingException {
-        LoginUserTO user = new LoginUserTO();
-        user.setUsername("admin");
-        user.setPassword("admin");
         UserService userService = new UserService();
         return userService.login(user).getData();
     }
@@ -100,37 +90,7 @@ public class Algorithm extends  BackendCoreService {
         return stockService.getStocks(filters, auth);
     }
 
-    public void createStock() throws JsonProcessingException {
-        String auth = loginAdmin();
-        //assertNotNull(auth);
-        NewStockTO stock = createRandomStock();
-        ResponseTO<Void> response = stockService.createStock(stock, auth);
-        //assertNull(response.getError());
-        //assertEquals(Integer.valueOf(200), response.getParams().getStatus());
-    }
-
-    private NewStockTO createRandomStock() {
-        NewStockTO newStock = new NewStockTO();
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < 3; i++) {
-            int x = 'A' + (int) (new Random().nextFloat() * ('Z' - 'A' + 1));
-            stringBuilder.append((char) x);
-        }
-        newStock.setAbbreviation(stringBuilder.toString());
-        newStock.setAmount(123);
-        newStock.setCurrentPrice(1.23);
-        newStock.setName("abcMyFunc");
-        newStock.setPriceChangeRatio(0.0);
-        StockOwnerTO owner = new StockOwnerTO();
-        owner.setAmount(123);
-        StockUserTO user = new StockUserTO();
-        user.setId(30); //change user id to correct one (between 2 and 30 should work)
-        owner.setUser(user);
-        newStock.setOwners(Collections.singletonList(owner));
-        return newStock;
-    }
-
-    private void AlgorithmMain() throws IOException { //przerobić na metodę
+    public static void main(String[] args) throws IOException {
 
         {//Coby nie przeliczać tego w "if" - możnaby do funkcji //odpowiada za obliczenie poszczególnych progów (1-33, 34-66 itd.)
             algPercentages[1] = algPercentages[0] + algPercentages[1];
@@ -145,13 +105,12 @@ public class Algorithm extends  BackendCoreService {
 
         //Wczytywanie danych z komunikatu.
 
-        for (int i=0; i<3; i ++){
-            generateUserData();
-            register(email.get(i), password.get(i), firstName.get(i), lastName.get(i));
-            System.out.println("Rejestracja" + i);   //Rejestracja
+        if (register == true) {
+            register();
+            System.out.println("Rejestracja");   //Rejestracja
         }
 
-        String authorization = login(email.get(0), password.get(0));
+        String authorization = login();
         System.out.println("Logowanie");   //Logowanie
 
         while (numOfOperations > 0) {
@@ -167,7 +126,7 @@ public class Algorithm extends  BackendCoreService {
                     else System.out.println("Zlecenie sprzedaży");   //Zlecenie sprzedaży
                     numOfOperations--;
                 }
-            } else if (randomNum <= algPercentages[1]) {
+            } else if (randomNum > algPercentages[0] && randomNum <= algPercentages[1]) {
                 System.out.println("Sprawdzenie listy posiadanych akcji");
                 //Sprawdzenie listy posiadanych akcji
                 numOfOperations--;
@@ -177,7 +136,7 @@ public class Algorithm extends  BackendCoreService {
                     else System.out.println("Zlecenie sprzedaży");   //Zlecenie sprzedaży
                     numOfOperations--;
                 }
-            } else if (randomNum <= algPercentages[2]) {
+            } else if (randomNum > algPercentages[1] && randomNum <= algPercentages[2]) {
                 System.out.println("Sprawdzenie listy aktualnych zleceń");
                 //Sprawdzenie listy aktualnych zleceń
                 numOfOperations--;
@@ -187,10 +146,10 @@ public class Algorithm extends  BackendCoreService {
                     else System.out.println("Zlecenie sprzedaży");   //Zlecenie sprzedaży
                     numOfOperations--;
                 } else if (randomNum > algPercentages[9]) {
-                    System.out.println("Usunięcie zlecenia");   //Usunięcie zlecenia //order/deactivation
+                    System.out.println("Usunięcie zlecenia");   //Usunięcie zlecenia
                     numOfOperations--;
                 }
-            } else {
+            } else if (randomNum > algPercentages[2]) {
                 randomNum = ThreadLocalRandom.current().nextInt(1, 101);
                 if (randomNum <= algPercentages[11]) System.out.println("Zlecenie kupna");   //Zlecenie kupna
                 else System.out.println("Zlecenie sprzedaży");   //Zlecenie sprzedaży
