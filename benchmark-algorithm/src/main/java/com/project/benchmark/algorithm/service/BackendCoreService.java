@@ -85,7 +85,7 @@ public abstract class BackendCoreService {
         Client client = ClientBuilder.newClient();
         ResteasyWebTarget target = (ResteasyWebTarget) client.target(url);
         if(tag != null) {
-            target.queryParam("tag", tag);
+            target = target.queryParam("tag", tag);
         }
         final Invocation inv = func.apply(target);
         Instant begin = Instant.now();
