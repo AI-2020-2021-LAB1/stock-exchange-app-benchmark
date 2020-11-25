@@ -40,6 +40,7 @@ public class OrderServiceTest extends TestCase {
         OrderFiltersTO filters = new OrderFiltersTO();
         SortParams sort = new SortParams("name", true);
         PageParams params = new PageParams(0, 20, Collections.singletonList(sort));
+        filters.setPageParams(params);
         return orderService.getOrders(filters);
     }
 
