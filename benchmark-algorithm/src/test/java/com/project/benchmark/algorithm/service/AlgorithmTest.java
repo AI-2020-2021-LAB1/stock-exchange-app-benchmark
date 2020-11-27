@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.benchmark.algorithm.dto.base.PageParams;
 import com.project.benchmark.algorithm.dto.base.SortParams;
 import com.project.benchmark.algorithm.dto.order.NewOrderTO;
+import com.project.benchmark.algorithm.dto.order.OrderFiltersTO;
+import com.project.benchmark.algorithm.dto.order.OrderTO;
 import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
 import com.project.benchmark.algorithm.dto.stock.*;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
@@ -34,7 +36,7 @@ public class AlgorithmTest {
     AdminStockService adminStockService;
     UserDetailsService userDetailsService;
     StockService stockService;
-    AdminOrderService orderService;
+    AdminOrderService adminOrderService;
 
     List<String> firstName = new ArrayList<>();
     List<String> lastName = new ArrayList<>();
@@ -42,6 +44,7 @@ public class AlgorithmTest {
     List<String> password = new ArrayList<>();
     List<UserDetailsTO> users = new ArrayList<>();
     List<StockTO> stocks = new ArrayList<>();
+    List<OrderTO> orders = new ArrayList<>();
     int stockAmount = 30;
     private static final LinkedBlockingQueue<ResponseTO> responseQueue = new LinkedBlockingQueue<>();
 
@@ -64,6 +67,7 @@ public class AlgorithmTest {
         assertNull(details.getError());
         assertNotNull(details.getData());
         users.add(details.getData());
+        printUsers();
     }
 
     @Test
@@ -223,7 +227,7 @@ public class AlgorithmTest {
             stocks.addAll(response.getData());
             i++;
         } while(true);
-        //stocks.forEach(p -> System.out.println(p.getName() + " " + p.getAmount() + " " + p.getId() + " " + p.getTag() + " " + p.getCurrentPrice() + " " + p.getPriceChangeRatio() + " " + p.getAbbreviation()));
+        stocks.forEach(p -> System.out.println(p.getName() + " " + p.getAmount() + " " + p.getId() + " " + p.getTag() + " " + p.getCurrentPrice() + " " + p.getPriceChangeRatio() + " " + p.getAbbreviation()));
     }
 
     @Test
@@ -266,9 +270,9 @@ public class AlgorithmTest {
         testGetUserDetails();
         String auth = login();
         NewOrderTO order = createExampleBuyingOrder();
-        orderService = new AdminOrderService(auth, responseQueue);
-        ResponseDataTO<Void> response = orderService.createOrder(order);
-        assertEquals(Integer.valueOf(200), response.getParams().getStatus());
+        adminOrderService = new AdminOrderService(auth, responseQueue);
+        ResponseDataTO<Void> response = adminOrderService.createOrder(order);
+        assertEquals(200, response.getParams().getStatus().intValue());
     }
 
     private NewOrderTO createExampleBuyingOrder() {
@@ -282,5 +286,48 @@ public class AlgorithmTest {
         newOrder.setPriceType("EQUAL");
         newOrder.setStock(stocks.get(0));
         return newOrder;
+    }
+
+    @Test
+    public void getOwnedStocks() throws JsonProcessingException {
+        StockFiltersTO filters = new StockFiltersTO();
+        SortParams sort = new SortParams("id", true);
+        testCreateStock();
+        userDetailsService = new UserDetailsService(login(), responseQueue);
+        int i = 0;
+        do {
+            PageParams params = new PageParams(i, 20, Collections.singletonList(sort));
+            filters.setPageParams(params);
+            var response = userDetailsService.getOwnedStocks(filters);
+            if (response.getData().size() == 0)
+                break;
+            i++;
+            stocks.addAll(response.getData());
+        } while(true);
+    }
+
+    @Test
+    public void getOwnedOrders() throws JsonProcessingException {
+        OrderFiltersTO filters = new OrderFiltersTO();
+        SortParams sort = new SortParams("id", true);
+        testCreateOrder();
+        userDetailsService = new UserDetailsService(login(), responseQueue);
+        int i = 0;
+        do {
+            PageParams params = new PageParams(i, 1000, Collections.singletonList(sort));
+            filters.setPageParams(params);
+            var response = userDetailsService.getOwnedOrders(filters);
+            if (response.getData().size() <1000)
+                break;
+            i++;
+            orders.addAll(response.getData());
+        } while(true);
+    }
+
+    @Test
+    public void testDeactivateOrder() throws JsonProcessingException {
+        ResponseDataTO<Void> response = adminOrderService.deactivateOrder(orders.get(0).getId());
+        assertNull(response.getError());
+        assertEquals(200, response.getParams().getStatus().intValue());
     }
 }

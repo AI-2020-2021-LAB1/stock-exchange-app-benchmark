@@ -26,8 +26,8 @@ public class AdminOrderServiceTest {
 
     private String login() {
         LoginUserTO user = new LoginUserTO();
-        user.setUsername("benchmark_Aswqhqdudrx_Yuilbfsgpqk@gmail.com");
-        user.setPassword("$2a$10$Bt1BJ8eMEmOAZL6lxew9beVB5Qq8qbHZZLWgH1hHpC7g0ZSyriOwC");
+        user.setUsername("admin@admin.pl");
+        user.setPassword("Admin!23");
         return userService.login(user).getData();
     }
 
@@ -61,8 +61,8 @@ public class AdminOrderServiceTest {
     }
 
     @Test
-    public void deactivateOrderTest() {
-        Integer orderId = 21;
+    public void deactivateOrderTest() throws JsonProcessingException {
+        Integer orderId = 10457;
         ResponseDataTO<Void> response = orderService.deactivateOrder(orderId);
         assertNull(response.getError());
         assertEquals(Integer.valueOf(200), response.getParams().getStatus());
