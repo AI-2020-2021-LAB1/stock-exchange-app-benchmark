@@ -164,7 +164,7 @@ public class Algorithm extends BackendCoreService {
 
     private void createStock(int iter) throws JsonProcessingException {
         String auth = loginAdmin();
-        adminStockService = new AdminStockService(auth, new LinkedBlockingQueue<>());
+        adminStockService = new AdminStockService(auth, responseQueue);
         NewStockTO stock = generateRandomStock(iter);
         var response = adminStockService.createStock(stock, "BENCHMARK");
     }
@@ -248,8 +248,11 @@ public class Algorithm extends BackendCoreService {
 
     private NewOrderTO createExampleOrder(int iter, String type) {
         NewOrderTO newOrder = new NewOrderTO();
-        newOrder.setAmount((long) new Random().nextInt(stockAmount));
-        newOrder.setRemainingAmount(newOrder.getAmount());
+        long amount = new Random().nextInt(userStocks.get(iter).getAmount().intValue());
+        if (amount == 0) amount = 1;
+        userStocks.get(iter).setAmount(userStocks.get(iter).getAmount() - amount);
+        newOrder.setAmount(amount);
+        newOrder.setRemainingAmount(amount);
         newOrder.setDateClosing(OffsetDateTime.now().plusDays(3));
         newOrder.setDateCreation(OffsetDateTime.now());
         newOrder.setDateExpiration(OffsetDateTime.now().plusDays(3));
@@ -261,8 +264,10 @@ public class Algorithm extends BackendCoreService {
     }
 
     private void deactivateOrder() throws JsonProcessingException {
-        int i = new Random().nextInt(userOrders.size());
-        adminOrderService.deactivateOrder(userOrders.get(i).getId());
+        if (userOrders.size() > 0) {
+            adminOrderService.deactivateOrder(userOrders.get(0).getId());
+            userOrders.remove(0);
+        }
     }
 
     public void removeTag() {
