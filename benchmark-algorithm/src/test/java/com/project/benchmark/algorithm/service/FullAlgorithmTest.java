@@ -285,6 +285,7 @@ public class FullAlgorithmTest extends BackendCoreService {
     private void deactivateOrder() throws JsonProcessingException {
         if (userOrders.size() > 0) {
             var response = adminOrderService.deactivateOrder(userOrders.get(0).getId());
+            userOrders.remove(0);
             assertNull(response.getError());
             assertEquals(200, response.getParams().getStatus().intValue());
         }
