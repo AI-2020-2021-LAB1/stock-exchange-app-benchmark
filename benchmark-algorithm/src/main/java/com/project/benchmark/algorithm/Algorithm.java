@@ -241,12 +241,12 @@ public class Algorithm extends BackendCoreService {
     }
 
     private void createOrder(int iter, String type) throws JsonProcessingException {
-        NewOrderTO order = createExampleBuyingOrder(iter, type);
+        NewOrderTO order = createExampleOrder(iter, type);
         adminOrderService = new AdminOrderService(authorization.get(iter), responseQueue);
         adminOrderService.createOrder(order);
     }
 
-    private NewOrderTO createExampleBuyingOrder(int iter, String type) {
+    private NewOrderTO createExampleOrder(int iter, String type) {
         NewOrderTO newOrder = new NewOrderTO();
         newOrder.setAmount((long) new Random().nextInt(stockAmount));
         newOrder.setRemainingAmount(newOrder.getAmount());
