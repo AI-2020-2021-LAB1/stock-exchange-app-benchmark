@@ -263,8 +263,9 @@ public class Algorithm extends BackendCoreService {
         return newOrder;
     }
 
-    private void deactivateOrder() throws JsonProcessingException {
+    private void deactivateOrder(int iter) throws JsonProcessingException {
         if (userOrders.size() > 0) {
+            adminOrderService = new AdminOrderService(authorization.get(iter), responseQueue);
             adminOrderService.deactivateOrder(userOrders.get(0).getId());
             userOrders.remove(0);
         }
@@ -344,7 +345,7 @@ public class Algorithm extends BackendCoreService {
                     numOfOperations--;
                 } else if (randomNum > algPercentages[9]) {
                     if (userOrders.size() > 0)
-                        deactivateOrder();
+                        deactivateOrder(iter);
                     numOfOperations--;
                 }
             } else {

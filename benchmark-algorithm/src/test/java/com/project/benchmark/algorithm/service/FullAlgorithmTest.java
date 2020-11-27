@@ -282,8 +282,9 @@ public class FullAlgorithmTest extends BackendCoreService {
         return newOrder;
     }
 
-    private void deactivateOrder() throws JsonProcessingException {
+    private void deactivateOrder(int iter) throws JsonProcessingException {
         if (userOrders.size() > 0) {
+            adminOrderService = new AdminOrderService(authorization.get(iter), responseQueue);
             var response = adminOrderService.deactivateOrder(userOrders.get(0).getId());
             userOrders.remove(0);
             assertNull(response.getError());
@@ -370,7 +371,7 @@ public class FullAlgorithmTest extends BackendCoreService {
                         createOrder(iter, "SELLING_ORDER");
                     numOfOperations--;
                 } else if (randomNum > algPercentages[9]) {
-                    deactivateOrder();
+                    deactivateOrder(iter);
                     numOfOperations--;
                 }
             } else {
