@@ -35,16 +35,17 @@ public class AdminOrderService extends BackendCoreService {
         );
     }
 
-    public ResponseDataTO<Void> deactivateOrder(Integer orderId) {
+    public ResponseDataTO<Void> deactivateOrder(Integer orderId) throws JsonProcessingException {
         String url = this.pathParam(ORDER_DEACTIVATE, "id", orderId.toString());
+        String json = mapper.writeValueAsString(orderId);
         return manageInvocation(
                 url,
-                HttpMethod.DELETE,
+                HttpMethod.POST,
                 Void.class,
                 target -> target.request()
                         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, fullAuth)//token
-                        .buildDelete()
+                        .buildPost(Entity.json(json))
         );
     }
 }
