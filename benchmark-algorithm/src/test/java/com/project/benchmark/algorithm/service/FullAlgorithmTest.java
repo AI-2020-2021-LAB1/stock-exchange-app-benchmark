@@ -1,4 +1,4 @@
-package com.project.benchmark.algorithm;
+package com.project.benchmark.algorithm.service;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -19,19 +19,18 @@ import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
 import com.project.benchmark.algorithm.dto.stock.*;
 import com.project.benchmark.algorithm.dto.user.UserDetailsTO;
 import com.project.benchmark.algorithm.internal.ResponseTO;
-import com.project.benchmark.algorithm.service.BackendCoreService;
-import com.project.benchmark.algorithm.service.StockService;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
-import com.project.benchmark.algorithm.service.UserDetailsService;
-import com.project.benchmark.algorithm.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
 import com.project.benchmark.algorithm.service.admin.AdminOrderService;
 import com.project.benchmark.algorithm.service.admin.AdminStockService;
 import com.project.benchmark.algorithm.service.admin.AdminTagService;
+import org.junit.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-public class Algorithm extends BackendCoreService {
+import static org.junit.Assert.*;
+
+public class FullAlgorithmTest extends BackendCoreService {
 
     int algPercentages[] = {33, 33, 24, 10, 30, 70, 30, 70, 15, 70, 15, 50, 50};
     int numOfOperations = 20;
@@ -55,8 +54,8 @@ public class Algorithm extends BackendCoreService {
 
     private static final LinkedBlockingQueue<ResponseTO> responseQueue = new LinkedBlockingQueue<>();
 
-    public Algorithm(LinkedBlockingQueue<ResponseTO> queue) {
-        super(queue);
+    public FullAlgorithmTest() {
+        super(responseQueue);
     }
 
     private String encodePassword(String password) {
@@ -110,9 +109,12 @@ public class Algorithm extends BackendCoreService {
     private void getUserDetails(String email, String password) {
         userService = new UserService(new LinkedBlockingQueue<>());
         String auth = login(email, password);
+        assertNotNull(auth);
         authorization.add(auth);
         userDetailsService = new UserDetailsService(auth, new LinkedBlockingQueue<>());
         ResponseDataTO<UserDetailsTO> details = userDetailsService.getUserDetails();
+        assertNull(details.getError());
+        assertNotNull(details.getData());
         users.add(details.getData());
     }
 
@@ -126,6 +128,7 @@ public class Algorithm extends BackendCoreService {
 
     private void getAllStocks() {
         String auth = loginAdmin();
+        assertNotNull(auth);
         StockFiltersTO filters = new StockFiltersTO();
         SortParams sort = new SortParams("name", true);
         int i = 0;
@@ -134,6 +137,8 @@ public class Algorithm extends BackendCoreService {
             filters.setPageParams(params);
             StockService stockService = new StockService(auth, responseQueue);
             var response = stockService.getStocks(filters);
+            assertNull(response.getError());
+            assertNotNull(response.getData());
             if (response.getData().size() < maxItemsPerPage)
                 break;
             i++;
@@ -142,6 +147,7 @@ public class Algorithm extends BackendCoreService {
 
     private void getStocksByTag() {
         String auth = loginAdmin();
+        assertNotNull(auth);
         StockFiltersTO filters = new StockFiltersTO();
         filters.setTag("BENCHMARK");
         SortParams sort = new SortParams("name", true);
@@ -151,6 +157,8 @@ public class Algorithm extends BackendCoreService {
             filters.setPageParams(params);
             StockService stockService = new StockService(auth, responseQueue);
             var response = stockService.getStocks(filters);
+            assertNull(response.getError());
+            assertNotNull(response.getData());
             if (response.getData().size() == 0)
                 break;
             else {
@@ -164,9 +172,11 @@ public class Algorithm extends BackendCoreService {
 
     private void createStock(int iter) throws JsonProcessingException {
         String auth = loginAdmin();
-        adminStockService = new AdminStockService(auth, responseQueue);
+        assertNotNull(auth);
+        adminStockService = new AdminStockService(auth, new LinkedBlockingQueue<>());
         NewStockTO stock = generateRandomStock(iter);
         var response = adminStockService.createStock(stock, "BENCHMARK");
+        assertNull(response.getError());
     }
 
     private void getOwnedStocks(int iter) {
@@ -178,6 +188,8 @@ public class Algorithm extends BackendCoreService {
             PageParams params = new PageParams(i, maxItemsPerPage, Collections.singletonList(sort));
             filters.setPageParams(params);
             var response = userDetailsService.getOwnedStocks(filters);
+            assertNull(response.getError());
+            assertNotNull(response.getData());
             if (response.getData().size() == 0)
                 break;
             else {
@@ -198,6 +210,8 @@ public class Algorithm extends BackendCoreService {
             PageParams params = new PageParams(i, maxItemsPerPage, Collections.singletonList(sort));
             filters.setPageParams(params);
             var response = userDetailsService.getOwnedOrders(filters);
+            assertNull(response.getError());
+            assertNotNull(response.getData());
             if (response.getData().size() == 0)
                 break;
             else {
@@ -241,15 +255,20 @@ public class Algorithm extends BackendCoreService {
     }
 
     private void createOrder(int iter, String type) throws JsonProcessingException {
-        NewOrderTO order = createExampleOrder(iter, type);
+        NewOrderTO order = createExampleBuyingOrder(iter, type);
         adminOrderService = new AdminOrderService(authorization.get(iter), responseQueue);
-        adminOrderService.createOrder(order);
+        var response = adminOrderService.createOrder(order);
+        if (response.getError() != null)
+            System.out.println(response.getError().getStatus() + " " + response.getError().getMessage());
+        assertEquals(200, response.getParams().getStatus().intValue());
     }
 
-    private NewOrderTO createExampleOrder(int iter, String type) {
+    private NewOrderTO createExampleBuyingOrder(int iter, String type) {
         NewOrderTO newOrder = new NewOrderTO();
         long amount = new Random().nextInt(userStocks.get(iter).getAmount().intValue());
         if (amount == 0) amount = 1;
+        System.out.println(type);
+        System.out.println(userStocks.get(iter).getAmount());
         userStocks.get(iter).setAmount(userStocks.get(iter).getAmount() - amount);
         newOrder.setAmount(amount);
         newOrder.setRemainingAmount(amount);
@@ -266,24 +285,30 @@ public class Algorithm extends BackendCoreService {
     private void deactivateOrder(int iter) throws JsonProcessingException {
         if (userOrders.size() > 0) {
             adminOrderService = new AdminOrderService(authorization.get(iter), responseQueue);
-            adminOrderService.deactivateOrder(userOrders.get(0).getId());
+            var response = adminOrderService.deactivateOrder(userOrders.get(0).getId());
             userOrders.remove(0);
+            assertNull(response.getError());
+            assertEquals(200, response.getParams().getStatus().intValue());
         }
     }
 
-    private void removeTag() {
+    public void removeTag() {
         String auth = loginAdmin();
+        assertNotNull(auth);
         String tag = "BENCHMARK";
         AdminTagService adminTagService = new AdminTagService(auth, responseQueue);
-        adminTagService.removeTag(tag);
+        var response = adminTagService.removeTag(tag);
+        assertNull(response.getError());
+        assertEquals(200, response.getParams().getStatus().intValue());
     }
 
-    public void AlgorithmMain() throws IOException {
+    @Test
+    public void testAlgorithmMain() throws IOException {
 
         removeTag();
         int iter = 0; // do wykorzystania w przypadku wielowątkowości
 
-        // Wczytywanie danych z komunikatu
+        // Wczytanie danych z komunikatu
         // Przypisanie danych do algPercentages, numOfOperations
 
         algPercentages[1] = algPercentages[0] + algPercentages[1];
@@ -299,9 +324,11 @@ public class Algorithm extends BackendCoreService {
             generateUserData();
             register(i);
             getUserDetails(email.get(i), password.get(i));
-            createStock(i);
         }
 
+        for (int i = 0; i < 3; i++) {
+            createStock(i);
+        }
         getStocksByTag();
         getOwnedOrders(iter);
         getOwnedStocks(iter);
@@ -344,8 +371,7 @@ public class Algorithm extends BackendCoreService {
                         createOrder(iter, "SELLING_ORDER");
                     numOfOperations--;
                 } else if (randomNum > algPercentages[9]) {
-                    if (userOrders.size() > 0)
-                        deactivateOrder(iter);
+                    deactivateOrder(iter);
                     numOfOperations--;
                 }
             } else {

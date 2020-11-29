@@ -19,15 +19,15 @@ public class AdminOrderServiceTest {
     UserService userService;
 
     @Before
-    public void setUp() throws JsonProcessingException {
+    public void setUp() {
         userService = new UserService(new LinkedBlockingQueue<>());
         orderService = new AdminOrderService(login(), new LinkedBlockingQueue<>());
     }
 
     private String login() {
         LoginUserTO user = new LoginUserTO();
-        user.setUsername("MarcinNajman@gmail.pl");
-        user.setPassword("MarcinNajman.gmail.pl1");
+        user.setUsername("admin@admin.pl");
+        user.setPassword("Admin!23");
         return userService.login(user).getData();
     }
 
@@ -35,30 +35,34 @@ public class AdminOrderServiceTest {
     public void createOrder() throws JsonProcessingException {
         NewOrderTO order = createExampleOrder();
         ResponseDataTO<Void> response = orderService.createOrder(order);
-        assertNull(response.getError());
         assertEquals(Integer.valueOf(200), response.getParams().getStatus());
     }
 
     private NewOrderTO createExampleOrder(){
         NewOrderTO newOrder = new NewOrderTO();
-        newOrder.setAmount((long) 123);
-        newOrder.setDateClosing(OffsetDateTime.now());
+        newOrder.setAmount((long) 10);
+        newOrder.setDateClosing(null);
         newOrder.setDateCreation(OffsetDateTime.now());
-        newOrder.setDateExpiration(OffsetDateTime.now());
-        newOrder.setId(5);
+        newOrder.setDateExpiration(OffsetDateTime.now().plusDays(3));
         newOrder.setOrderType("BUYING_ORDER");
-        newOrder.setPrice(100.0);
+        newOrder.setPrice(1.0);
         newOrder.setPriceType("EQUAL");
-        newOrder.setRemainingAmount((long)23);
+        newOrder.setRemainingAmount((long)10);
         StockTO stockTO = new StockTO();
-        stockTO.setAmount((long)100);
+        stockTO.setId(63); //istniejący stock
+        stockTO.setPriceChangeRatio(0.0);
+        stockTO.setName("benchmark_JwO");
+        stockTO.setAmount((long)10);
+        stockTO.setCurrentPrice(5.05);
+        stockTO.setAbbreviation("JwO");
+        stockTO.setTag("BENCHMARK");
         newOrder.setStock(stockTO);
         return newOrder;
     }
 
     @Test
-    public void deactivateOrderTest() {
-        Integer orderId = 40;
+    public void deactivateOrderTest() throws JsonProcessingException {
+        Integer orderId = 10457;
         ResponseDataTO<Void> response = orderService.deactivateOrder(orderId);
         assertNull(response.getError());
         assertEquals(Integer.valueOf(200), response.getParams().getStatus());

@@ -34,7 +34,7 @@ public class UserServiceTest {
             body.setPassword("MarcinNajman.gmail.pl1");
             body.setFirstName("Marcinek");
             body.setLastName("Najmanek");
-            userService.register(body, null);
+            userService.register(body, "BENCHMARK");
         } catch (JsonProcessingException e) {
             fail("Test failed");
         }

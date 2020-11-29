@@ -25,4 +25,5 @@ public class StockFiltersTO {
     @QueryString("priceChangeRatio>")
     private Double priceChangeRatioMore;
     private PageParams pageParams;
+    private String tag;
 }
