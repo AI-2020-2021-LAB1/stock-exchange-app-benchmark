@@ -271,7 +271,7 @@ public class Algorithm extends BackendCoreService {
         }
     }
 
-    public void removeTag() {
+    private void removeTag() {
         String auth = loginAdmin();
         String tag = "BENCHMARK";
         AdminTagService adminTagService = new AdminTagService(auth, responseQueue);
