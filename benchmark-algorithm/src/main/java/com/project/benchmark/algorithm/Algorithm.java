@@ -278,7 +278,7 @@ public class Algorithm extends BackendCoreService {
         adminTagService.removeTag(tag);
     }
 
-    private void AlgorithmMain() throws IOException {
+    public void AlgorithmMain() throws IOException {
 
         removeTag();
         int iter = 0; // do wykorzystania w przypadku wielowątkowości
