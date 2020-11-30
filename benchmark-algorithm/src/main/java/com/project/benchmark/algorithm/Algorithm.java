@@ -19,7 +19,6 @@ import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
 import com.project.benchmark.algorithm.dto.stock.*;
 import com.project.benchmark.algorithm.dto.user.UserDetailsTO;
 import com.project.benchmark.algorithm.internal.ResponseTO;
-import com.project.benchmark.algorithm.service.BackendCoreService;
 import com.project.benchmark.algorithm.service.StockService;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
 import com.project.benchmark.algorithm.service.UserDetailsService;
@@ -31,7 +30,7 @@ import com.project.benchmark.algorithm.service.admin.AdminStockService;
 import com.project.benchmark.algorithm.service.admin.AdminTagService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-public class Algorithm extends BackendCoreService {
+public class Algorithm {
 
     int algPercentages[] = {33, 33, 24, 10, 30, 70, 30, 70, 15, 70, 15, 50, 50};
     int numOfOperations = 20;
@@ -53,10 +52,10 @@ public class Algorithm extends BackendCoreService {
     UserService userService;
     UserDetailsService userDetailsService;
 
-    private static final LinkedBlockingQueue<ResponseTO> responseQueue = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<ResponseTO> responseQueue;
 
     public Algorithm(LinkedBlockingQueue<ResponseTO> queue) {
-        super(queue);
+        responseQueue = queue;
     }
 
     private String encodePassword(String password) {

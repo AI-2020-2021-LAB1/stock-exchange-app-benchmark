@@ -3,9 +3,7 @@ package com.project.benchmark.algorithm;
 import com.project.benchmark.algorithm.internal.BenchmarkConfiguration;
 import com.project.benchmark.algorithm.internal.ResponseTO;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -22,14 +20,16 @@ public class BenchmarkLauncher {
     /**
      * runner for async tasks
      */
-    private final ThreadPoolExecutor executor;
+    private final ThreadPoolExecutor backendExecutor;
+    private ExecutorService userExecutor;
     private final Lock lock;
     private boolean started = false;
 
     public BenchmarkLauncher(BenchmarkConfiguration conf) {
         this.conf = conf;
         lock = new ReentrantLock();
-        executor = new ThreadPoolExecutor(4, 16, 2, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
+        userExecutor = Executors.newFixedThreadPool(8);
+        backendExecutor = new ThreadPoolExecutor(8, 64, 2, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
     }
 
     /**
