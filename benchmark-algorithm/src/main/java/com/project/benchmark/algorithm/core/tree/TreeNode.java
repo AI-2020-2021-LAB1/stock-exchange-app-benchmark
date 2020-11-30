@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 public abstract class TreeNode<T> {
 
     @Builder.Default
-    protected final Consumer<T> consumer = (ui) -> {};
+    protected Consumer<T> consumer = (ui) -> {};
     protected final ProbabilityTree<T> tree;
 
     void execute(T obj) {

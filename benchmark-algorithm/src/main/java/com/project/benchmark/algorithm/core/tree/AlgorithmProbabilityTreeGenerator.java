@@ -17,28 +17,29 @@ public class AlgorithmProbabilityTreeGenerator {
 
         var logoutNode = StopNode.<UserIdentity>builder()
                 .tree(tree)
-                .consumer(this::logout)
+                .consumer(AlgorithmLogic::logout)
                 .build();
 
-        var limitNotReachedNode = ProbabilityNode.<UserIdentity>builder()
+        var afterLoginNode = ProbabilityNode.<UserIdentity>builder()
                 .tree(tree)
+                .consumer(AlgorithmLogic::loadUserDetails)
                 .build();
 
         var limitReachedCheckNode = ConditionNode.<UserIdentity>builder()
-                .predicate(this::limitReached)
+                .predicate(AlgorithmLogic::limitReached)
                 .onTrue(logoutNode)
-                .onFalse(limitNotReachedNode)
+                .onFalse(afterLoginNode)
                 .build();
 
         var sellOrderNode = LinearNode.<UserIdentity>builder()
                 .tree(tree)
-                .consumer(this::createSellOrder)
+                .consumer(AlgorithmLogic::createSellOrder)
                 .nextNode(limitReachedCheckNode)
                 .build();
 
         var buyOrderNode = LinearNode.<UserIdentity>builder()
                 .tree(tree)
-                .consumer(this::createBuyOrder)
+                .consumer(AlgorithmLogic::createBuyOrder)
                 .nextNode(limitReachedCheckNode)
                 .build();
 
@@ -50,83 +51,45 @@ public class AlgorithmProbabilityTreeGenerator {
 
         var removeOrderNode = LinearNode.<UserIdentity>builder()
                 .tree(tree)
-                .consumer(this::removeOrder)
+                .consumer(AlgorithmLogic::removeOrder)
                 .nextNode(limitReachedCheckNode)
                 .build();
 
         var allStocksNode = ProbabilityNode.<UserIdentity>builder()
-                .consumer(this::getAllStocks)
+                .consumer(AlgorithmLogic::getAllStocks)
                 .tree(tree)
                 .child(new Pair<>(params.getAllStocksMakeOrder(), createOrderNode))
                 .child(new Pair<>(params.getAllStocksEnd(), limitReachedCheckNode))
                 .build();
 
         var ownedStocksNode = ProbabilityNode.<UserIdentity>builder()
-                .consumer(this::getOwnedStocks)
+                .consumer(AlgorithmLogic::getOwnedStocks)
                 .tree(tree)
                 .child(new Pair<>(params.getOwnedStocksMakeOrder(), createOrderNode))
                 .child(new Pair<>(params.getOwnedStocksEnd(), limitReachedCheckNode))
                 .build();
 
         var ownedOrdersNode = ProbabilityNode.<UserIdentity>builder()
-                .consumer(this::getOwnedOrders)
+                .consumer(AlgorithmLogic::getOwnedOrders)
                 .tree(tree)
                 .child(new Pair<>(params.getUserOrdersMakeOrder(), createOrderNode))
                 .child(new Pair<>(params.getUserOrdersEnd(), limitReachedCheckNode))
                 .child(new Pair<>(params.getUserOrderDeleteOrder(), removeOrderNode))
                 .build();
 
-        var loginNode = ProbabilityNode.<UserIdentity>builder()
-                .consumer(this::login)
+        var loginNode = LinearNode.<UserIdentity>builder()
+                .consumer(AlgorithmLogic::login)
                 .tree(tree)
-                .child(new Pair<>(params.getLoginAllStocks(), allStocksNode))
-                .child(new Pair<>(params.getLoginOwnedStocks(), ownedStocksNode))
-                .child(new Pair<>(params.getLoginUserOrders(), ownedOrdersNode))
-                .child(new Pair<>(params.getLoginMakeOrder(), createOrderNode))
+                .nextNode(afterLoginNode)
                 .build();
 
-        limitNotReachedNode.getChildren().addAll(loginNode.getChildren());
-
+        afterLoginNode.getChildren().add(new Pair<>(params.getLoginAllStocks(), allStocksNode));
+        afterLoginNode.getChildren().add(new Pair<>(params.getLoginOwnedStocks(), ownedStocksNode));
+        afterLoginNode.getChildren().add(new Pair<>(params.getLoginUserOrders(), ownedOrdersNode));
+        afterLoginNode.getChildren().add(new Pair<>(params.getLoginMakeOrder(), createOrderNode));
         tree.root = loginNode;
 
         return tree;
-    }
-
-    private void getOwnedOrders(UserIdentity identity) {
-        //TODO: functionality
-    }
-
-    private void getOwnedStocks(UserIdentity identity) {
-        //TODO: functionality
-    }
-
-    private void removeOrder(UserIdentity identity) {
-        //TODO: functionality
-    }
-
-    private void createBuyOrder(UserIdentity identity) {
-        //TODO: functionality
-    }
-
-    private void createSellOrder(UserIdentity identity) {
-        //TODO: functionality
-    }
-
-    private void login(UserIdentity identity) {
-        identity.authenticate();
-    }
-
-    private void getAllStocks(UserIdentity identity) {
-        //TODO: functionality
-    }
-
-    private void logout(UserIdentity identity) {
-        identity.logout();
-    }
-
-    private boolean limitReached(UserIdentity identity) {
-        //TODO: functionality
-        return true;
     }
 
     private BenchmarkProbabilityTreeParams generateInternalConfiguration(BenchmarkConfiguration conf) {

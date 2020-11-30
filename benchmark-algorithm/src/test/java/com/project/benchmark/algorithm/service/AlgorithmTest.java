@@ -12,7 +12,6 @@ import com.project.benchmark.algorithm.dto.user.LoginUserTO;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
 import com.project.benchmark.algorithm.dto.user.UserDetailsTO;
 import com.project.benchmark.algorithm.internal.ResponseTO;
-import com.project.benchmark.algorithm.service.admin.AdminOrderService;
 import com.project.benchmark.algorithm.service.admin.AdminStockService;
 import com.project.benchmark.algorithm.service.admin.AdminTagService;
 import org.junit.BeforeClass;
@@ -36,7 +35,7 @@ public class AlgorithmTest {
     AdminStockService adminStockService;
     UserDetailsService userDetailsService;
     StockService stockService;
-    AdminOrderService adminOrderService;
+    OrderService adminOrderService;
 
     List<String> firstName = new ArrayList<>();
     List<String> lastName = new ArrayList<>();
@@ -270,7 +269,7 @@ public class AlgorithmTest {
         testGetUserDetails();
         String auth = login();
         NewOrderTO order = createExampleBuyingOrder();
-        adminOrderService = new AdminOrderService(auth, responseQueue);
+        adminOrderService = new OrderService(auth, responseQueue);
         ResponseDataTO<Void> response = adminOrderService.createOrder(order);
         assertEquals(200, response.getParams().getStatus().intValue());
     }
