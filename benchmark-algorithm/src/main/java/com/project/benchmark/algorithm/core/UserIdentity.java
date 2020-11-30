@@ -15,15 +15,23 @@ public class UserIdentity {
     private final String password;
     private final LinkedBlockingQueue<ResponseTO> queue;
     private final UserService userService;
+    private Double money;
+    private final int initialOperations;
+    private int operations;
+    private final UserCache userCache;
+    private final String tag;
 
     private String authenticationToken;
     private UserServiceContainer serviceContainer;
 
-    public UserIdentity(String email, LinkedBlockingQueue<ResponseTO> queue) {
+    public UserIdentity(String email, LinkedBlockingQueue<ResponseTO> queue, int initialOperations, String tag) {
         this.email = email;
         this.queue = queue;
+        this.initialOperations = initialOperations;
+        this.tag = tag;
         this.password = GLOBAL_PASSWORD;
         userService = new UserService(queue);
+        userCache = new UserCache();
     }
 
     public void authenticate() {
@@ -35,6 +43,7 @@ public class UserIdentity {
             authenticationToken = token;
             serviceContainer = new UserServiceContainer(authenticationToken, queue);
         }
+        operations = initialOperations;
     }
 
     public void logout() {
@@ -43,6 +52,27 @@ public class UserIdentity {
     }
 
     public UserServiceContainer getServiceContainer() {
+        operations--;
         return serviceContainer;
+    }
+
+    public Double getMoney() {
+        return money;
+    }
+
+    public void setMoney(Double money) {
+        this.money = money;
+    }
+
+    public int getOperations() {
+        return operations;
+    }
+
+    public UserCache getUserCache() {
+        return userCache;
+    }
+
+    public String getTag() {
+        return tag;
     }
 }

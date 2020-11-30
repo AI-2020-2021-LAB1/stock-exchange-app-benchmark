@@ -19,13 +19,13 @@ import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
 import com.project.benchmark.algorithm.dto.stock.*;
 import com.project.benchmark.algorithm.dto.user.UserDetailsTO;
 import com.project.benchmark.algorithm.internal.ResponseTO;
+import com.project.benchmark.algorithm.service.OrderService;
 import com.project.benchmark.algorithm.service.StockService;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
 import com.project.benchmark.algorithm.service.UserDetailsService;
 import com.project.benchmark.algorithm.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
-import com.project.benchmark.algorithm.service.admin.AdminOrderService;
 import com.project.benchmark.algorithm.service.admin.AdminStockService;
 import com.project.benchmark.algorithm.service.admin.AdminTagService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -48,7 +48,7 @@ public class Algorithm {
     List<OrderTO> userOrders = new ArrayList<>();
     List<StockTO> userStocks = new ArrayList<>();
     AdminStockService adminStockService;
-    AdminOrderService adminOrderService;
+    OrderService orderService;
     UserService userService;
     UserDetailsService userDetailsService;
 
@@ -241,8 +241,8 @@ public class Algorithm {
 
     private void createOrder(int iter, String type) throws JsonProcessingException {
         NewOrderTO order = createExampleOrder(iter, type);
-        adminOrderService = new AdminOrderService(authorization.get(iter), responseQueue);
-        adminOrderService.createOrder(order);
+        orderService = new OrderService(authorization.get(iter), responseQueue);
+        orderService.createOrder(order);
     }
 
     private NewOrderTO createExampleOrder(int iter, String type) {
@@ -264,8 +264,8 @@ public class Algorithm {
 
     private void deactivateOrder(int iter) throws JsonProcessingException {
         if (userOrders.size() > 0) {
-            adminOrderService = new AdminOrderService(authorization.get(iter), responseQueue);
-            adminOrderService.deactivateOrder(userOrders.get(0).getId());
+            orderService = new OrderService(authorization.get(iter), responseQueue);
+            orderService.deactivateOrder(userOrders.get(0).getId());
             userOrders.remove(0);
         }
     }

@@ -22,7 +22,6 @@ import com.project.benchmark.algorithm.internal.ResponseTO;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
-import com.project.benchmark.algorithm.service.admin.AdminOrderService;
 import com.project.benchmark.algorithm.service.admin.AdminStockService;
 import com.project.benchmark.algorithm.service.admin.AdminTagService;
 import org.junit.Test;
@@ -48,7 +47,7 @@ public class FullAlgorithmTest extends BackendCoreService {
     List<OrderTO> userOrders = new ArrayList<>();
     List<StockTO> userStocks = new ArrayList<>();
     AdminStockService adminStockService;
-    AdminOrderService adminOrderService;
+    OrderService adminOrderService;
     UserService userService;
     UserDetailsService userDetailsService;
 
@@ -256,7 +255,7 @@ public class FullAlgorithmTest extends BackendCoreService {
 
     private void createOrder(int iter, String type) throws JsonProcessingException {
         NewOrderTO order = createExampleBuyingOrder(iter, type);
-        adminOrderService = new AdminOrderService(authorization.get(iter), responseQueue);
+        adminOrderService = new OrderService(authorization.get(iter), responseQueue);
         var response = adminOrderService.createOrder(order);
         if (response.getError() != null)
             System.out.println(response.getError().getStatus() + " " + response.getError().getMessage());
@@ -284,7 +283,7 @@ public class FullAlgorithmTest extends BackendCoreService {
 
     private void deactivateOrder(int iter) throws JsonProcessingException {
         if (userOrders.size() > 0) {
-            adminOrderService = new AdminOrderService(authorization.get(iter), responseQueue);
+            adminOrderService = new OrderService(authorization.get(iter), responseQueue);
             var response = adminOrderService.deactivateOrder(userOrders.get(0).getId());
             userOrders.remove(0);
             assertNull(response.getError());
