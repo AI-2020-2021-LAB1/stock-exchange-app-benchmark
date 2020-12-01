@@ -9,7 +9,7 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.function.Consumer;
 
-class ProbabilityNode<T> extends TreeNode<T>{
+class ProbabilityNode<T> extends TreeNode<T> {
     @Getter
     protected final List<Pair<Integer, TreeNode<T>>> children;
 
@@ -21,9 +21,9 @@ class ProbabilityNode<T> extends TreeNode<T>{
 
     private TreeNode<T> randomChild(SecureRandom random) {
         int value = random.nextInt(100) + 1;
-        for(var pair: children) {
+        for (var pair : children) {
             value -= pair.getFirst();
-            if(value <= 0) {
+            if (value <= 0) {
                 return pair.getLast();
             }
         }
@@ -31,10 +31,7 @@ class ProbabilityNode<T> extends TreeNode<T>{
     }
 
     @Override
-    protected void postExecute(T obj) {
-        if(!children.isEmpty() && !tree.algorithmState.stopSignal.get()) {
-            TreeNode<T> child = randomChild(tree.random);
-            child.execute(obj);
-        }
+    protected TreeNode<T> nextNode(T obj) {
+        return randomChild(tree.random);
     }
 }

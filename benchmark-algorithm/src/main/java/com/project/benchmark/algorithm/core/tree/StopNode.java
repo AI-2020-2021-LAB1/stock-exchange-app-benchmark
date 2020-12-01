@@ -11,7 +11,7 @@ class StopNode<T> extends TreeNode<T> {
     }
 
     @Override
-    protected void postExecute(T obj) {
-        //Empty, no task to do
+    protected TreeNode<T> nextNode(T obj) {
+        return null;
     }
 }

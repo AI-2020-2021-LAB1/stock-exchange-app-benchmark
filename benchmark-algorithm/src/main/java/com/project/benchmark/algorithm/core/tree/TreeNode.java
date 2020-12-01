@@ -12,9 +12,9 @@ public abstract class TreeNode<T> {
     protected Consumer<T> consumer = (ui) -> {};
     protected final ProbabilityTree<T> tree;
 
-    void execute(T obj) {
+    TreeNode<T> execute(T obj) {
         consumer.accept(obj);
-        postExecute(obj);
+        return nextNode(obj);
     }
-    protected abstract void postExecute(T obj);
+    protected abstract TreeNode<T> nextNode(T obj);
 }

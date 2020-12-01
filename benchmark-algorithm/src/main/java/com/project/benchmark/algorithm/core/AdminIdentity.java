@@ -16,6 +16,7 @@ public class AdminIdentity {
     private final LinkedBlockingQueue<ResponseTO> queue;
     private String authenticationToken;
 
+    private UserService userService;
     @Getter
     private AdminStockService stockService;
     @Getter
@@ -23,17 +24,22 @@ public class AdminIdentity {
 
     public AdminIdentity(LinkedBlockingQueue<ResponseTO> queue) {
         this.queue = queue;
+        userService = new UserService(queue);
     }
 
-    public void authenticate(UserService service) {
+    public void authenticate() {
         LoginUserTO user = new LoginUserTO();
         user.setUsername(email);
         user.setPassword(password);
-        String token = service.login(user).getData();
+        String token = userService.login(user).getData();
         authenticationToken = token;
         if (token != null) {
             stockService = new AdminStockService(authenticationToken, queue);
             tagService = new AdminTagService(authenticationToken, queue);
         }
+    }
+
+    public boolean isAuthenticated() {
+        return authenticationToken != null;
     }
 }
