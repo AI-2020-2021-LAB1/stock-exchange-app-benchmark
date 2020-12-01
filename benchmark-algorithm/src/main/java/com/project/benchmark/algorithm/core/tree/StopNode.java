@@ -6,8 +6,8 @@ import java.util.function.Consumer;
 
 class StopNode<T> extends TreeNode<T> {
     @Builder
-    protected StopNode(Consumer<T> consumer, ProbabilityTree<T> tree) {
-        super(consumer, tree);
+    protected StopNode(Consumer<T> consumer) {
+        super(consumer);
     }
 
     @Override

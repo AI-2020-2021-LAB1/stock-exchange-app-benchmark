@@ -6,17 +6,20 @@ import lombok.Getter;
 import lombok.Singular;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 class ProbabilityNode<T> extends TreeNode<T> {
     @Getter
     protected final List<Pair<Integer, TreeNode<T>>> children;
+    private final SecureRandom random;
 
     @Builder
-    protected ProbabilityNode(Consumer<T> consumer, ProbabilityTree<T> tree, @Singular List<Pair<Integer, TreeNode<T>>> children) {
-        super(consumer, tree);
-        this.children = children;
+    protected ProbabilityNode(Consumer<T> consumer, @Singular List<Pair<Integer, TreeNode<T>>> children) {
+        super(consumer);
+        this.children = new ArrayList<>(children);
+        random = new SecureRandom();
     }
 
     private TreeNode<T> randomChild(SecureRandom random) {
@@ -32,6 +35,6 @@ class ProbabilityNode<T> extends TreeNode<T> {
 
     @Override
     protected TreeNode<T> nextNode(T obj) {
-        return randomChild(tree.random);
+        return randomChild(random);
     }
 }

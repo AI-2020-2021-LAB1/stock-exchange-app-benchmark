@@ -15,12 +15,10 @@ public class AlgorithmProbabilityTreeGenerator {
         ProbabilityTree<UserIdentity> tree = new ProbabilityTree<>();
 
         var logoutNode = StopNode.<UserIdentity>builder()
-                .tree(tree)
                 .consumer(AlgorithmLogic::logout)
                 .build();
 
         var afterLoginNode = ProbabilityNode.<UserIdentity>builder()
-                .tree(tree)
                 .build();
 
         var limitReachedCheckNode = ConditionNode.<UserIdentity>builder()
@@ -30,46 +28,39 @@ public class AlgorithmProbabilityTreeGenerator {
                 .build();
 
         var sellOrderNode = LinearNode.<UserIdentity>builder()
-                .tree(tree)
                 .consumer(AlgorithmLogic::createSellOrder)
                 .nextNode(limitReachedCheckNode)
                 .build();
 
         var buyOrderNode = LinearNode.<UserIdentity>builder()
-                .tree(tree)
                 .consumer(AlgorithmLogic::createBuyOrder)
                 .nextNode(limitReachedCheckNode)
                 .build();
 
         var createOrderNode = ProbabilityNode.<UserIdentity>builder()
-                .tree(tree)
                 .child(new Pair<>(params.getMakeOrderBuyOrder(), buyOrderNode))
                 .child(new Pair<>(params.getMakeOrderSellOrder(), sellOrderNode))
                 .build();
 
         var removeOrderNode = LinearNode.<UserIdentity>builder()
-                .tree(tree)
                 .consumer(AlgorithmLogic::removeOrder)
                 .nextNode(limitReachedCheckNode)
                 .build();
 
         var allStocksNode = ProbabilityNode.<UserIdentity>builder()
                 .consumer(AlgorithmLogic::getAllStocks)
-                .tree(tree)
                 .child(new Pair<>(params.getAllStocksMakeOrder(), createOrderNode))
                 .child(new Pair<>(params.getAllStocksEnd(), limitReachedCheckNode))
                 .build();
 
         var ownedStocksNode = ProbabilityNode.<UserIdentity>builder()
                 .consumer(AlgorithmLogic::getOwnedStocks)
-                .tree(tree)
                 .child(new Pair<>(params.getOwnedStocksMakeOrder(), createOrderNode))
                 .child(new Pair<>(params.getOwnedStocksEnd(), limitReachedCheckNode))
                 .build();
 
         var ownedOrdersNode = ProbabilityNode.<UserIdentity>builder()
                 .consumer(AlgorithmLogic::getOwnedOrders)
-                .tree(tree)
                 .child(new Pair<>(params.getUserOrdersMakeOrder(), createOrderNode))
                 .child(new Pair<>(params.getUserOrdersEnd(), limitReachedCheckNode))
                 .child(new Pair<>(params.getUserOrderDeleteOrder(), removeOrderNode))
@@ -77,7 +68,6 @@ public class AlgorithmProbabilityTreeGenerator {
 
         var loginNode = LinearNode.<UserIdentity>builder()
                 .consumer(AlgorithmLogic::login)
-                .tree(tree)
                 .nextNode(afterLoginNode)
                 .build();
 
