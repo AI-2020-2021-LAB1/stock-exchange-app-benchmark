@@ -3,6 +3,7 @@ package com.project.benchmark.algorithm;
 import com.project.benchmark.algorithm.core.UserIdentity;
 import com.project.benchmark.algorithm.core.tree.AlgorithmProbabilityTreeGenerator;
 import com.project.benchmark.algorithm.core.tree.ProbabilityTree;
+import com.project.benchmark.algorithm.exception.BenchmarkInitializationException;
 import com.project.benchmark.algorithm.internal.BenchmarkConfiguration;
 import com.project.benchmark.algorithm.internal.ResponseTO;
 

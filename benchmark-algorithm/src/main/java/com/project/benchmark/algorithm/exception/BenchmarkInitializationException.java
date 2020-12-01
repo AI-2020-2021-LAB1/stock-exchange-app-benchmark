@@ -1,11 +1,7 @@
-package com.project.benchmark.algorithm;
+package com.project.benchmark.algorithm.exception;
 
 public class BenchmarkInitializationException extends RuntimeException {
     public BenchmarkInitializationException(String message) {
         super(message);
-    }
-
-    public BenchmarkInitializationException(String message, Throwable cause) {
-        super(message, cause);
     }
 }

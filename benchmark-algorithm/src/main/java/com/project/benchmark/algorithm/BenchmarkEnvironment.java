@@ -5,11 +5,11 @@ import com.project.benchmark.algorithm.core.AdminIdentity;
 import com.project.benchmark.algorithm.core.BenchmarkState;
 import com.project.benchmark.algorithm.core.UserIdentity;
 import com.project.benchmark.algorithm.core.tree.ProbabilityTree;
-import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
 import com.project.benchmark.algorithm.dto.stock.NewStockTO;
 import com.project.benchmark.algorithm.dto.stock.StockOwnerTO;
 import com.project.benchmark.algorithm.dto.stock.StockUserTO;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
+import com.project.benchmark.algorithm.exception.BenchmarkInitializationException;
 import com.project.benchmark.algorithm.internal.ResponseTO;
 import com.project.benchmark.algorithm.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -24,7 +24,7 @@ class BenchmarkEnvironment {
     private static final int USER_THREADS = 8;
     private final List<UserIdentity> users = new ArrayList<>();
     private ThreadPoolExecutor backendExecutor;
-    private ExecutorService userExecutor;
+    private ThreadPoolExecutor userExecutor;
     private final String tag;
     private final AdminIdentity adminIdentity;
     private ProbabilityTree<UserIdentity> tree;
@@ -62,21 +62,22 @@ class BenchmarkEnvironment {
             for(var e: futures.entrySet()) {
                 try {
                     e.getValue().get(50, TimeUnit.MILLISECONDS);
-                    if(!state.forceStopSignal.get()) {
+                    if(!state.stopSignal.get()) {
                         newFutures.put(e.getKey(), backendExecutor.submit(() -> tree.execute(e.getKey(), state)));
                     }
                 } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
                 }
             }
             futures.putAll(newFutures);
-        } while (state.forceStopSignal.get() && futures.values().stream().allMatch(Future::isDone));
+        } while (state.stopSignal.get() && futures.values().stream().allMatch(Future::isDone));
     }
 
     public void stop() {
         state.stopSignal.set(true);
+        userExecutor.shutdown();
         while(true) {
             try {
-                if (userExecutor.awaitTermination(1, TimeUnit.MINUTES)) break;
+                if (userExecutor.awaitTermination(10, TimeUnit.SECONDS)) break;
             } catch (InterruptedException ignored) {
             }
         }
@@ -85,9 +86,10 @@ class BenchmarkEnvironment {
 
     public void forceStop() {
         state.forceStopSignal.set(true);
+        userExecutor.shutdown();
         while(true) {
             try {
-                if (userExecutor.awaitTermination(1, TimeUnit.MINUTES)) break;
+                if (userExecutor.awaitTermination(10, TimeUnit.SECONDS)) break;
             } catch (InterruptedException ignored) {
             }
         }
@@ -104,6 +106,8 @@ class BenchmarkEnvironment {
 
     static class BenchmarkEnvironmentBuilder {
         private static final String EMAIL_FORMAT = "%s_user%d@benchmark.com";
+        private static final int MAX_INIT_THREADS = 256;
+        private static final int MAX_THREADS = 512;
         private final AdminIdentity adminIdentity;
         private final UserService userService;
         private final LinkedBlockingQueue<ResponseTO> queue;
@@ -166,8 +170,17 @@ class BenchmarkEnvironment {
                 throw new BenchmarkInitializationException("Unable to login as admin");
             }
             environment = new BenchmarkEnvironment(tag, adminIdentity);
-            environment.userExecutor = Executors.newFixedThreadPool(USER_THREADS);
-            environment.backendExecutor = new ThreadPoolExecutor(userCount / 5, userCount / 2, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
+            int executorThreads = USER_THREADS > userCount ? userCount : USER_THREADS;
+            environment.userExecutor = new ThreadPoolExecutor(executorThreads, executorThreads, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+            int backendInitialThreads = userCount < 16 ? userCount : userCount * 2 / 5;
+            if(backendInitialThreads > MAX_INIT_THREADS) {
+                backendInitialThreads = MAX_INIT_THREADS;
+            }
+            int backendMaxThreads = userCount < 16 ? userCount : userCount * 4 / 5;
+            if(backendMaxThreads > MAX_THREADS) {
+                backendInitialThreads = MAX_THREADS;
+            }
+            environment.backendExecutor = new ThreadPoolExecutor(backendInitialThreads, backendMaxThreads, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
             environment.tree = tree;
             createUsers();
             createStocks();
@@ -176,15 +189,15 @@ class BenchmarkEnvironment {
 
         private void createUsers() {
             int bound = userCount + 1;
-            List<Future<ResponseDataTO<RegisterUserTO>>> futures = new ArrayList<>();
+            Map<String, Future<?>> futures = new HashMap<>();
             for (int i = 1; i < bound; i++) {
                 RegisterUserTO u = generateUser(i);
-                futures.add(environment.backendExecutor.submit(() -> userService.register(u, tag)));
+                futures.put(u.getEmail(), environment.backendExecutor.submit(() -> userService.register(u, tag)));
             }
-            for (var future : futures) {
+            for (var future : futures.entrySet()) {
                 try {
-                    RegisterUserTO user = future.get().getData();
-                    UserIdentity identity = new UserIdentity(user.getEmail(), queue, operations, tag);
+                    future.getValue().get();
+                    UserIdentity identity = new UserIdentity(future.getKey(), queue, operations, tag);
                     environment.users.add(identity);
                 } catch (InterruptedException | ExecutionException ignored) {
                 }
