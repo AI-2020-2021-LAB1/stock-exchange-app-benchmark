@@ -44,13 +44,13 @@ public class UserService extends BackendCoreService {
         return res.copy(LoginUserResponseTO::getAccessToken);
     }
 
-    public ResponseDataTO<RegisterUserTO> register(RegisterUserTO user, String tag) throws JsonProcessingException {
+    public ResponseDataTO<Void> register(RegisterUserTO user, String tag) throws JsonProcessingException {
         String jsonString = mapper.writeValueAsString(user);
 
         return manageInvocation(
                 registerURL,
                 HttpMethod.POST,
-                RegisterUserTO.class,
+                Void.class,
                 (target) -> target.request()
                         .accept(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, fullAuth)
