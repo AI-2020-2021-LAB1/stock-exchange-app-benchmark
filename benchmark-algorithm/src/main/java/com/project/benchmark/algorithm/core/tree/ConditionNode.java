@@ -20,11 +20,10 @@ class ConditionNode<T> extends TreeNode<T> {
     }
 
     @Override
-    protected void postExecute(T obj) {
+    protected TreeNode<T> nextNode(T obj) {
         if(predicate.test(obj)) {
-            onTrue.execute(obj);
-        } else {
-            onFalse.execute(obj);
+            return onTrue;
         }
+        return onFalse;
     }
 }

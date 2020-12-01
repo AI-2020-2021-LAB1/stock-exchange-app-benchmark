@@ -1,6 +1,5 @@
 package com.project.benchmark.algorithm.core.tree;
 
-import com.project.benchmark.algorithm.core.AlgorithmState;
 import com.project.benchmark.algorithm.core.UserIdentity;
 import com.project.benchmark.algorithm.internal.BenchmarkConfiguration;
 import com.project.benchmark.algorithm.utils.Pair;
@@ -9,11 +8,11 @@ import java.math.BigDecimal;
 
 public class AlgorithmProbabilityTreeGenerator {
 
-    public ProbabilityTree<UserIdentity> generate(BenchmarkConfiguration conf, AlgorithmState state) {
+    public ProbabilityTree<UserIdentity> generate(BenchmarkConfiguration conf) {
 
         BenchmarkProbabilityTreeParams params = generateInternalConfiguration(conf);
 
-        ProbabilityTree<UserIdentity> tree = new ProbabilityTree<>(state);
+        ProbabilityTree<UserIdentity> tree = new ProbabilityTree<>();
 
         var logoutNode = StopNode.<UserIdentity>builder()
                 .tree(tree)
@@ -22,7 +21,6 @@ public class AlgorithmProbabilityTreeGenerator {
 
         var afterLoginNode = ProbabilityNode.<UserIdentity>builder()
                 .tree(tree)
-                .consumer(AlgorithmLogic::loadUserDetails)
                 .build();
 
         var limitReachedCheckNode = ConditionNode.<UserIdentity>builder()

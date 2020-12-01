@@ -1,5 +1,8 @@
 package com.project.benchmark.algorithm;
 
+import com.project.benchmark.algorithm.core.UserIdentity;
+import com.project.benchmark.algorithm.core.tree.AlgorithmProbabilityTreeGenerator;
+import com.project.benchmark.algorithm.core.tree.ProbabilityTree;
 import com.project.benchmark.algorithm.internal.BenchmarkConfiguration;
 import com.project.benchmark.algorithm.internal.ResponseTO;
 
@@ -9,6 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class BenchmarkLauncher {
 
+    public static final int USER_COUNT = 100;
     /**
      * full configuration taken from DB
      */
@@ -17,19 +21,15 @@ public class BenchmarkLauncher {
      * queue where threads should put responses
      */
     private LinkedBlockingQueue<ResponseTO> responseQueue;
-    /**
-     * runner for async tasks
-     */
-    private final ThreadPoolExecutor backendExecutor;
-    private ExecutorService userExecutor;
+
+    private BenchmarkEnvironment environment;
+
     private final Lock lock;
     private boolean started = false;
 
     public BenchmarkLauncher(BenchmarkConfiguration conf) {
         this.conf = conf;
         lock = new ReentrantLock();
-        userExecutor = Executors.newFixedThreadPool(8);
-        backendExecutor = new ThreadPoolExecutor(8, 64, 2, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
     }
 
     /**
@@ -39,7 +39,7 @@ public class BenchmarkLauncher {
      *                         new response results
      * @return true if started successfully, false when another user has already started it
      */
-    public boolean start(LinkedBlockingQueue<ResponseTO> responseQueueRef) {
+    public boolean start(LinkedBlockingQueue<ResponseTO> responseQueueRef) throws BenchmarkInitializationException {
         lock.lock();
         try {
             if (!started) {
@@ -94,15 +94,23 @@ public class BenchmarkLauncher {
         }
     }
 
-    private void internalStart() {
-        //TODO: run tasks
+    private void internalStart() throws BenchmarkInitializationException {
+        ProbabilityTree<UserIdentity> tree = new AlgorithmProbabilityTreeGenerator()
+                .generate(conf);
+
+        environment = BenchmarkEnvironment.builder(responseQueue)
+                .tree(tree)
+                .operations(conf.getNoOfOperations().intValue())
+                .userCount(USER_COUNT)
+                .build();
+
     }
 
     private void internalStop() {
-        //TODO: stop working when all elements will finish algorithm
+        environment.stop();
     }
 
     private void internalForceStop() {
-        //TODO: immediately stop all processes after single algorithm step
+        environment.forceStop();
     }
 }

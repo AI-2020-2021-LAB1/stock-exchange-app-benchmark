@@ -169,14 +169,4 @@ class AlgorithmLogic {
     static boolean limitReached(UserIdentity identity) {
         return identity.getOperations() <= 0;
     }
-
-    static void loadUserDetails(UserIdentity identity) {
-        UserServiceContainer services = identity.getServiceContainer();
-        if(services != null) {
-            ResponseDataTO<UserDetailsTO> res = services.getDetailsService().getUserDetails();
-            if(res.getData() != null) {
-                identity.setMoney(res.getData().getMoney());
-            }
-        }
-    }
 }

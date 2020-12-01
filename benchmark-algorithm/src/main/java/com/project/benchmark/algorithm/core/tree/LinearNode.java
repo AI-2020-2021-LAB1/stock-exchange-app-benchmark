@@ -14,7 +14,7 @@ class LinearNode<T> extends TreeNode<T> {
     }
 
     @Override
-    protected void postExecute(T obj) {
-        nextNode.execute(obj);
+    protected TreeNode<T> nextNode(T obj) {
+        return nextNode;
     }
 }

@@ -15,7 +15,6 @@ public class UserIdentity {
     private final String password;
     private final LinkedBlockingQueue<ResponseTO> queue;
     private final UserService userService;
-    private Double money;
     private final int initialOperations;
     private int operations;
     private final UserCache userCache;
@@ -46,6 +45,10 @@ public class UserIdentity {
         operations = initialOperations;
     }
 
+    public boolean isAuthenticated() {
+        return authenticationToken != null;
+    }
+
     public void logout() {
         authenticationToken = null;
         serviceContainer = null;
@@ -54,14 +57,6 @@ public class UserIdentity {
     public UserServiceContainer getServiceContainer() {
         operations--;
         return serviceContainer;
-    }
-
-    public Double getMoney() {
-        return money;
-    }
-
-    public void setMoney(Double money) {
-        this.money = money;
     }
 
     public int getOperations() {
