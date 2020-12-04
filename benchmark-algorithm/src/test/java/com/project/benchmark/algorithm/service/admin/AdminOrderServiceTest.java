@@ -25,8 +25,8 @@ public class AdminOrderServiceTest {
 
     private String login() throws JsonProcessingException {
         LoginUserTO user = new LoginUserTO();
-        user.setUsername("MarcinNajman@gmail.pl");
-        user.setPassword("MarcinNajman.gmail.pl1");
+        user.setUsername("{userName}");
+        user.setPassword("{password}");
         return userService.login(user).getData();
     }
 
