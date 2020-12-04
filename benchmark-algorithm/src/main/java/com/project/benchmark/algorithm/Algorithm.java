@@ -33,7 +33,7 @@ public class Algorithm {
 
     public static void generateUserData (){
         String www="password";
-        password = (String) encodePassword(www);
+        password = encodePassword(www);
         int leftLimitUpp = 65; // letter 'A'
         int rightLimitUpp = 90; // letter 'Z'
         int leftLimitLow = 97; // letter 'a'
@@ -82,6 +82,14 @@ public class Algorithm {
         return userService.login(user).getData();
     }
 
+    private static String loginAdmin() throws JsonProcessingException {
+        LoginUserTO user = new LoginUserTO();
+        user.setUsername("{userName}");
+        user.setPassword("{password}");
+        UserService userService = new UserService();
+        return userService.login(user).getData();
+    }
+
     private static ResponseTO<List<StockTO>> getStocks(String auth) throws IOException {
         StockFiltersTO filters = new StockFiltersTO();
         SortParams sort = new SortParams("name", true);
@@ -105,7 +113,7 @@ public class Algorithm {
 
         //Wczytywanie danych z komunikatu.
 
-        if (register == true) {
+        if (register) {
             register();
             System.out.println("Rejestracja");   //Rejestracja
         }

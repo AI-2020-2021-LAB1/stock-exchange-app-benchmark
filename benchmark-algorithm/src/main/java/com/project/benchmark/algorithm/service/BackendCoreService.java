@@ -13,6 +13,7 @@ import com.project.benchmark.algorithm.dto.response.ParametersTO;
 import com.project.benchmark.algorithm.dto.response.ResponseTO;
 import com.project.benchmark.algorithm.utils.QueryString;
 import org.apache.http.HttpStatus;
+import org.jboss.resteasy.util.HttpResponseCodes;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
