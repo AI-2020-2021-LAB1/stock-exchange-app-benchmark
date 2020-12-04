@@ -8,9 +8,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import com.project.benchmark.algorithm.dto.base.PageParams;
 import com.project.benchmark.algorithm.dto.base.SortParams;
-import com.project.benchmark.algorithm.dto.response.ResponseTO;
-import com.project.benchmark.algorithm.dto.stock.*;
-import com.project.benchmark.algorithm.service.BackendCoreService;
+import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
+import com.project.benchmark.algorithm.dto.stock.StockTO;
 import com.project.benchmark.algorithm.service.StockService;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
 import com.project.benchmark.algorithm.service.UserService;
@@ -84,15 +83,7 @@ public class Algorithm extends  BackendCoreService {
         return userService.login(user).getData();
     }
 
-    private static String loginAdmin() throws JsonProcessingException {
-        LoginUserTO user = new LoginUserTO();
-        user.setUsername("{userName}");
-        user.setPassword("{password}");
-        UserService userService = new UserService();
-        return userService.login(user).getData();
-    }
-
-    private static ResponseTO<List<StockTO>> getStocks(String auth) throws IOException {
+    private static ResponseDataTO<List<StockTO>> getStocks(String auth) throws IOException {
         StockFiltersTO filters = new StockFiltersTO();
         SortParams sort = new SortParams("name", true);
         PageParams params = new PageParams(0, 20, Collections.singletonList(sort));

@@ -2,7 +2,7 @@ package com.project.benchmark.algorithm.service.admin;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.benchmark.algorithm.dto.order.*;
-import com.project.benchmark.algorithm.dto.response.ResponseTO;
+import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
 import com.project.benchmark.algorithm.dto.stock.StockTO;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
 import com.project.benchmark.algorithm.service.UserService;
@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.time.OffsetDateTime;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.junit.Assert.*;
 
@@ -18,12 +19,12 @@ public class AdminOrderServiceTest {
     UserService userService;
 
     @Before
-    public void setUp() {
-        orderService = new AdminOrderService();
-        userService = new UserService();
+    public void setUp() throws JsonProcessingException {
+        userService = new UserService(new LinkedBlockingQueue<>());
+        orderService = new AdminOrderService(login(), new LinkedBlockingQueue<>());
     }
 
-    private String login() throws JsonProcessingException {
+    private String login() {
         LoginUserTO user = new LoginUserTO();
         user.setUsername("{userName}");
         user.setPassword("{password}");
@@ -32,10 +33,8 @@ public class AdminOrderServiceTest {
 
     @Test
     public void createOrder() throws JsonProcessingException {
-        String auth = login();
-        assertNotNull(auth);
         NewOrderTO order = createExampleOrder();
-        ResponseTO<Void> response = orderService.createOrder(order, auth);
+        ResponseDataTO<Void> response = orderService.createOrder(order);
         assertNull(response.getError());
         assertEquals(Integer.valueOf(200), response.getParams().getStatus());
     }
@@ -58,11 +57,9 @@ public class AdminOrderServiceTest {
     }
 
     @Test
-    public void deactivateOrderTest() throws JsonProcessingException {
-        String auth = login();
-        assertNotNull(auth);
+    public void deactivateOrderTest() {
         Integer orderId = 40;
-        ResponseTO<Void> response = orderService.deactivateOrder(orderId, auth);
+        ResponseDataTO<Void> response = orderService.deactivateOrder(orderId);
         assertNull(response.getError());
         assertEquals(Integer.valueOf(200), response.getParams().getStatus());
     }
