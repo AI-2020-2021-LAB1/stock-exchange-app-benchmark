@@ -17,7 +17,7 @@ public class Endpoints {
     Pozostałe endpointy:
     /api/stock/{id} - [GET] [PATCH] - pobranie i aktualizowanie konkretnej akcji
     /api/stock/{id}/index - [GET] - pobranie historii indeksowania akcji    */
-    String API_STOCK = "/api/stock";
+    public static final String API_STOCK = "/api/stock";
 
     /* Endpoint do listy zleceń [GET]
     Pozostałe endpointy:

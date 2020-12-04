@@ -19,7 +19,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void loginTest() {
+    public void loginTest() throws JsonProcessingException {
         LoginUserTO user = new LoginUserTO("adudek@adudek.pl", "Adudek@dud3k");
         userService.login(user);
     }
