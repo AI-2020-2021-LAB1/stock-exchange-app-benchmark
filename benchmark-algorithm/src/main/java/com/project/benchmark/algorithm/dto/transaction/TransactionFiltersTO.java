@@ -12,12 +12,20 @@ import java.util.Date;
 public class TransactionFiltersTO {
     private String abbreviation;
     private Long amount;
-    private Long amountMore;
+    @QueryString("amount<")
     private Long amountLess;
-    private Date date;
+    @QueryString("amount>")
+    private Long amountMore;
+    private OffsetDateTime date;
+    @QueryString("date<")
+    private OffsetDateTime dateLess;
+    @QueryString("date>")
+    private OffsetDateTime dateMore;
     private String name;
     private PageParams pageParams;
     private Double unitPrice;
-    private Double unitPriceMore;
+    @QueryString("unitPrice<")
     private Double unitPriceLess;
+    @QueryString("unitPrice>")
+    private Double unitPriceMore;
 }

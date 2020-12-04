@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 public class TransactionTO {
-    private long amount;
+    private Long amount;
     private OrderTO buyingOrder;
     private Date date;
     private Integer id;
