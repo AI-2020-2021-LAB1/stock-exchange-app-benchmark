@@ -13,5 +13,5 @@ public class NewStockTO {
     private Double currentPrice;
     private String name;
     private Double priceChangeRatio;
-    private List<NewStockOwnerTO> owners;
+    private List<StockOwnerTO> owners;
 }

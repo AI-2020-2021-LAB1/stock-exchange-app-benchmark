@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class NewStockOwnerTO {
+public class StockOwnerTO {
     private Integer amount;
-    private NewStockUserTO user;
+    private StockUserTO user;
 }
