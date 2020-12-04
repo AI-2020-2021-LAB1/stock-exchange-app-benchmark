@@ -2,9 +2,11 @@ package com.project.benchmark.algorithm.dto.stock;
 
 import com.project.benchmark.algorithm.dto.base.PageParams;
 import com.project.benchmark.algorithm.utils.QueryString;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class StockFiltersTO {
     private String abbreviation;
     private Long amount;

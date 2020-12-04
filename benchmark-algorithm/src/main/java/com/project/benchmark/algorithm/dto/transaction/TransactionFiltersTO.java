@@ -2,11 +2,13 @@ package com.project.benchmark.algorithm.dto.transaction;
 
 import com.project.benchmark.algorithm.dto.base.PageParams;
 import com.project.benchmark.algorithm.utils.QueryString;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 public class TransactionFiltersTO {
     private String abbreviation;
     private Long amount;

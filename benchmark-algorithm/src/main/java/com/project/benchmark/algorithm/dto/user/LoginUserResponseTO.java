@@ -1,9 +1,11 @@
 package com.project.benchmark.algorithm.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class LoginUserResponseTO {
     @JsonProperty("access_token")
     private String accessToken;

@@ -10,7 +10,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>benchmark-backend</artifactId>
+    <artifactId>stock-exchange-app-benchmark</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>benchmark-backend</name>
     <description>Benchmark server implementation</description>
@@ -81,7 +81,7 @@
     </dependencies>
 
     <build>
-        <finalName>stock-exchange-app-benchmark</finalName>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

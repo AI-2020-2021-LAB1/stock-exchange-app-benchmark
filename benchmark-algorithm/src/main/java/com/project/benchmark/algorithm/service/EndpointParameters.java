@@ -2,7 +2,8 @@ package com.project.benchmark.algorithm.service;
 
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class EndpointParameters {

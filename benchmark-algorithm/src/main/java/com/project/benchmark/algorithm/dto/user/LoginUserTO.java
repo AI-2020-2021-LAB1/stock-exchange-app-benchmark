@@ -2,7 +2,8 @@ package com.project.benchmark.algorithm.dto.user;
 
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginUserTO {
