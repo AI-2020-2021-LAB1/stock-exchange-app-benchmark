@@ -33,6 +33,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -187,7 +188,9 @@ public abstract class BackendCoreService {
         params.setEndpoint(p.getEndpoint());
         params.setMethod(p.getMethod());
         try {
-            params.setOperationTime(Double.parseDouble(res.getHeaderString(BUSINESS_LOGIC_EXECUTION_TIME_HEADER)));
+            String header = res.getHeaderString(BUSINESS_LOGIC_EXECUTION_TIME_HEADER);
+            long nanos = Long.parseLong(header);
+            params.setOperationTime((double)nanos / 1000000);
         } catch(Exception ignored) {
         }
         dto.setParams(params);
