@@ -1,13 +1,11 @@
 package com.project.benchmark.algorithm.dto.order;
 
 import com.project.benchmark.algorithm.dto.stock.StockTO;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.Date;
 
-@Getter
-@Setter
+@Data
 public class OrderTO {
     private Long amount;
     private Date dateClosing; //java.util.Date, możliwe do zmiany

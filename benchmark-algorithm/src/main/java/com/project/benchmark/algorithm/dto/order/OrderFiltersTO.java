@@ -1,14 +1,11 @@
 package com.project.benchmark.algorithm.dto.order;
 
 import com.project.benchmark.algorithm.dto.base.PageParams;
-import com.project.benchmark.algorithm.utils.QueryString;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.Date;
 
-@Getter
-@Setter
+@Data
 public class OrderFiltersTO {
     private String abbreviation;
     private boolean active;

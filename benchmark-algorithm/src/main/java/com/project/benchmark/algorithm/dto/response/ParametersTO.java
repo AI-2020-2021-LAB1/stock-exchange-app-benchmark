@@ -1,12 +1,11 @@
 package com.project.benchmark.algorithm.dto.response;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+
 
 import java.time.OffsetDateTime;
 
-@Getter
-@Setter
+@Data
 public class ParametersTO {
     private String method;
     private OffsetDateTime responseDate;

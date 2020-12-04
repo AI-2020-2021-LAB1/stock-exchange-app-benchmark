@@ -13,7 +13,6 @@ import com.project.benchmark.algorithm.dto.response.ParametersTO;
 import com.project.benchmark.algorithm.dto.response.ResponseTO;
 import com.project.benchmark.algorithm.utils.QueryString;
 import org.apache.http.HttpStatus;
-import org.jboss.resteasy.util.HttpResponseCodes;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
@@ -107,7 +106,7 @@ public abstract class BackendCoreService {
         JsonNode content = root.get("content");
         T typeObject;
         //pageable type
-        if(content != null && content.isArray()) {
+        if (content != null && content.isArray()) {
             typeObject = mapper.convertValue(content, type);
         } else {
             //other
@@ -149,8 +148,9 @@ public abstract class BackendCoreService {
     /**
      * Automatically put single path param to url.
      * Conversion: {name} => value
-     * @param url URL to convert
-     * @param name path param name
+     *
+     * @param url   URL to convert
+     * @param name  path param name
      * @param value value inserted to URL
      * @return new URL with filled path param
      */

@@ -3,10 +3,10 @@ package org.project.benchmark.algorithm.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
-import com.project.benchmark.algorithm.service.BackendCoreService;
 import com.project.benchmark.algorithm.service.UserService;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 public class UserServiceTest {
