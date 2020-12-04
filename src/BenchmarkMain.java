@@ -38,6 +38,9 @@ public class BenchmarkMain {
         HttpURLConnection connection = (HttpURLConnection) new URL("{host:port}" + name).openConnection();
 
         connection.setRequestMethod("GET");
+        String auth = "{login:password}";
+        byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes());
+        connection.setRequestProperty("Authorization", "Basic " + new String(encodedAuth));
 
         int responseCode = connection.getResponseCode();
         if(responseCode == 200){
