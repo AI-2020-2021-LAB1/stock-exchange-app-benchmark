@@ -1,7 +1,9 @@
 package com.project.stockexchangeappbenchmark;
 
 import com.project.stockexchangeappbenchmark.service.BackendService;
+import org.apache.http.HttpException;
 
+import javax.xml.bind.ValidationException;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -12,9 +14,11 @@ import java.util.Scanner;
 
 public class BenchmarkMain {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ValidationException, HttpException {
 
         new BackendService().login();
+        new BackendService().loginRestEasy();
+//        new BackendService().registerRestEasy();
 //        Scanner scanner = new Scanner(System.in);
 //
 //        System.out.println("(Type 'get' or 'set' now.)");
