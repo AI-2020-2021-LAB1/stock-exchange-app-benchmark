@@ -1,6 +1,7 @@
 package com.project.benchmark.algorithm.dto.order;
 
 import com.project.benchmark.algorithm.dto.base.PageParams;
+import com.project.benchmark.algorithm.utils.QueryString;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,19 +12,29 @@ import java.util.Date;
 public class OrderFiltersTO {
     private String abbreviation;
     private boolean active;
-    private Double amount;
-    private Double amountLess;
-    private Double amountMore;
-    private Date creationDateLess; //java.util.Date, możliwe do zmiany
-    private Date creationDateMore; //java.util.Date, możliwe do zmiany
-    private Date dateClosingLess; //java.util.Date, możliwe do zmiany
-    private Date dateClosingMore; //java.util.Date, możliwe do zmiany
-    private Date dateExpirationLess; //java.util.Date, możliwe do zmiany
-    private Date dateExpirationMore; //java.util.Date, możliwe do zmiany
+    private Long amount;
+    @QueryString("amount<")
+    private Long amountLess;
+    @QueryString("amount>")
+    private Long amountMore;
+    @QueryString("creationDate<")
+    private OffsetDateTime creationDateLess;
+    @QueryString("creationDate>")
+    private OffsetDateTime creationDateMore;
+    @QueryString("dateClosing<")
+    private OffsetDateTime dateClosingLess;
+    @QueryString("dateClosing>")
+    private OffsetDateTime dateClosingMore;
+    @QueryString("dateExpiration<")
+    private OffsetDateTime dateExpirationLess;
+    @QueryString("dateExpiration>")
+    private OffsetDateTime dateExpirationMore;
     private String name;
     private String orderType;
     private Double price;
+    @QueryString("price<")
     private Double priceLess;
+    @QueryString("price>")
     private Double priceMore;
     private String priceType;
     private PageParams pageParams;

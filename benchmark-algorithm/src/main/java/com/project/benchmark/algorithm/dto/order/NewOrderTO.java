@@ -4,15 +4,15 @@ import com.project.benchmark.algorithm.dto.stock.StockTO;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 
 @Getter
 @Setter
-public class OrderTO {
+public class NewOrderTO {
     private Long amount;
-    private Date dateClosing; //java.util.Date, możliwe do zmiany
-    private Date dateCreation; //java.util.Date, możliwe do zmiany
-    private Date dateExpiration; //java.util.Date, możliwe do zmiany
+    private OffsetDateTime dateClosing;
+    private OffsetDateTime dateCreation;
+    private OffsetDateTime dateExpiration;
     private Integer id;
     private String orderType;
     private Double price;
