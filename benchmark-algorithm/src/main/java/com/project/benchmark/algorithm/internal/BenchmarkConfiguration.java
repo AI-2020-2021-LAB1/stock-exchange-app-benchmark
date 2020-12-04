@@ -3,13 +3,15 @@ package com.project.benchmark.algorithm.internal;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Configuration {
+public class BenchmarkConfiguration {
     private boolean registration;
     private BigDecimal certaintyLevel;
     private BigDecimal loginAllStocks;
