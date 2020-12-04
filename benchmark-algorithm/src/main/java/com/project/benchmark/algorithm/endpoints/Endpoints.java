@@ -5,13 +5,13 @@ public class Endpoints {
     String address = "{host:port}";
 
     //Token logowania [GET]
-    String OAUTH_TOKEN = "/oauth/token";
+    public static final String OAUTH_TOKEN = "/oauth/token";
 
     // oauth [POST]
-    String OAUTH = "/oauth";
+    public static final String OAUTH = "/oauth";
 
     //Endpoint do rejestracji nowego użytkownika [POST]
-    String API_REGISTER = "/api/register";
+    public static final String API_REGISTER = "/api/register";
 
     /* Endpoint do listy akcji [GET] [POST]
     Pozostałe endpointy:
@@ -24,12 +24,12 @@ public class Endpoints {
     /api/order/{id} - [GET] - pobranie konkretnego zlecenia
     /api/order/{id}/deactivation - [POST] - dezaktywacja zlecenia
     /api/order/{id}/transactions - [GET] - pobranie transakcji zlecenia     */
-    String API_ORDER = "/api/order";
+    public static final String API_ORDER = "/api/order";
 
     /* Endpoint do transakcji [GET]
     Pozostałe endpointy:
     /api/transaction/{id} - [GET] - pobranie konkretnej transakcji    */
-    String API_TRANSACTION = "/api/transaction";
+    public static final String API_TRANSACTION = "/api/transaction";
 
     /* Endpoint do listy użytkowników [GET]
     Pozostałe endpointy:
@@ -37,11 +37,11 @@ public class Endpoints {
     /api/user/{id}/order - [GET] - pobranie listy zleceń użytkownika
     /api/user/{id}/stock - [GET] - pobranie listy akcji użytkownika
      */
-    String API_USER = "/api/user";
+    public static final String API_USER = "/api/user";
 
     // Posiadane zlecenia uzytkownika [GET]
-    String USER_OWNED_ORDERS = "/api/user/order/owned";
+    public static final String USER_OWNED_ORDERS = "/api/user/order/owned";
 
     // Transakcje użytkownika [GET]
-    String USER_OWNED_TRANSACTIONS = "/api/user/transaction/owned";
+    public static final String USER_OWNED_TRANSACTIONS = "/api/user/transaction/owned";
 }
