@@ -41,10 +41,10 @@ public class BenchmarkLauncher {
     public boolean start(LinkedBlockingQueue<ResponseTO> responseQueueRef) {
         lock.lock();
         try {
-            if(!started) {
+            if (!started) {
                 started = true;
                 this.responseQueue = responseQueueRef;
-                //TODO: run tasks
+                internalStart();
                 return true;
             }
             return false;
@@ -63,7 +63,7 @@ public class BenchmarkLauncher {
         try {
             if(started) {
                 started = false;
-                //TODO: stop working when all elements will finish algorithm
+                internalStop();
                 return true;
             }
             return false;
@@ -82,12 +82,24 @@ public class BenchmarkLauncher {
         try {
             if(started) {
                 started = false;
-                //TODO: immediately stop all processes after single algorithm step
+                internalForceStop();
                 return true;
             }
             return false;
         } finally {
             lock.unlock();
         }
+    }
+
+    private void internalStart() {
+        //TODO: run tasks
+    }
+
+    private void internalStop() {
+        //TODO: stop working when all elements will finish algorithm
+    }
+
+    private void internalForceStop() {
+        //TODO: immediately stop all processes after single algorithm step
     }
 }

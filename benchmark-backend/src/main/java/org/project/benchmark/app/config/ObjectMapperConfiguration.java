@@ -9,6 +9,7 @@ public class ObjectMapperConfiguration {
     @Bean
     ObjectMapper mapper() {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.findAndRegisterModules();
         //additional config
         return mapper;
     }
