@@ -112,7 +112,12 @@ public abstract class BackendCoreService {
         response.setStatusCode(params.getStatus());
         response.setResponseDate(params.getResponseDate());
         response.setRequestResponseTime(BigDecimal.valueOf(params.getRequestResponseTime()));
-        response.setOperationTime(BigDecimal.valueOf(params.getOperationTime()));
+        if (params.getOperationTime() != null) {
+            response.setOperationTime(BigDecimal.valueOf(params.getOperationTime()));
+        }
+        else {
+            response.setOperationTime(BigDecimal.ZERO);
+        }
         response.setEndpoint(params.getEndpoint());
         response.setMethodType(params.getMethod());
         response.setUsersLoggedIn(0);//TODO: how to calc this?

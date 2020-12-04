@@ -5,6 +5,7 @@ import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
 import com.project.benchmark.algorithm.dto.user.LoginUserResponseTO;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
+import com.project.benchmark.algorithm.endpoints.Endpoints;
 import com.project.benchmark.algorithm.internal.ResponseTO;
 import org.apache.http.HttpHeaders;
 
@@ -16,7 +17,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class UserService extends BackendCoreService {
 
-    private static final String loginURL = Endpoints.address +"/oauth/token";
+    private static final String loginURL = Endpoints.address + Endpoints.OAUTH_TOKEN;
     private static final String registerURL = Endpoints.address + Endpoints.API_REGISTER;
 
     public UserService(LinkedBlockingQueue<ResponseTO> queue) {

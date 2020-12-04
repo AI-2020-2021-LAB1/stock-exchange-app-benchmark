@@ -19,4 +19,5 @@ public class StockFiltersTO {
     private Double priceChangeRatioLess;
     private Double priceChangeRatioMore;
     private PageParams pageParams;
+    private String tag;
 }
