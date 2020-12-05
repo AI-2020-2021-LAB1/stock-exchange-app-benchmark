@@ -61,7 +61,8 @@ public class AdminStockService extends BackendCoreService {
         return manageInvocation(
                 url,
                 HttpMethod.GET,
-                new TypeReference<>(){},
+                new TypeReference<>() {
+                },
                 target -> target
                         .queryParams(this.convertToMap(filters, StockOwnersFiltersTO.class))
                         .request()

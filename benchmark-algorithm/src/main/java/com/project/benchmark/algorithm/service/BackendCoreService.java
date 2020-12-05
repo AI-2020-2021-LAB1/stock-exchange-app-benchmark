@@ -84,7 +84,7 @@ public abstract class BackendCoreService {
     protected <T> ResponseDataTO<T> manageInvocation(String url, String method, Class<T> clazz, Function<ResteasyWebTarget, Invocation> func, String tag) {
         Client client = ClientBuilder.newClient();
         ResteasyWebTarget target = (ResteasyWebTarget) client.target(url);
-        if(tag != null) {
+        if (tag != null) {
             target = target.queryParam("tag", tag);
         }
         final Invocation inv = func.apply(target);
@@ -114,8 +114,7 @@ public abstract class BackendCoreService {
         response.setRequestResponseTime(BigDecimal.valueOf(params.getRequestResponseTime()));
         if (params.getOperationTime() != null) {
             response.setOperationTime(BigDecimal.valueOf(params.getOperationTime()));
-        }
-        else {
+        } else {
             response.setOperationTime(BigDecimal.ZERO);
         }
         response.setEndpoint(params.getEndpoint());
@@ -146,7 +145,7 @@ public abstract class BackendCoreService {
         ResponseDataTO<T> dto = generateResponse(res, p);
         String json = res.readEntity(String.class);
         if (dto.getParams().getStatus().equals(HttpStatus.SC_OK)) {
-            if(Void.class.equals(expectedClazz)) {
+            if (Void.class.equals(expectedClazz)) {
                 dto.setData(null);
             } else {
                 dto.setData(mapper.readValue(json, expectedClazz));
@@ -167,7 +166,7 @@ public abstract class BackendCoreService {
     private ErrorTO resolveAuthenticationError(Response res) {
         ErrorTO error = new ErrorTO();
         error.setStatus(res.getStatus());
-        if(res.getStatus() == HttpResponseCodes.SC_UNAUTHORIZED) {
+        if (res.getStatus() == HttpResponseCodes.SC_UNAUTHORIZED) {
             error.setMessage("Unauthorized");
         } else if (res.getStatus() == HttpResponseCodes.SC_FORBIDDEN) {
             error.setMessage("Access denied");
@@ -188,8 +187,8 @@ public abstract class BackendCoreService {
         try {
             String header = res.getHeaderString(BUSINESS_LOGIC_EXECUTION_TIME_HEADER);
             long nanos = Long.parseLong(header);
-            params.setOperationTime((double)nanos / 1000000);
-        } catch(Exception ignored) {
+            params.setOperationTime((double) nanos / 1000000);
+        } catch (Exception ignored) {
         }
         dto.setParams(params);
         return dto;
@@ -225,7 +224,7 @@ public abstract class BackendCoreService {
                     name = ann.value();
                 }
                 Object o = field.get(object);
-                if(o != null) {
+                if (o != null) {
                     map.add(name, o);
                 }
             } catch (IllegalAccessException ignored) {
@@ -235,14 +234,14 @@ public abstract class BackendCoreService {
     }
 
     private void convertPageParams(MultivaluedMap<String, Object> map, PageParams params) {
-        if(params != null) {
-            if(params.getPage() != null) {
+        if (params != null) {
+            if (params.getPage() != null) {
                 map.add("page", params.getPage());
             }
-            if(params.getSize() != null) {
+            if (params.getSize() != null) {
                 map.add("size", params.getSize());
             }
-            if(params.getSort() != null) {
+            if (params.getSort() != null) {
                 List<Object> sort = params.getSort().stream()
                         .map(s -> s.getName() + "," + (s.isAsc() ? "asc" : "desc"))
                         .collect(Collectors.toList());

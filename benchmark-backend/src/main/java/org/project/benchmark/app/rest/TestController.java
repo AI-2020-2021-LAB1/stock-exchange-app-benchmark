@@ -35,7 +35,7 @@ public class TestController {
     @ApiResponses(@ApiResponse(code = 200, message = " Successfully paged tests."))
     public Page<TestDTO> getTests(@ApiIgnore Pageable pageable) {
         return testService.getTests(pageable)
-                .map(test -> mapper.convertValue(test,TestDTO.class));
+                .map(test -> mapper.convertValue(test, TestDTO.class));
     }
 
     @PostMapping
@@ -53,7 +53,7 @@ public class TestController {
     @ApiResponses({@ApiResponse(code = 200, message = "Test was successfully retrieved."),
             @ApiResponse(code = 404, message = "Given test not found.", response = ErrorResponse.class)})
     public TestDTO getTestDetails(@ApiParam(value = "Id of desired Test", required = true)
-                                      @PathVariable Long id) {
+                                  @PathVariable Long id) {
         return mapper.convertValue(testService.getTestByID(id),
                 TestDTO.class);
     }
@@ -88,10 +88,10 @@ public class TestController {
                     response = ErrorResponse.class),
             @ApiResponse(code = 404, message = "Given test not found.", response = ErrorResponse.class)
     })
-    public Page<ResponseDTO> getTestResponses(@ApiParam(value = "The test's id",  required = true) @PathVariable Long id,
+    public Page<ResponseDTO> getTestResponses(@ApiParam(value = "The test's id", required = true) @PathVariable Long id,
                                               @ApiIgnore Pageable pageable) {
-        return responseService.getTestResponses(id,pageable)
-                .map(response -> mapper.convertValue(response,ResponseDTO.class));
+        return responseService.getTestResponses(id, pageable)
+                .map(response -> mapper.convertValue(response, ResponseDTO.class));
     }
 
 }
