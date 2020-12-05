@@ -20,10 +20,6 @@ import javax.validation.Valid;
 @AllArgsConstructor
 @Api(value = "Tests", description = "REST API for test's management", tags = "Tests")
 @CrossOrigin("*")
-@ApiResponses({
-        @ApiResponse(code = 400, message = "The request could not be understood or was missing required parameters.",
-                response = ErrorResponse.class),
-})
 public class TestController {
 
     private final TestService testService;
@@ -35,7 +31,7 @@ public class TestController {
     @ApiResponses(@ApiResponse(code = 200, message = " Successfully paged tests."))
     public Page<TestDTO> getTests(@ApiIgnore Pageable pageable) {
         return testService.getTests(pageable)
-                .map(test -> mapper.convertValue(test, TestDTO.class));
+                .map(test -> mapper.convertValue(test,TestDTO.class));
     }
 
     @PostMapping
@@ -72,26 +68,23 @@ public class TestController {
     }
 
     @DeleteMapping("/{id}")
-    @ApiOperation(value = "Delete existing test", notes = "Required role ADMIN")
+    @ApiOperation(value = "Delete existing test")
     @ApiResponses({@ApiResponse(code = 200, message = "Test was successfully deleted."),
-            @ApiResponse(code = 400, message = "The request could not be understood or was missing required parameters.",
-                    response = ErrorResponse.class),
             @ApiResponse(code = 404, message = "Given test not found.", response = ErrorResponse.class)})
     public void delete(@ApiParam(value = "The id of test to delete.", required = true) @PathVariable Long id) {
         testService.deleteTest(id);
     }
 
+    //SPECYFIKACJA ?
     @GetMapping("/{id}/responses")
     @ApiOperation(value = "Page given test's responses")
     @ApiResponses({@ApiResponse(code = 200, message = "Successfully paged test's responses."),
-            @ApiResponse(code = 400, message = "The request could not be understood or was missing required parameters.",
-                    response = ErrorResponse.class),
             @ApiResponse(code = 404, message = "Given test not found.", response = ErrorResponse.class)
     })
-    public Page<ResponseDTO> getTestResponses(@ApiParam(value = "The test's id", required = true) @PathVariable Long id,
+    public Page<ResponseDTO> getTestResponses(@ApiParam(value = "The test's id",  required = true) @PathVariable Long id,
                                               @ApiIgnore Pageable pageable) {
-        return responseService.getTestResponses(id, pageable)
-                .map(response -> mapper.convertValue(response, ResponseDTO.class));
+        return responseService.getTestResponses(id,pageable)
+                .map(response -> mapper.convertValue(response,ResponseDTO.class));
     }
 
 }

@@ -1,5 +1,6 @@
 package org.project.benchmark.app.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 
+@JsonIgnoreProperties(value = { "reponses" })
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
@@ -33,4 +35,5 @@ public class TestDTO {
     @ApiModelProperty(notes = "Configuration's object related with this test.")
     @NotNull(message = "This field is required.")
     private ConfigurationDTO configuration;
+
 }

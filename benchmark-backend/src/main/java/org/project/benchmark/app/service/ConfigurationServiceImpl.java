@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.project.benchmark.app.dto.ConfigurationDTO;
 import org.project.benchmark.app.entity.Configuration;
+import org.project.benchmark.app.entity.Test;
 import org.project.benchmark.app.repository.ConfigurationRepository;
+import org.project.benchmark.app.repository.ResponseRepository;
+import org.project.benchmark.app.repository.TestRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,8 @@ import java.util.Optional;
 public class ConfigurationServiceImpl implements ConfigurationService {
 
     private final ConfigurationRepository repository;
+    private final TestRepository testRepository;
+    private final ResponseRepository responseRepository;
     private final ObjectMapper mapper;
 
     @Override
@@ -70,6 +75,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     public void deleteConfiguration(Long id) {
         Configuration configuration = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Configuration not found"));
+        for (Test test : configuration.getTests()) {
+            test.getResponses().forEach(responseRepository::delete);
+            testRepository.delete(test);
+        }
         repository.delete(configuration);
     }
 
@@ -87,7 +96,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     private void configurationDTOToConfiguration(ConfigurationDTO configurationDTO, Configuration configuration) {
         configuration.setName(configurationDTO.getName().trim());
-        configuration.setRegistration(configurationDTO.isRegistration());
         configuration.setCertaintyLevel(configurationDTO.getCertaintyLevel());
         configuration.setLoginAllStocks(configurationDTO.getLoginAllStocks());
         configuration.setLoginMakeOrder(configurationDTO.getLoginMakeOrder());

@@ -3,7 +3,6 @@ package org.project.benchmark.app.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.project.benchmark.app.dto.ConfigurationDTO;
 import org.project.benchmark.app.dto.ErrorResponse;
 import org.project.benchmark.app.dto.TestDTO;
@@ -21,10 +20,6 @@ import javax.validation.Valid;
 @AllArgsConstructor
 @Api(value = "Configurations", description = "REST API for configuration's management", tags = "Configurations")
 @CrossOrigin("*")
-@ApiResponses({
-        @ApiResponse(code = 400, message = "The request could not be understood or was missing required parameters.",
-                response = ErrorResponse.class),
-})
 public class ConfigurationController {
 
     private final ConfigurationService configurationService;
@@ -44,7 +39,7 @@ public class ConfigurationController {
     @ApiResponses({@ApiResponse(code = 200, message = "Configuration's indexes was successfully created."),
             @ApiResponse(code = 400, message = "The request could not be understood or was missing required parameters.",
                     response = ErrorResponse.class),
-            @ApiResponse(code = 409, message = "Given configuration already exist.", response = ErrorResponse.class)})
+            @ApiResponse(code = 409, message = "Configuration with given name already exists.", response = ErrorResponse.class)})
     public void create(@RequestBody @Valid ConfigurationDTO configurationDTO) {
         configurationService.createConfiguration(configurationDTO);
     }
@@ -54,7 +49,7 @@ public class ConfigurationController {
     @ApiResponses({@ApiResponse(code = 200, message = "Configuration was successfully retrieved."),
             @ApiResponse(code = 404, message = "Given configuration not found.", response = ErrorResponse.class)})
     public ConfigurationDTO getConfigurationDetails(@ApiParam(value = "Id of desired Configuration", required = true)
-                                                        @PathVariable Long id) {
+                                                    @PathVariable Long id) {
         return mapper.convertValue(configurationService.getConfigurationByID(id),
                 ConfigurationDTO.class);
     }
@@ -75,23 +70,19 @@ public class ConfigurationController {
     @DeleteMapping("/{id}")
     @ApiOperation(value = "Delete existing Configuration")
     @ApiResponses({@ApiResponse(code = 200, message = "Configuration's indexes was successfully deleted."),
-            @ApiResponse(code = 400, message = "The request could not be understood or was missing required parameters.",
-                    response = ErrorResponse.class),
             @ApiResponse(code = 404, message = "Given configuration not found.", response = ErrorResponse.class)})
     public void delete(@ApiParam(value = "The id of configuration to delete.", required = true)
-                           @PathVariable Long id) {
+                       @PathVariable Long id) {
         configurationService.deleteConfiguration(id);
     }
 
-    @GetMapping("/{id}/test")
+    @GetMapping("/{id}/tests")
     @ApiOperation(value = "Page given configuration's tests")
     @ApiResponses({@ApiResponse(code = 200, message = "Successfully paged configuration's tests."),
-            @ApiResponse(code = 400, message = "The request could not be understood or was missing required parameters.",
-                    response = ErrorResponse.class),
             @ApiResponse(code = 404, message = "Given configuration not found.", response = ErrorResponse.class)
     })
     public Page<TestDTO> getConfigurationTests(@ApiParam(value = "The configuration's id",  required = true)
-                                                   @PathVariable Long id, @ApiIgnore Pageable pageable) {
+                                               @PathVariable Long id, @ApiIgnore Pageable pageable) {
         return testService.getConfigurationTests(id,pageable)
                 .map(test -> mapper.convertValue(test,TestDTO.class));
     }

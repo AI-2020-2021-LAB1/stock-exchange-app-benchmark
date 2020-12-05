@@ -1,18 +1,22 @@
 package org.project.benchmark.app.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+@JsonIgnoreProperties(value = { "tests" })
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-@Getter
-@Setter
+@Data
 @ApiModel(description = "Configuration object stored in database.")
 public class ConfigurationDTO {
 
@@ -28,9 +32,6 @@ public class ConfigurationDTO {
 
     @ApiModelProperty(notes = "The configuration's archiving status")
     private boolean archived;
-
-    @ApiModelProperty(notes = "The configuration's registration status")
-    private boolean registration;
 
     @ApiModelProperty(notes = "The configuration's certainty level")
     private BigDecimal certaintyLevel;

@@ -21,12 +21,12 @@ public interface ResponseRepository extends JpaRepository<Response, Long>,
     <S extends Response> S save(S s);
 
     @Override
-    Page<Response> findAll(@Nullable Specification<Response> var1, Pageable var2);
+    Page<Response> findAll(@Nullable Specification<Response> specification, Pageable pageable);
 
 
     @Query("SELECT r FROM Response r WHERE r.test.id = :testId ORDER BY r.responseDate desc")
     List<Response> findResponseByTestId(@Param("testId") Long testId);
 
     @Query("SELECT r FROM Response r WHERE r.test.id = :testId ORDER BY r.responseDate desc")
-    Page<Response> findResponseByTestId(@Param("testId") Long testId, Pageable pa);
+    Page<Response> findResponseByTestId(@Param("testId") Long testId, Pageable pageable);
 }
