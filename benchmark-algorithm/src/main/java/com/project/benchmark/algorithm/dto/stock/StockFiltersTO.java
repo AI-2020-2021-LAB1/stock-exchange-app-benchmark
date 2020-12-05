@@ -10,14 +10,20 @@ import lombok.Setter;
 public class StockFiltersTO {
     private String abbreviation;
     private Long amount;
+    @QueryString("amount>")
     private Long amountMore;
+    @QueryString("amount<")
     private Long amountLess;
     private Double currentPrice;
+    @QueryString("currentPrice>")
     private Double currentPriceMore;
+    @QueryString("currentPrice<")
     private Double currentPriceLess;
     private String name;
-    private Double priceChangeRatioLess;
+    @QueryString("priceChangeRatio>")
     private Double priceChangeRatioMore;
+    @QueryString("priceChangeRatio<")
+    private Double priceChangeRatioLess;
     private PageParams pageParams;
     private String tag;
 }
