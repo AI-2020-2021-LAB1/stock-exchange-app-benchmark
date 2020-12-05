@@ -5,7 +5,7 @@ import com.project.benchmark.algorithm.utils.QueryString;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 
 @Getter
 @Setter

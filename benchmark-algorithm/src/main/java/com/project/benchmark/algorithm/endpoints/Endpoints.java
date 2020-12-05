@@ -2,7 +2,7 @@ package com.project.benchmark.algorithm.endpoints;
 
 public class Endpoints {
     //Adres do serwisu
-    String address = "{host:port}";
+    public static final String address = "{host:port}";
 
     //Token logowania [GET]
     public static final String OAUTH_TOKEN = "/oauth/token";

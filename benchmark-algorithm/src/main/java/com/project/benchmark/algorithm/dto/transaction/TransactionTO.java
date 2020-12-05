@@ -4,7 +4,7 @@ import com.project.benchmark.algorithm.dto.order.OrderTO;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.OffsetDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
