@@ -95,8 +95,8 @@ public class ConfigurationApiTest {
 
     @Test
     void shouldCreateConfiguration(){
-        ConfigurationDTO configurationDTO = createCustomConfigurationDTO("ASD",false);
-        Configuration configuration = createCustomConf(null, configurationDTO.getName(),configurationDTO.isRegistration());
+        ConfigurationDTO configurationDTO = createCustomConfigurationDTO("ASD");
+        Configuration configuration = createCustomConf(null, configurationDTO.getName());
         when(configurationRepository.findByName(configurationDTO.getName())).thenReturn(Optional.empty());
         when(mapper.convertValue(configurationDTO, Configuration.class)).thenReturn(configuration);
         assertAll(() -> configurationService.createConfiguration(configurationDTO));
@@ -124,7 +124,7 @@ public class ConfigurationApiTest {
         return Configuration.builder()
                 .id(id).name(RandomString.make())
                 .createdAt(OffsetDateTime.now())
-                .archived(false).registration(false)
+                .archived(false)
                 .certaintyLevel(BigDecimal.ONE)
                 .loginAllStocks(BigDecimal.ONE)
                 .loginOwnedStocks(BigDecimal.ONE)
@@ -144,11 +144,11 @@ public class ConfigurationApiTest {
                 .build();
     }
 
-    private static Configuration createCustomConf(Long id, String name,Boolean registration) {
+    private static Configuration createCustomConf(Long id, String name) {
         return Configuration.builder()
                 .id(id).name(name)
                 .createdAt(OffsetDateTime.now())
-                .archived(false).registration(registration)
+                .archived(false)
                 .certaintyLevel(BigDecimal.ONE)
                 .loginAllStocks(BigDecimal.ONE)
                 .loginOwnedStocks(BigDecimal.ONE)
@@ -168,12 +168,12 @@ public class ConfigurationApiTest {
                 .build();
     }
 
-    public static ConfigurationDTO createCustomConfigurationDTO(Long id, String name,Boolean registration) {
+    public static ConfigurationDTO createCustomConfigurationDTO(Long id, String name) {
         return ConfigurationDTO.builder()
                 .id(id)
                 .name(name)
                 .createdAt(OffsetDateTime.now())
-                .archived(false).registration(registration)
+                .archived(false)
                 .certaintyLevel(BigDecimal.ONE)
                 .loginAllStocks(BigDecimal.ONE)
                 .loginOwnedStocks(BigDecimal.ONE)
@@ -193,11 +193,11 @@ public class ConfigurationApiTest {
                 .build();
     }
 
-    public static ConfigurationDTO createCustomConfigurationDTO(String name,Boolean registration) {
+    public static ConfigurationDTO createCustomConfigurationDTO(String name) {
         return ConfigurationDTO.builder()
                 .name(name)
                 .createdAt(OffsetDateTime.now())
-                .archived(false).registration(registration)
+                .archived(false)
                 .certaintyLevel(BigDecimal.ONE)
                 .loginAllStocks(BigDecimal.ONE)
                 .loginOwnedStocks(BigDecimal.ONE)
@@ -231,7 +231,6 @@ public class ConfigurationApiTest {
                 () -> assertEquals(expected.getName(), output.getName()),
                 () -> assertEquals(expected.getCreatedAt(), output.getCreatedAt()),
                 () -> assertEquals(expected.isArchived(), output.isArchived()),
-                () -> assertEquals(expected.isRegistration(), output.isRegistration()),
                 () -> assertEquals(expected.getCertaintyLevel(), output.getCertaintyLevel()),
                 () -> assertEquals(expected.getLoginAllStocks(), output.getLoginAllStocks()),
                 () -> assertEquals(expected.getLoginOwnedStocks(), output.getLoginOwnedStocks()),

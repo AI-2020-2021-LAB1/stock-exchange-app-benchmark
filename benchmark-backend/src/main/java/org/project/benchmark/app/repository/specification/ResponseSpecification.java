@@ -10,9 +10,9 @@ import org.springframework.data.jpa.domain.Specification;
 @Join(path = "test", alias = "t")
 @And({
         @Spec(path = "t.id", spec = Equal.class, params = {"testId"}),
-        @Spec(path = "endpoint", spec = LikeIgnoreCase.class, params = {"endpoint"}),
-        @Spec(path = "statusCode", spec = Equal.class, params = {"statusCode"}),
-        @Spec(path = "methodType", spec = EqualIgnoreCase.class, params = {"methodType"}),
+        @Spec(path = "endpoint", spec = LikeIgnoreCase.class),
+        @Spec(path = "statusCode", spec = Equal.class),
+        @Spec(path = "methodType", spec = EqualIgnoreCase.class),
         @Spec(path = "responseDate", spec = GreaterThanOrEqual.class, params = {"responseDate>"}),
         @Spec(path = "responseDate", spec =  LessThanOrEqual.class, params = {"responseDate<"}),
         @Spec(path = "usersLoggedIn", spec = GreaterThanOrEqual.class, params = {"usersLoggedIn>"}),

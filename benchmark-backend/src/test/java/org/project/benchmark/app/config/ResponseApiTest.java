@@ -157,7 +157,7 @@ public class ResponseApiTest {
         return Configuration.builder()
                 .id(id).name(RandomString.make())
                 .createdAt(OffsetDateTime.now())
-                .archived(false).registration(false)
+                .archived(false)
                 .certaintyLevel(BigDecimal.ONE)
                 .loginAllStocks(BigDecimal.ONE)
                 .loginOwnedStocks(BigDecimal.ONE)

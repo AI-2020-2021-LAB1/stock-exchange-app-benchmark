@@ -1,7 +1,11 @@
 package org.project.benchmark.app.entity;
 
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -28,9 +32,6 @@ public class Configuration {
 
     @Column(nullable = false, name = "archived")
     private boolean archived;
-
-    @Column(nullable = false, name = "registration")
-    private boolean registration;
 
     @Column(nullable = false, name = "certainty_level")
     private BigDecimal certaintyLevel;
@@ -80,6 +81,7 @@ public class Configuration {
     @Column(nullable = false, name = "no_of_money")
     private BigDecimal noOfMoney;
 
+    @JsonIgnore
     @OneToMany(targetEntity = Test.class, mappedBy = "configuration")
     private List<Test> tests;
 }

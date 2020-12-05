@@ -165,7 +165,7 @@ public class TestApiTest {
         return Configuration.builder()
                 .id(id).name(RandomString.make())
                 .createdAt(OffsetDateTime.now())
-                .archived(false).registration(false)
+                .archived(false)
                 .certaintyLevel(BigDecimal.ONE)
                 .loginAllStocks(BigDecimal.ONE)
                 .loginOwnedStocks(BigDecimal.ONE)
@@ -190,7 +190,7 @@ public class TestApiTest {
                 .id(id)
                 .name(RandomString.make())
                 .createdAt(OffsetDateTime.now())
-                .archived(false).registration(false)
+                .archived(false)
                 .certaintyLevel(BigDecimal.ONE)
                 .loginAllStocks(BigDecimal.ONE)
                 .loginOwnedStocks(BigDecimal.ONE)
@@ -209,7 +209,7 @@ public class TestApiTest {
                 .noOfMoney(BigDecimal.ONE)
                 .build();
     }
-    
+
     public static void assertTest(Test output, Test expected) {
         assertAll(() -> assertEquals(expected.getId(), output.getId()),
                 () -> assertEquals(expected.getStartDate(), output.getStartDate()),

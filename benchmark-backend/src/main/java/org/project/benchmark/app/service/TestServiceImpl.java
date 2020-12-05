@@ -6,6 +6,7 @@ import org.project.benchmark.app.dto.TestDTO;
 import org.project.benchmark.app.entity.Configuration;
 import org.project.benchmark.app.entity.Test;
 import org.project.benchmark.app.repository.ConfigurationRepository;
+import org.project.benchmark.app.repository.ResponseRepository;
 import org.project.benchmark.app.repository.TestRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ public class TestServiceImpl implements TestService {
 
     private final TestRepository repository;
     private final ConfigurationRepository configurationRepository;
+    private final ResponseRepository responseRepository;
     private final ObjectMapper mapper;
 
     @Override
@@ -49,7 +51,8 @@ public class TestServiceImpl implements TestService {
     @Transactional
     public void updateTest(TestDTO testDTO, Long id) {
         Test test = getTestByID(id);
-        testDTOToTest(testDTO, test);
+        test.setEndDate(testDTO.getEndDate());
+        test.setStartDate(testDTO.getStartDate());
         repository.save(test);
     }
 
@@ -66,6 +69,7 @@ public class TestServiceImpl implements TestService {
     public void deleteTest(Long id) {
         Test test = repository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Test not found"));
+        test.getResponses().forEach(responseRepository::delete);
         repository.delete(test);
     }
 

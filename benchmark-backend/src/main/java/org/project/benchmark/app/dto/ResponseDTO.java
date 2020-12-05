@@ -26,6 +26,9 @@ public class ResponseDTO {
     @ApiModelProperty(notes = "The response's endpoint.")
     private String endpoint;
 
+    @ApiModelProperty(notes = "The response's status code.")
+    private Integer statusCode;
+
     @ApiModelProperty(notes = "The response's method type.")
     private MethodType methodType;
 
