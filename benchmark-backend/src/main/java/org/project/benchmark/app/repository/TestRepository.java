@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.OffsetDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -23,4 +25,14 @@ public interface TestRepository extends JpaRepository<Test, Long>,
 
     @Query("SELECT t FROM Test t WHERE t.configuration.id = :configurationId ORDER BY t.startDate desc")
     Page<Test> findTestByConfigurationId(@Param("configurationId") Long configurationId, Pageable pa);
+
+    @Query("SELECT t FROM Test t WHERE t.id not in :ids and :date between t.startDate and t.endDate")
+    List<Test> findTestsToBegin(@Param("ids") Collection<Long> ids, @Param("date") OffsetDateTime date);
+
+    @Query("SELECT t FROM Test t WHERE :date between t.startDate and t.endDate")
+    List<Test> findTestsToBegin(@Param("date") OffsetDateTime date);
+
+    @Query("SELECT t FROM Test t WHERE t.id in :ids and :date > t.endDate")
+    List<Test> findTestsToFinish(@Param("ids") Collection<Long> ids, @Param("date") OffsetDateTime date);
+
 }
