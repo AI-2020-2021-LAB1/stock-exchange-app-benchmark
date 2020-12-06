@@ -79,6 +79,10 @@ public class BenchmarkService {
                 saveSingleQueueResponses( testId, queue);
             }
         }
+    }
+
+    @Scheduled(fixedDelay = 5000)
+    void scheduleStartEnd() {
         if(benchmarks.isEmpty()) {
             List<Test> testsToStart = testRepository.findTestsToBegin(OffsetDateTime.now());
             testsToStart.forEach(this::startBenchmark);
