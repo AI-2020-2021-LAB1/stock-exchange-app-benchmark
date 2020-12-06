@@ -104,6 +104,7 @@ public class BenchmarkLauncher {
                 .userCount(conf.getNoOfUsers())
                 .build();
 
+        environment.start();
     }
 
     private void internalStop() {

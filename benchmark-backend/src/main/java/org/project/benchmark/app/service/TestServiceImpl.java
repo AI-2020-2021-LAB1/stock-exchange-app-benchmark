@@ -26,7 +26,7 @@ public class TestServiceImpl implements TestService {
     private final ObjectMapper mapper;
 
     @Override
-    public List<Test> getAllTests()  {
+    public List<Test> getAllTests() {
         return repository.findAll();
     }
 
@@ -59,8 +59,9 @@ public class TestServiceImpl implements TestService {
     @Override
     @Transactional
     public void createTest(TestDTO testDTO) {
-        Test test = mapper.convertValue(testDTO,Test.class);
+        Test test = mapper.convertValue(testDTO, Test.class);
         testDTOToTest(testDTO, test);
+        test.setUserCount(testDTO.getUserCount());
         repository.save(test);
     }
 
@@ -78,10 +79,10 @@ public class TestServiceImpl implements TestService {
     public Page<Test> getConfigurationTests(Long configurationId, Pageable pageable) {
         configurationRepository.findById(configurationId).orElseThrow(() ->
                 new EntityNotFoundException("Configuration Not Found"));
-        return repository.findTestByConfigurationId(configurationId,pageable);
+        return repository.findTestByConfigurationId(configurationId, pageable);
     }
 
-    private void testDTOToTest(TestDTO testDTO, Test test){
+    private void testDTOToTest(TestDTO testDTO, Test test) {
         test.setConfiguration(mapper.convertValue(testDTO.getConfiguration(), Configuration.class));
         test.setEndDate(testDTO.getEndDate());
         test.setStartDate(testDTO.getStartDate());
