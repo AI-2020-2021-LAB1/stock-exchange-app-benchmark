@@ -87,10 +87,18 @@ public class BenchmarkService {
             List<Test> testsToStart = testRepository.findTestsToBegin(OffsetDateTime.now());
             testsToStart.forEach(this::startBenchmark);
         } else {
+            List<Test> allTests = testRepository.findAllById(benchmarks.keySet());
+            Map<Long, Test> tests = allTests.stream().collect(Collectors.toMap(Test::getId, t -> t));
+            for(var e: benchmarks.entrySet()) {
+                if(tests.get(e.getKey()) == null) {
+                    e.getValue().stop();
+                }
+                else if(tests.get(e.getKey()).getEndDate().isBefore(OffsetDateTime.now())) {
+                    e.getValue().stop();
+                }
+            }
             List<Test> testsToStart = testRepository.findTestsToBegin(benchmarks.keySet(), OffsetDateTime.now());
             testsToStart.forEach(this::startBenchmark);
-            List<Test> testsToEnd = testRepository.findTestsToFinish(benchmarks.keySet(), OffsetDateTime.now());
-            testsToEnd.forEach(this::stopBenchmark);
         }
     }
 
