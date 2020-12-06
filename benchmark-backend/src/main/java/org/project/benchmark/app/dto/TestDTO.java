@@ -36,4 +36,7 @@ public class TestDTO {
     @NotNull(message = "This field is required.")
     private ConfigurationDTO configuration;
 
+    @ApiModelProperty(notes = "User count specified for test")
+    @NotNull(message = "This field is required.")
+    private Integer userCount;
 }

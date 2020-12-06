@@ -25,4 +25,5 @@ public class BenchmarkConfiguration {
     private BigDecimal makeOrderSellOrder;
     private BigDecimal noOfOperations;
     private BigDecimal noOfMoney;
+    private Integer noOfUsers;
 }

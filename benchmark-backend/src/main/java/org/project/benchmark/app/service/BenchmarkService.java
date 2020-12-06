@@ -44,6 +44,7 @@ public class BenchmarkService {
     void startBenchmark(Test test) {
         Configuration conf = test.getConfiguration();
         BenchmarkConfiguration benchmarkConf = mapper.convertValue(conf, BenchmarkConfiguration.class);
+        benchmarkConf.setNoOfUsers(test.getUserCount());
         BenchmarkLauncher launcher = new BenchmarkLauncher(benchmarkConf);
         LinkedBlockingQueue<ResponseTO> queue = new LinkedBlockingQueue<>();
         boolean success = launcher.start(queue);

@@ -32,6 +32,9 @@ public class Test {
     @Column(nullable = false, name = "end_date")
     private OffsetDateTime endDate;
 
+    @Column(nullable = false, name = "user_count")
+    private Integer userCount;
+
     @JsonIgnore
     @OneToMany(targetEntity = Response.class, mappedBy = "test")
     private List<Response> responses;

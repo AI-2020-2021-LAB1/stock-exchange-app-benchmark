@@ -13,7 +13,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class BenchmarkLauncher {
 
-    public static final int USER_COUNT = 100;
     /**
      * full configuration taken from DB
      */
@@ -102,7 +101,7 @@ public class BenchmarkLauncher {
         environment = BenchmarkEnvironment.builder(responseQueue)
                 .tree(tree)
                 .operations(conf.getNoOfOperations().intValue())
-                .userCount(USER_COUNT)
+                .userCount(conf.getNoOfUsers())
                 .build();
 
     }
