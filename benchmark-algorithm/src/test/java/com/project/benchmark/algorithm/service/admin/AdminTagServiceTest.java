@@ -33,7 +33,7 @@ public class AdminTagServiceTest {
 
     @Test
     public void removeTagTest() {
-        String tag = "TAG";//put existing tag
+        String tag = "BENCHMARK";//put existing tag
         var response = adminTagService.removeTag(tag);
         assertNull(response.getError());
         assertEquals(200, response.getParams().getStatus().intValue());

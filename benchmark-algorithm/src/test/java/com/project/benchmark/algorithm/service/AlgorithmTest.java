@@ -57,19 +57,6 @@ public class AlgorithmTest {
     }
 
     @Test
-    public void testGetUserDetails()  {
-        userService = new UserService(new LinkedBlockingQueue<>());
-        String auth = login();
-        assertNotNull(auth);
-        userDetailsService = new UserDetailsService(auth, new LinkedBlockingQueue<>());
-        ResponseDataTO<UserDetailsTO> details = userDetailsService.getUserDetails();
-        assertNull(details.getError());
-        assertNotNull(details.getData());
-        users.add(details.getData());
-        printUsers();
-    }
-
-    @Test
     public void testRegister() throws JsonProcessingException {
         testGenerateUserData();
         RegisterUserTO body = new RegisterUserTO();
@@ -80,6 +67,18 @@ public class AlgorithmTest {
         UserService userService = new UserService(responseQueue);
         userService.register(body, "BENCHMARK");
         testGetUserDetails();
+    }
+
+    public void testGetUserDetails() {
+        userService = new UserService(new LinkedBlockingQueue<>());
+        String auth = login();
+        assertNotNull(auth);
+        userDetailsService = new UserDetailsService(auth, new LinkedBlockingQueue<>());
+        ResponseDataTO<UserDetailsTO> details = userDetailsService.getUserDetails();
+        assertNull(details.getError());
+        assertNotNull(details.getData());
+        users.add(details.getData());
+        printUsers();
     }
 
     @Test
@@ -142,13 +141,14 @@ public class AlgorithmTest {
 
     private String loginAdmin() {
         LoginUserTO user = new LoginUserTO();
-        user.setUsername("{userName}");
-        user.setPassword("{password}");
+        user.setUsername("admin_username_required");
+        user.setPassword("admin_password_required");
         return userService.login(user).getData();
     }
 
     @Test
-    public void testGenerateRandomStock() {
+    public void testGenerateRandomStock() throws JsonProcessingException {
+        testRegister();
         NewStockTO newStock = new NewStockTO();
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < 3; i++) {
@@ -225,18 +225,8 @@ public class AlgorithmTest {
                 break;
             stocks.addAll(response.getData());
             i++;
-        } while(true);
+        } while (true);
         stocks.forEach(p -> System.out.println(p.getName() + " " + p.getAmount() + " " + p.getId() + " " + p.getTag() + " " + p.getCurrentPrice() + " " + p.getPriceChangeRatio() + " " + p.getAbbreviation()));
-    }
-
-    @Test
-    public void testRemoveTag() {
-        String auth = loginAdmin();
-        String tag = "BENCHMARK";
-        AdminTagService adminTagService = new AdminTagService(auth, responseQueue);
-        var response = adminTagService.removeTag(tag);
-        assertNull(response.getError());
-        assertEquals(200, response.getParams().getStatus().intValue());
     }
 
     @Test
@@ -302,7 +292,7 @@ public class AlgorithmTest {
                 break;
             i++;
             stocks.addAll(response.getData());
-        } while(true);
+        } while (true);
     }
 
     @Test
@@ -316,16 +306,33 @@ public class AlgorithmTest {
             PageParams params = new PageParams(i, 1000, Collections.singletonList(sort));
             filters.setPageParams(params);
             var response = userDetailsService.getOwnedOrders(filters);
-            if (response.getData().size() <1000)
+            if (response.getData().size() <= 0)
                 break;
+            else {
+                orders.addAll(response.getData());
+                if (response.getData().size() < 1000)
+                    break;
+            }
             i++;
             orders.addAll(response.getData());
-        } while(true);
+        } while (true);
     }
 
     @Test
     public void testDeactivateOrder() throws JsonProcessingException {
+        getOwnedOrders();
         ResponseDataTO<Void> response = adminOrderService.deactivateOrder(orders.get(0).getId());
+        assertNull(response.getError());
+        assertEquals(200, response.getParams().getStatus().intValue());
+    }
+
+
+    @Test
+    public void testRemoveTag() {
+        String auth = loginAdmin();
+        String tag = "BENCHMARK";
+        AdminTagService adminTagService = new AdminTagService(auth, responseQueue);
+        var response = adminTagService.removeTag(tag);
         assertNull(response.getError());
         assertEquals(200, response.getParams().getStatus().intValue());
     }

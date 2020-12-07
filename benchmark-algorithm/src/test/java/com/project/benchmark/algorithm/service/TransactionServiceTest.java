@@ -36,7 +36,7 @@ public class TransactionServiceTest extends TestCase {
 
     private ResponseDataTO<List<TransactionTO>> getTransactions() {
         TransactionFiltersTO filters = new TransactionFiltersTO();
-        SortParams sort = new SortParams("name", true);
+        SortParams sort = new SortParams("date", true);
         PageParams params = new PageParams(0, 20, Collections.singletonList(sort));
         filters.setPageParams(params);
         return transactionService.getTransactions(filters);

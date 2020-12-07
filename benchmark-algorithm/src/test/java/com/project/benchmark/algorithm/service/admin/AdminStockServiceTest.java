@@ -18,6 +18,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import static org.junit.Assert.*;
 
 public class AdminStockServiceTest {
+    /*
+
 
     AdminStockService stockService;
     UserService userService;
@@ -32,30 +34,30 @@ public class AdminStockServiceTest {
 
     private String login() {
         LoginUserTO user = new LoginUserTO();
-        user.setUsername("MarcinNajman@gmail.pl");
-        user.setPassword("MarcinNajman.gmail.pl1");
+        user.setUsername("admin_login_required");
+        user.setPassword("admin_password_required");
         return userService.login(user).getData();
     }
 
     @Test
     public void createStock() throws JsonProcessingException {
         NewStockTO stock = createExampleStock();
-        ResponseDataTO<Void> response = stockService.createStock(stock, null);
+        ResponseDataTO<Void> response = stockService.createStock(stock, "BENCHMARK");
         assertNull(response.getError());
         assertEquals(Integer.valueOf(200), response.getParams().getStatus());
     }
 
     private NewStockTO createExampleStock() {
         NewStockTO newStock = new NewStockTO();
-        newStock.setAbbreviation("abc");
+        newStock.setAbbreviation("CBA");
         newStock.setAmount(123);
         newStock.setCurrentPrice(1.23);
-        newStock.setName("abcMyFunc");
+        newStock.setName("CBANewFunc");
         newStock.setPriceChangeRatio(0.0);
         StockOwnerTO owner = new StockOwnerTO();
         owner.setAmount(123);
         StockUserTO user = new StockUserTO();
-        user.setId(30); //change user id to correct one (between 2 and 30 should work)
+        user.setId(641); //change user id to correct one
         owner.setUser(user);
         newStock.setOwners(Collections.singletonList(owner));
         return newStock;
@@ -63,7 +65,7 @@ public class AdminStockServiceTest {
 
     @Test
     public void removeStockTest() {
-        Integer stockId = 40; //put there correct stock id (for example from previous test)
+        Integer stockId = 633; //put there correct stock id (for example from previous test)
         ResponseDataTO<Void> response = stockService.removeStock(stockId);
         assertNull(response.getError());
         assertEquals(Integer.valueOf(200), response.getParams().getStatus());
@@ -71,11 +73,13 @@ public class AdminStockServiceTest {
 
     @Test
     public void getStockOwnersTest() throws IOException {
-        Integer stockId = 29; //put there correct stock id (for example from previous test)
+        Integer stockId = 633; //put there correct stock id (for example from previous test)
         StockOwnersFiltersTO filters = new StockOwnersFiltersTO();
-        filters.setPageParams(new PageParams(0, 20, Collections.singletonList(new SortParams("email", true))));
+        filters.setPageParams(new PageParams(0, 20, Collections.singletonList(new SortParams("id", true))));
         ResponseDataTO<List<StockOwnerTO>> response = stockService.getStockOwners(stockId, filters);
         assertNull(response.getError());
         assertNotNull(response.getData());
     }
+
+     */
 }

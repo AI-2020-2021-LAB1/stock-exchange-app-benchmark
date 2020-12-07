@@ -45,7 +45,7 @@ public class UserDetailsServiceTest {
     @Test
     public void getOwnedOrders() {
         OrderFiltersTO filters = new OrderFiltersTO();
-        SortParams sort = new SortParams("name", true);
+        SortParams sort = new SortParams("id", true);
         PageParams params = new PageParams(0, 20, Collections.singletonList(sort));
         filters.setPageParams(params);
         var orders = userDetailsService.getOwnedOrders(filters);
@@ -56,7 +56,7 @@ public class UserDetailsServiceTest {
     @Test
     public void getOwnedStocks() {
         StockFiltersTO filters = new StockFiltersTO();
-        SortParams sort = new SortParams("name", true);
+        SortParams sort = new SortParams("id", true);
         PageParams params = new PageParams(0, 20, Collections.singletonList(sort));
         filters.setPageParams(params);
         var stocks = userDetailsService.getOwnedStocks(filters);
