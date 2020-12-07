@@ -7,8 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import org.project.benchmark.app.dto.ConfigurationDTO;
 import org.project.benchmark.app.dto.TestDTO;
 import org.project.benchmark.app.entity.Configuration;
@@ -123,8 +121,6 @@ public class TestApiTest {
     }
 
     @org.junit.jupiter.api.Test
-    @ExtendWith(MockitoExtension.class)
-    @MockitoSettings(strictness = Strictness.LENIENT)
     void shouldPageTestsFromConfiguration() {
         Configuration configuration = createCustomConf(1L);
         when(configurationRepository.findById(1L)).thenReturn(Optional.of(configuration));
@@ -133,7 +129,6 @@ public class TestApiTest {
                 createCustomTest(2L),
                 createCustomTest(3L));
         Pageable pageable = PageRequest.of(0,20);
-        when(testRepository.findTestByConfigurationId(1L)).thenReturn(testList);
         when(testRepository.findTestByConfigurationId(Mockito.anyLong(),Mockito.eq(pageable)))
                 .thenReturn(new PageImpl<>(testList, pageable, testList.size()));
         Page<Test> output = testService.getConfigurationTests(1L,pageable);
@@ -150,6 +145,7 @@ public class TestApiTest {
                 .startDate(OffsetDateTime.now())
                 .endDate(OffsetDateTime.now(ZoneId.of("UTC+03:00")))
                 .configuration(createCustomConf((long) 1))
+                .userCount(1)
                 .build();
     }
 
@@ -158,6 +154,7 @@ public class TestApiTest {
                 .startDate(OffsetDateTime.now())
                 .endDate(OffsetDateTime.now(ZoneId.of("UTC+03:00")))
                 .configuration(createCustomConfigurationDTO((long) 1))
+                .userCount(1)
                 .build();
     }
 
@@ -214,6 +211,7 @@ public class TestApiTest {
         assertAll(() -> assertEquals(expected.getId(), output.getId()),
                 () -> assertEquals(expected.getStartDate(), output.getStartDate()),
                 () -> assertEquals(expected.getEndDate(), output.getEndDate()),
-                () -> assertEquals(expected.getConfiguration(), output.getConfiguration()));
+                () -> assertEquals(expected.getConfiguration(), output.getConfiguration()),
+                () -> assertEquals(expected.getUserCount(), output.getUserCount()));
     }
 }

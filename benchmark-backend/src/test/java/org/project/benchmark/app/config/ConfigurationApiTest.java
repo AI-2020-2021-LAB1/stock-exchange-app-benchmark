@@ -8,8 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import org.project.benchmark.app.dto.ConfigurationDTO;
 import org.project.benchmark.app.entity.Configuration;
 import org.project.benchmark.app.repository.ConfigurationRepository;
@@ -22,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +35,7 @@ public class ConfigurationApiTest {
 
     @Mock
     ConfigurationRepository configurationRepository;
+
     @Mock
     ObjectMapper mapper;
 
@@ -50,7 +48,7 @@ public class ConfigurationApiTest {
     }
 
     @Test
-    void shouldThrowEntityNotFoundWhenGettingTestById() {
+    void shouldThrowEntityNotFoundWhenGettingConfigurationById() {
         Long id = 1L;
         when(configurationRepository.findById(id)).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> configurationService.getConfigurationByID(id));
@@ -103,9 +101,7 @@ public class ConfigurationApiTest {
     }
 
     @Test
-    @ExtendWith(MockitoExtension.class)
-    @MockitoSettings(strictness = Strictness.LENIENT)
-    void shouldDeleteTest() {
+    void shouldDeleteConfiguration() {
         Long id = 1L;
         Configuration configuration = createCustomConf(id);
         when(configurationRepository.findById(id)).thenReturn(Optional.of(configuration));
@@ -113,12 +109,11 @@ public class ConfigurationApiTest {
     }
 
     @Test
-    void shouldThrowEntityNotFoundExceptionWhenDeletingTest() {
+    void shouldThrowEntityNotFoundExceptionWhenDeletingConfiguration() {
         Long id = 1L;
         when(configurationRepository.findById(id)).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> configurationService.deleteConfiguration(id));
     }
-
 
     private static Configuration createCustomConf(Long id) {
         return Configuration.builder()
@@ -168,31 +163,6 @@ public class ConfigurationApiTest {
                 .build();
     }
 
-    public static ConfigurationDTO createCustomConfigurationDTO(Long id, String name) {
-        return ConfigurationDTO.builder()
-                .id(id)
-                .name(name)
-                .createdAt(OffsetDateTime.now())
-                .archived(false)
-                .certaintyLevel(BigDecimal.ONE)
-                .loginAllStocks(BigDecimal.ONE)
-                .loginOwnedStocks(BigDecimal.ONE)
-                .loginUserOrders(BigDecimal.ONE)
-                .loginMakeOrder(BigDecimal.ONE)
-                .allStocksMakeOrder(BigDecimal.ONE)
-                .allStocksEnd(BigDecimal.ONE)
-                .ownedStocksMakeOrder(BigDecimal.ONE)
-                .ownedStocksEnd(BigDecimal.ONE)
-                .userOrdersMakeOrder(BigDecimal.ONE)
-                .userOrdersEnd(BigDecimal.ONE)
-                .userOrderDeleteOrder(BigDecimal.ONE)
-                .makeOrderBuyOrder(BigDecimal.ONE)
-                .makeOrderSellOrder(BigDecimal.ONE)
-                .noOfOperations(BigDecimal.ONE)
-                .noOfMoney(BigDecimal.ONE)
-                .build();
-    }
-
     public static ConfigurationDTO createCustomConfigurationDTO(String name) {
         return ConfigurationDTO.builder()
                 .name(name)
@@ -214,15 +184,6 @@ public class ConfigurationApiTest {
                 .makeOrderSellOrder(BigDecimal.ONE)
                 .noOfOperations(BigDecimal.ONE)
                 .noOfMoney(BigDecimal.ONE)
-                .build();
-    }
-
-    private static org.project.benchmark.app.entity.Test createCustomTest(Long id) {
-        return org.project.benchmark.app.entity.Test.builder()
-                .id(id)
-                .startDate(OffsetDateTime.now())
-                .endDate(OffsetDateTime.now(ZoneId.of("UTC+03:00")))
-                .configuration(createCustomConf((long) 1))
                 .build();
     }
 
