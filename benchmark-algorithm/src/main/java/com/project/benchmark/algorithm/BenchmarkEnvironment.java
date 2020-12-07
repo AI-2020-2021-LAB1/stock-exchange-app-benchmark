@@ -5,6 +5,7 @@ import com.project.benchmark.algorithm.core.AdminIdentity;
 import com.project.benchmark.algorithm.core.BenchmarkState;
 import com.project.benchmark.algorithm.core.UserIdentity;
 import com.project.benchmark.algorithm.core.tree.ProbabilityTree;
+import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
 import com.project.benchmark.algorithm.dto.stock.NewStockTO;
 import com.project.benchmark.algorithm.dto.stock.StockOwnerTO;
 import com.project.benchmark.algorithm.dto.stock.StockUserTO;
@@ -24,7 +25,7 @@ class BenchmarkEnvironment {
     private static final int USER_THREADS = 8;
     private final List<UserIdentity> users = new ArrayList<>();
     private ThreadPoolExecutor backendExecutor;
-    private ThreadPoolExecutor userExecutor;
+    private ExecutorService userExecutor;
     private final String tag;
     private final AdminIdentity adminIdentity;
     private ProbabilityTree<UserIdentity> tree;
@@ -189,16 +190,18 @@ class BenchmarkEnvironment {
 
         private void createUsers() {
             int bound = userCount + 1;
-            Map<String, Future<?>> futures = new HashMap<>();
+            Map<String, Future<ResponseDataTO<?>>> futures = new HashMap<>();
             for (int i = 1; i < bound; i++) {
                 RegisterUserTO u = generateUser(i);
                 futures.put(u.getEmail(), environment.backendExecutor.submit(() -> userService.register(u, tag)));
             }
             for (var future : futures.entrySet()) {
                 try {
-                    future.getValue().get();
-                    UserIdentity identity = new UserIdentity(future.getKey(), queue, operations, tag);
-                    environment.users.add(identity);
+                    var response = future.getValue().get();
+                    if (response.isSuccess()) {
+                        UserIdentity identity = new UserIdentity(future.getKey(), queue, operations, tag);
+                        environment.users.add(identity);
+                    }
                 } catch (InterruptedException | ExecutionException ignored) {
                 }
             }
