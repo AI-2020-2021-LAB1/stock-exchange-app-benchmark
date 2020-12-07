@@ -8,8 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import org.project.benchmark.app.entity.Configuration;
 import org.project.benchmark.app.entity.MethodType;
 import org.project.benchmark.app.entity.Response;
@@ -84,7 +82,7 @@ public class ResponseApiTest {
         Pageable pageable = PageRequest.of(0,20);
         Specification<Response> responseSpecification =
                 (Specification<Response>) (root, criteriaQuery, criteriaBuilder) ->
-                        criteriaBuilder.equal(root.get("testId"), 3L);
+                        criteriaBuilder.equal(root.get("testId"), 2L);
         when(responseRepository.findAll(Mockito.any(Specification.class), Mockito.eq(pageable)))
                 .thenReturn(new PageImpl<>(responseList, pageable, responseList.size()));
         Page<Response> output = responseService.getResponses(pageable,responseSpecification);
@@ -110,8 +108,6 @@ public class ResponseApiTest {
     }
 
     @Test
-    @ExtendWith(MockitoExtension.class)
-    @MockitoSettings(strictness = Strictness.LENIENT)
     void shouldPageResponsesFromTest() {
         org.project.benchmark.app.entity.Test test = createCustomTest(1L);
         when(testRepository.findById(1L)).thenReturn(Optional.of(test));
@@ -120,7 +116,6 @@ public class ResponseApiTest {
                 createCustomResponse(2L,1L),
                 createCustomResponse(3L,1L));
         Pageable pageable = PageRequest.of(0,20);
-        when(responseRepository.findResponseByTestId(1L)).thenReturn(responseList);
         when(responseRepository.findResponseByTestId(Mockito.anyLong(),Mockito.eq(pageable)))
                 .thenReturn(new PageImpl<>(responseList, pageable, responseList.size()));
         Page<Response> output = responseService.getTestResponses(1L,pageable);
@@ -150,6 +145,7 @@ public class ResponseApiTest {
                 .startDate(OffsetDateTime.now())
                 .endDate(OffsetDateTime.now(ZoneId.of("UTC+03:00")))
                 .configuration(createCustomConf(1L))
+                .userCount(1)
                 .build();
     }
 

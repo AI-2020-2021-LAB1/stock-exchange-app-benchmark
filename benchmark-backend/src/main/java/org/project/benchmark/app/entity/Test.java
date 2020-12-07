@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.FutureOrPresent;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -27,16 +28,19 @@ public class Test {
     private Configuration configuration;
 
     @Column(nullable = false, name = "start_date")
+    @FutureOrPresent
     private OffsetDateTime startDate;
 
     @Column(nullable = false, name = "end_date")
+    @FutureOrPresent
     private OffsetDateTime endDate;
 
     @Column(nullable = false, name = "user_count")
     private Integer userCount;
 
     @JsonIgnore
-    @OneToMany(targetEntity = Response.class, mappedBy = "test")
+    @OneToMany(targetEntity = Response.class, mappedBy = "test",
+            cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH,CascadeType.REMOVE})
     private List<Response> responses;
 
 }

@@ -82,6 +82,7 @@ public class Configuration {
     private BigDecimal noOfMoney;
 
     @JsonIgnore
-    @OneToMany(targetEntity = Test.class, mappedBy = "configuration")
+    @OneToMany(targetEntity = Test.class, mappedBy = "configuration",
+            cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH,CascadeType.REMOVE})
     private List<Test> tests;
 }
