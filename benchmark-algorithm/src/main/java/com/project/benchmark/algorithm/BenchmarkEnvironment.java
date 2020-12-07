@@ -5,9 +5,11 @@ import com.project.benchmark.algorithm.core.AdminIdentity;
 import com.project.benchmark.algorithm.core.BenchmarkState;
 import com.project.benchmark.algorithm.core.UserIdentity;
 import com.project.benchmark.algorithm.core.tree.ProbabilityTree;
+import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
 import com.project.benchmark.algorithm.dto.stock.NewStockTO;
 import com.project.benchmark.algorithm.dto.stock.StockOwnerTO;
 import com.project.benchmark.algorithm.dto.stock.StockUserTO;
+import com.project.benchmark.algorithm.dto.tag.TagTO;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
 import com.project.benchmark.algorithm.exception.BenchmarkInitializationException;
 import com.project.benchmark.algorithm.internal.ResponseTO;
@@ -106,12 +108,13 @@ class BenchmarkEnvironment {
 
     static class BenchmarkEnvironmentBuilder {
         private static final String EMAIL_FORMAT = "%s_user%d@benchmark.com";
+        private static final int TAG_CREATION_CHANCES = 5;
         private static final int MAX_INIT_THREADS = 256;
         private static final int MAX_THREADS = 512;
         private final AdminIdentity adminIdentity;
         private final UserService userService;
         private final LinkedBlockingQueue<ResponseTO> queue;
-        private final String tag;
+        private String tag;
         private Integer userCount;
         private Integer stockCount;
         private Integer operations;
@@ -122,7 +125,6 @@ class BenchmarkEnvironment {
             adminIdentity = new AdminIdentity(queue);
             userService = new UserService(queue);
             this.queue = queue;
-            tag = RandomStringUtils.randomAlphanumeric(15);
         }
 
         BenchmarkEnvironmentBuilder userCount(int count) {
@@ -169,6 +171,7 @@ class BenchmarkEnvironment {
             if(!adminIdentity.isAuthenticated()) {
                 throw new BenchmarkInitializationException("Unable to login as admin");
             }
+            createTag();
             environment = new BenchmarkEnvironment(tag, adminIdentity);
             int executorThreads = USER_THREADS > userCount ? userCount : USER_THREADS;
             environment.userExecutor = new ThreadPoolExecutor(executorThreads, executorThreads, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
@@ -185,6 +188,21 @@ class BenchmarkEnvironment {
             createUsers();
             createStocks();
             return environment;
+        }
+
+        private void createTag() throws BenchmarkInitializationException {
+            ResponseDataTO<Void> response;
+            for(int counter = 1; counter <= TAG_CREATION_CHANCES; counter++) {
+                tag = RandomStringUtils.randomAlphanumeric(15);
+                try {
+                    response = adminIdentity.getTagService().createTag(new TagTO(tag));
+                    if(response.getError() == null) {
+                        return;
+                    }
+                } catch (JsonProcessingException ignored) {
+                }
+            }
+            throw new BenchmarkInitializationException("Unable to create tag");
         }
 
         private void createUsers() {
