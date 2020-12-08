@@ -31,11 +31,13 @@ import java.time.OffsetDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class BackendCoreService {
 
+    final static AtomicInteger loggedInUsers = new AtomicInteger();
     private final static String BUSINESS_LOGIC_EXECUTION_TIME_HEADER = "Execution-Time-Business-Logic";
 
     protected final ObjectMapper mapper = new ObjectMapper()
@@ -119,7 +121,7 @@ public abstract class BackendCoreService {
         }
         response.setEndpoint(params.getEndpoint());
         response.setMethodType(params.getMethod());
-        response.setUsersLoggedIn(0);//TODO: how to calc this?
+        response.setUsersLoggedIn(loggedInUsers.get());
         return response;
     }
 
