@@ -9,7 +9,7 @@ COPY .mvn .mvn
 COPY ./benchmark-backend/src ./benchmark-backend/src
 COPY ./benchmark-algorithm/src ./benchmark-algorithm/src
 RUN ["chmod", "+x", "mvnw"]
-RUN ./mvnw clean package && cp benchmark-backend/target/stock-exchange-app-benchmark.jar stock-exchange-app-benchmark.jar
+RUN ./mvnw clean package && cp benchmark-backend/target/benchmark-backend.jar stock-exchange-app-benchmark.jar
 
 # production stage
 FROM openjdk:14

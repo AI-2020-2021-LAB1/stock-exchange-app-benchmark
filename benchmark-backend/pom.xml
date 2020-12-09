@@ -11,9 +11,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>benchmark-backend</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>benchmark-backend</name>
-    <description>Benchmark server implementation</description>
 
     <properties>
         <java.version>11</java.version>
@@ -93,8 +90,8 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
     </dependencies>
 
