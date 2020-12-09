@@ -7,15 +7,18 @@ import com.project.benchmark.algorithm.internal.BenchmarkConfiguration;
 import com.project.benchmark.algorithm.internal.ResponseTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.project.benchmark.app.config.properties.CoreProperties;
 import org.project.benchmark.app.entity.Configuration;
 import org.project.benchmark.app.entity.MethodType;
 import org.project.benchmark.app.entity.Response;
 import org.project.benchmark.app.entity.Test;
 import org.project.benchmark.app.repository.ResponseRepository;
 import org.project.benchmark.app.repository.TestRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.persistence.EntityNotFoundException;
 import java.time.OffsetDateTime;
@@ -37,6 +40,14 @@ public class BenchmarkService {
     private final TestRepository testRepository;
     private final ObjectMapper mapper;
     private final ResponseRepository responseRepository;
+    private final CoreProperties coreProperties;
+
+    @PostConstruct
+    void init() {
+        if(!coreProperties.getAlgorithmThreads().isValid()) {
+            throw new IllegalStateException("Property algorithm-threads.min must be lower or equal tha algorithm-threads.max");
+        }
+    }
 
     @PreDestroy
     void preDestroy() {
@@ -49,6 +60,9 @@ public class BenchmarkService {
         BenchmarkConfiguration benchmarkConf = mapper.convertValue(conf, BenchmarkConfiguration.class);
         benchmarkConf.setNoOfUsers(test.getUserCount());
         benchmarkConf.setNoOfStocks(test.getStockCount());
+        benchmarkConf.setUserThreads(coreProperties.getCoreThreads());
+        benchmarkConf.setBackendMinThreads(coreProperties.getAlgorithmThreads().getMin());
+        benchmarkConf.setBackendMaxThreads(coreProperties.getAlgorithmThreads().getMax());
         BenchmarkLauncher launcher = new BenchmarkLauncher(benchmarkConf);
         LinkedBlockingQueue<ResponseTO> queue = new LinkedBlockingQueue<>();
         try {
@@ -78,7 +92,7 @@ public class BenchmarkService {
         return benchmarks.keySet();
     }
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelayString = "${benchmark.algorithm.scheduler.save-interval}")
     void schedule() {
         if(!queues.isEmpty()) {
             for(Map.Entry<Long, LinkedBlockingQueue<ResponseTO>> e: queues.entrySet()) {
