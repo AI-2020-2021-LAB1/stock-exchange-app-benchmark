@@ -191,7 +191,7 @@ class BenchmarkEnvironment {
             if(backendMaxThreads > backendThreadMax) {
                 backendInitialThreads = backendThreadMax;
             }
-            environment.backendExecutor = new ThreadPoolExecutor(backendInitialThreads, backendMaxThreads, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
+            environment.backendExecutor = new ThreadPoolExecutor(backendInitialThreads, backendMaxThreads, 100, TimeUnit.DAYS, new LinkedBlockingQueue<>());
             environment.tree = tree;
             createUsers();
             createStocks();
