@@ -51,6 +51,8 @@ public class TestServiceImpl implements TestService {
         Test test = getTestByID(id);
         test.setEndDate(testDTO.getEndDate());
         test.setStartDate(testDTO.getStartDate());
+        test.setUserCount(testDTO.getUserCount());
+        test.setStockCount(testDTO.getStockCount());
         repository.save(test);
     }
 
@@ -58,8 +60,11 @@ public class TestServiceImpl implements TestService {
     @Transactional
     public void createTest(TestDTO testDTO) {
         Test test = mapper.convertValue(testDTO, Test.class);
-        testDTOToTest(testDTO, test);
+        test.setConfiguration(mapper.convertValue(testDTO.getConfiguration(), Configuration.class));
+        test.setEndDate(testDTO.getEndDate());
+        test.setStartDate(testDTO.getStartDate());
         test.setUserCount(testDTO.getUserCount());
+        test.setStockCount(testDTO.getStockCount());
         repository.save(test);
     }
 
@@ -77,11 +82,5 @@ public class TestServiceImpl implements TestService {
         configurationRepository.findById(configurationId).orElseThrow(() ->
                 new EntityNotFoundException("Configuration Not Found"));
         return repository.findTestByConfigurationId(configurationId, pageable);
-    }
-
-    private void testDTOToTest(TestDTO testDTO, Test test) {
-        test.setConfiguration(mapper.convertValue(testDTO.getConfiguration(), Configuration.class));
-        test.setEndDate(testDTO.getEndDate());
-        test.setStartDate(testDTO.getStartDate());
     }
 }
