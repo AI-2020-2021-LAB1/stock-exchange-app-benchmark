@@ -23,7 +23,6 @@ import java.util.stream.IntStream;
 
 class BenchmarkEnvironment {
 
-    private static final int USER_THREADS = 8;
     private final List<UserIdentity> users = new ArrayList<>();
     private ThreadPoolExecutor backendExecutor;
     private ThreadPoolExecutor userExecutor;
@@ -43,12 +42,12 @@ class BenchmarkEnvironment {
     }
 
     public void start() {
-        IntStream.range(0, USER_THREADS)
+        IntStream.range(0, userExecutor.getMaximumPoolSize())
                 .forEach(i -> userExecutor.execute(() -> startThread(i)));
     }
 
     private void startThread(int i) {
-        int size = users.size() / USER_THREADS;
+        int size = users.size() / userExecutor.getMaximumPoolSize();
         int begin = size * i;
         int end = begin + size + 1;
         if(end > users.size()) {
@@ -109,8 +108,6 @@ class BenchmarkEnvironment {
     static class BenchmarkEnvironmentBuilder {
         private static final String EMAIL_FORMAT = "%s_user%d@benchmark.com";
         private static final int TAG_CREATION_CHANCES = 5;
-        private static final int MAX_INIT_THREADS = 256;
-        private static final int MAX_THREADS = 512;
         private final AdminIdentity adminIdentity;
         private final UserService userService;
         private final LinkedBlockingQueue<ResponseTO> queue;
@@ -118,6 +115,9 @@ class BenchmarkEnvironment {
         private Integer userCount;
         private Integer stockCount;
         private Integer operations;
+        private Integer backendThreadMin;
+        private Integer backendThreadMax;
+        private Integer userThreads;
         private BenchmarkEnvironment environment;
         private ProbabilityTree<UserIdentity> tree;
 
@@ -139,6 +139,17 @@ class BenchmarkEnvironment {
 
         BenchmarkEnvironmentBuilder operations(int count) {
             operations = count;
+            return this;
+        }
+
+        BenchmarkEnvironmentBuilder backendThreading(int min, int max) {
+            backendThreadMin = min;
+            backendThreadMax = max;
+            return this;
+        }
+
+        BenchmarkEnvironmentBuilder userThreading(int count) {
+            userThreads = count;
             return this;
         }
 
@@ -170,15 +181,15 @@ class BenchmarkEnvironment {
             }
             createTag();
             environment = new BenchmarkEnvironment(tag, adminIdentity);
-            int executorThreads = USER_THREADS > userCount ? userCount : USER_THREADS;
+            int executorThreads = userThreads > userCount ? userCount : userThreads;
             environment.userExecutor = new ThreadPoolExecutor(executorThreads, executorThreads, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
             int backendInitialThreads = userCount < 16 ? userCount : userCount * 2 / 5;
-            if(backendInitialThreads > MAX_INIT_THREADS) {
-                backendInitialThreads = MAX_INIT_THREADS;
+            if(backendInitialThreads > backendThreadMin) {
+                backendInitialThreads = backendThreadMin;
             }
             int backendMaxThreads = userCount < 16 ? userCount : userCount * 4 / 5;
-            if(backendMaxThreads > MAX_THREADS) {
-                backendInitialThreads = MAX_THREADS;
+            if(backendMaxThreads > backendThreadMax) {
+                backendInitialThreads = backendThreadMax;
             }
             environment.backendExecutor = new ThreadPoolExecutor(backendInitialThreads, backendMaxThreads, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
             environment.tree = tree;
