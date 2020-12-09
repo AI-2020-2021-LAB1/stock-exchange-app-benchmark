@@ -41,6 +41,9 @@ public class UserService extends BackendCoreService {
                         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
                         .buildPost(Entity.form(form1))
                 );
+        if(res.isSuccess()) {
+            loggedInUsers.incrementAndGet();
+        }
         return res.copy(LoginUserResponseTO::getAccessToken);
     }
 

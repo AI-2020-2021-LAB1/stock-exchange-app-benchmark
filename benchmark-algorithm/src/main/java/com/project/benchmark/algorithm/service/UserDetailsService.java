@@ -39,6 +39,10 @@ public class UserDetailsService extends BackendCoreService {
         );
     }
 
+    public void logout() {
+        loggedInUsers.decrementAndGet();
+    }
+
     public ResponseDataTO<List<OrderTO>> getOwnedOrders(OrderFiltersTO filters) {
         var queryParams = convertToMap(filters, OrderFiltersTO.class);
         return manageInvocation(
