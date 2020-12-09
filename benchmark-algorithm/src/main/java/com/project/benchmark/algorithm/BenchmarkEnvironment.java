@@ -154,13 +154,10 @@ class BenchmarkEnvironment {
             if(tree == null) {
                 throw new BenchmarkInitializationException("Tree not specified");
             }
-            if (stockCount == null) {
-                stockCount = userCount;
-            }
             if(operations == null || operations <= 0) {
                 throw new BenchmarkInitializationException("Operations count must be positive");
             }
-            if(stockCount <= 0) {
+            if(stockCount == null || stockCount <= 0) {
                 throw new BenchmarkInitializationException("Stock count must be positive");
             }
             return internalBuild();
