@@ -70,7 +70,7 @@ class BenchmarkEnvironment {
                 }
             }
             futures.putAll(newFutures);
-        } while (state.stopSignal.get() && futures.values().stream().allMatch(Future::isDone));
+        } while ((state.stopSignal.get() || state.forceStopSignal.get()) && futures.values().stream().allMatch(Future::isDone));
     }
 
     public void stop() {
@@ -191,7 +191,7 @@ class BenchmarkEnvironment {
             if(backendMaxThreads > backendThreadMax) {
                 backendInitialThreads = backendThreadMax;
             }
-            environment.backendExecutor = new ThreadPoolExecutor(backendInitialThreads, backendMaxThreads, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
+            environment.backendExecutor = new ThreadPoolExecutor(backendInitialThreads, backendMaxThreads, 100, TimeUnit.DAYS, new LinkedBlockingQueue<>());
             environment.tree = tree;
             createUsers();
             createStocks();
@@ -215,16 +215,18 @@ class BenchmarkEnvironment {
 
         private void createUsers() {
             int bound = userCount + 1;
-            Map<String, Future<?>> futures = new HashMap<>();
+            Map<String, Future<ResponseDataTO<?>>> futures = new HashMap<>();
             for (int i = 1; i < bound; i++) {
                 RegisterUserTO u = generateUser(i);
                 futures.put(u.getEmail(), environment.backendExecutor.submit(() -> userService.register(u, tag)));
             }
             for (var future : futures.entrySet()) {
                 try {
-                    future.getValue().get();
-                    UserIdentity identity = new UserIdentity(future.getKey(), queue, operations, tag);
-                    environment.users.add(identity);
+                    var response = future.getValue().get();
+                    if (response.isSuccess()) {
+                        UserIdentity identity = new UserIdentity(future.getKey(), queue, operations, tag);
+                        environment.users.add(identity);
+                    }
                 } catch (InterruptedException | ExecutionException ignored) {
                 }
             }
