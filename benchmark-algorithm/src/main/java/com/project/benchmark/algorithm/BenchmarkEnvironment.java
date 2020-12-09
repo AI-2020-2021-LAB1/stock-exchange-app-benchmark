@@ -70,7 +70,7 @@ class BenchmarkEnvironment {
                 }
             }
             futures.putAll(newFutures);
-        } while (state.stopSignal.get() && futures.values().stream().allMatch(Future::isDone));
+        } while ((state.stopSignal.get() || state.forceStopSignal.get()) && futures.values().stream().allMatch(Future::isDone));
     }
 
     public void stop() {
