@@ -25,7 +25,7 @@ class BenchmarkEnvironment {
 
     private final List<UserIdentity> users = new ArrayList<>();
     private ThreadPoolExecutor backendExecutor;
-    private ExecutorService userExecutor;
+    private ThreadPoolExecutor userExecutor;
     private final String tag;
     private final AdminIdentity adminIdentity;
     private ProbabilityTree<UserIdentity> tree;
