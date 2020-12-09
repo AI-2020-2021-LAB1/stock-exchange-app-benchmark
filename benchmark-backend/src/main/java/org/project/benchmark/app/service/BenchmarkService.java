@@ -2,18 +2,23 @@ package org.project.benchmark.app.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.benchmark.algorithm.BenchmarkLauncher;
+import com.project.benchmark.algorithm.exception.BenchmarkInitializationException;
 import com.project.benchmark.algorithm.internal.BenchmarkConfiguration;
 import com.project.benchmark.algorithm.internal.ResponseTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.project.benchmark.app.config.properties.CoreProperties;
 import org.project.benchmark.app.entity.Configuration;
 import org.project.benchmark.app.entity.MethodType;
 import org.project.benchmark.app.entity.Response;
 import org.project.benchmark.app.entity.Test;
 import org.project.benchmark.app.repository.ResponseRepository;
 import org.project.benchmark.app.repository.TestRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.persistence.EntityNotFoundException;
 import java.time.OffsetDateTime;
@@ -27,6 +32,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BenchmarkService {
     private final Map<Long, BenchmarkLauncher> benchmarks = new ConcurrentHashMap<>();
     private final Map<Long, LinkedBlockingQueue<ResponseTO>> queues = new ConcurrentHashMap<>();
@@ -34,6 +40,14 @@ public class BenchmarkService {
     private final TestRepository testRepository;
     private final ObjectMapper mapper;
     private final ResponseRepository responseRepository;
+    private final CoreProperties coreProperties;
+
+    @PostConstruct
+    void init() {
+        if(!coreProperties.getAlgorithmThreads().isValid()) {
+            throw new IllegalStateException("Property algorithm-threads.min must be lower or equal tha algorithm-threads.max");
+        }
+    }
 
     @PreDestroy
     void preDestroy() {
@@ -45,17 +59,24 @@ public class BenchmarkService {
         Configuration conf = test.getConfiguration();
         BenchmarkConfiguration benchmarkConf = mapper.convertValue(conf, BenchmarkConfiguration.class);
         benchmarkConf.setNoOfUsers(test.getUserCount());
+        benchmarkConf.setNoOfStocks(test.getStockCount());
+        benchmarkConf.setUserThreads(coreProperties.getCoreThreads());
+        benchmarkConf.setBackendMinThreads(coreProperties.getAlgorithmThreads().getMin());
+        benchmarkConf.setBackendMaxThreads(coreProperties.getAlgorithmThreads().getMax());
         BenchmarkLauncher launcher = new BenchmarkLauncher(benchmarkConf);
         LinkedBlockingQueue<ResponseTO> queue = new LinkedBlockingQueue<>();
-        boolean success = launcher.start(queue);
-        if(success) {
-            benchmarks.put(test.getId(), launcher);
-            queues.put(test.getId(), queue);
+        try {
+            boolean success = launcher.start(queue);
+            if(success) {
+                benchmarks.put(test.getId(), launcher);
+                queues.put(test.getId(), queue);
+            }
+        } catch (BenchmarkInitializationException e) {
+            log.error("Error starting benchmark", e);
         }
     }
 
-    void stopBenchmark(Test test) {
-        Long testId = test.getId();
+    void stopBenchmark(Long testId) {
         if(!benchmarks.containsKey(testId) || !queues.containsKey(testId)) {
             throw new EntityNotFoundException("Test isn't running");
         }
@@ -71,7 +92,7 @@ public class BenchmarkService {
         return benchmarks.keySet();
     }
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelayString = "${benchmark.algorithm.scheduler.save-interval}")
     void schedule() {
         if(!queues.isEmpty()) {
             for(Map.Entry<Long, LinkedBlockingQueue<ResponseTO>> e: queues.entrySet()) {
@@ -91,11 +112,12 @@ public class BenchmarkService {
             List<Test> allTests = testRepository.findAllById(benchmarks.keySet());
             Map<Long, Test> tests = allTests.stream().collect(Collectors.toMap(Test::getId, t -> t));
             for(var e: benchmarks.entrySet()) {
-                if(tests.get(e.getKey()) == null) {
-                    e.getValue().stop();
+                Test test = tests.get(e.getKey());
+                if(test == null) {
+                    stopBenchmark(e.getKey());
                 }
-                else if(tests.get(e.getKey()).getEndDate().isBefore(OffsetDateTime.now())) {
-                    e.getValue().stop();
+                else if(test.getEndDate().isBefore(OffsetDateTime.now())) {
+                    stopBenchmark(e.getKey());
                 }
             }
             List<Test> testsToStart = testRepository.findTestsToBegin(benchmarks.keySet(), OffsetDateTime.now());

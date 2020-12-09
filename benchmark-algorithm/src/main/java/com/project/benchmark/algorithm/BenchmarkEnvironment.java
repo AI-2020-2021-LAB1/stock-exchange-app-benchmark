@@ -9,6 +9,7 @@ import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
 import com.project.benchmark.algorithm.dto.stock.NewStockTO;
 import com.project.benchmark.algorithm.dto.stock.StockOwnerTO;
 import com.project.benchmark.algorithm.dto.stock.StockUserTO;
+import com.project.benchmark.algorithm.dto.tag.TagTO;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
 import com.project.benchmark.algorithm.exception.BenchmarkInitializationException;
 import com.project.benchmark.algorithm.internal.ResponseTO;
@@ -22,7 +23,6 @@ import java.util.stream.IntStream;
 
 class BenchmarkEnvironment {
 
-    private static final int USER_THREADS = 8;
     private final List<UserIdentity> users = new ArrayList<>();
     private ThreadPoolExecutor backendExecutor;
     private ExecutorService userExecutor;
@@ -42,12 +42,12 @@ class BenchmarkEnvironment {
     }
 
     public void start() {
-        IntStream.range(0, USER_THREADS)
+        IntStream.range(0, userExecutor.getMaximumPoolSize())
                 .forEach(i -> userExecutor.execute(() -> startThread(i)));
     }
 
     private void startThread(int i) {
-        int size = users.size() / USER_THREADS;
+        int size = users.size() / userExecutor.getMaximumPoolSize();
         int begin = size * i;
         int end = begin + size + 1;
         if(end > users.size()) {
@@ -107,15 +107,17 @@ class BenchmarkEnvironment {
 
     static class BenchmarkEnvironmentBuilder {
         private static final String EMAIL_FORMAT = "%s_user%d@benchmark.com";
-        private static final int MAX_INIT_THREADS = 256;
-        private static final int MAX_THREADS = 512;
+        private static final int TAG_CREATION_CHANCES = 5;
         private final AdminIdentity adminIdentity;
         private final UserService userService;
         private final LinkedBlockingQueue<ResponseTO> queue;
-        private final String tag;
+        private String tag;
         private Integer userCount;
         private Integer stockCount;
         private Integer operations;
+        private Integer backendThreadMin;
+        private Integer backendThreadMax;
+        private Integer userThreads;
         private BenchmarkEnvironment environment;
         private ProbabilityTree<UserIdentity> tree;
 
@@ -123,7 +125,6 @@ class BenchmarkEnvironment {
             adminIdentity = new AdminIdentity(queue);
             userService = new UserService(queue);
             this.queue = queue;
-            tag = RandomStringUtils.randomAlphanumeric(15);
         }
 
         BenchmarkEnvironmentBuilder userCount(int count) {
@@ -141,6 +142,17 @@ class BenchmarkEnvironment {
             return this;
         }
 
+        BenchmarkEnvironmentBuilder backendThreading(int min, int max) {
+            backendThreadMin = min;
+            backendThreadMax = max;
+            return this;
+        }
+
+        BenchmarkEnvironmentBuilder userThreading(int count) {
+            userThreads = count;
+            return this;
+        }
+
         BenchmarkEnvironmentBuilder tree(ProbabilityTree<UserIdentity> tree) {
             this.tree = tree;
             return this;
@@ -153,13 +165,10 @@ class BenchmarkEnvironment {
             if(tree == null) {
                 throw new BenchmarkInitializationException("Tree not specified");
             }
-            if (stockCount == null) {
-                stockCount = userCount;
-            }
             if(operations == null || operations <= 0) {
                 throw new BenchmarkInitializationException("Operations count must be positive");
             }
-            if(stockCount <= 0) {
+            if(stockCount == null || stockCount <= 0) {
                 throw new BenchmarkInitializationException("Stock count must be positive");
             }
             return internalBuild();
@@ -170,22 +179,38 @@ class BenchmarkEnvironment {
             if(!adminIdentity.isAuthenticated()) {
                 throw new BenchmarkInitializationException("Unable to login as admin");
             }
+            createTag();
             environment = new BenchmarkEnvironment(tag, adminIdentity);
-            int executorThreads = USER_THREADS > userCount ? userCount : USER_THREADS;
+            int executorThreads = userThreads > userCount ? userCount : userThreads;
             environment.userExecutor = new ThreadPoolExecutor(executorThreads, executorThreads, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
             int backendInitialThreads = userCount < 16 ? userCount : userCount * 2 / 5;
-            if(backendInitialThreads > MAX_INIT_THREADS) {
-                backendInitialThreads = MAX_INIT_THREADS;
+            if(backendInitialThreads > backendThreadMin) {
+                backendInitialThreads = backendThreadMin;
             }
             int backendMaxThreads = userCount < 16 ? userCount : userCount * 4 / 5;
-            if(backendMaxThreads > MAX_THREADS) {
-                backendInitialThreads = MAX_THREADS;
+            if(backendMaxThreads > backendThreadMax) {
+                backendInitialThreads = backendThreadMax;
             }
             environment.backendExecutor = new ThreadPoolExecutor(backendInitialThreads, backendMaxThreads, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
             environment.tree = tree;
             createUsers();
             createStocks();
             return environment;
+        }
+
+        private void createTag() throws BenchmarkInitializationException {
+            ResponseDataTO<Void> response;
+            for(int counter = 1; counter <= TAG_CREATION_CHANCES; counter++) {
+                tag = RandomStringUtils.randomAlphanumeric(15);
+                try {
+                    response = adminIdentity.getTagService().createTag(new TagTO(tag));
+                    if(response.getError() == null) {
+                        return;
+                    }
+                } catch (JsonProcessingException ignored) {
+                }
+            }
+            throw new BenchmarkInitializationException("Unable to create tag");
         }
 
         private void createUsers() {

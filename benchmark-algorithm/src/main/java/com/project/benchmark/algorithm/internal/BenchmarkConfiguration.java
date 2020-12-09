@@ -26,4 +26,8 @@ public class BenchmarkConfiguration {
     private BigDecimal noOfOperations;
     private BigDecimal noOfMoney;
     private Integer noOfUsers;
+    private Integer noOfStocks;
+    private Integer userThreads;
+    private Integer backendMinThreads;
+    private Integer backendMaxThreads;
 }

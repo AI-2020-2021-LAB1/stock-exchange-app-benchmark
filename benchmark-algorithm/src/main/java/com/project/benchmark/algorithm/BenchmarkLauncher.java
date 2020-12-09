@@ -102,6 +102,9 @@ public class BenchmarkLauncher {
                 .tree(tree)
                 .operations(conf.getNoOfOperations().intValue())
                 .userCount(conf.getNoOfUsers())
+                .stockCount(conf.getNoOfStocks())
+                .backendThreading(conf.getBackendMinThreads(), conf.getBackendMaxThreads())
+                .userThreading(conf.getUserThreads())
                 .build();
 
         environment.start();

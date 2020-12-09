@@ -3,6 +3,7 @@ package com.project.benchmark.algorithm;
 import com.project.benchmark.algorithm.core.UserIdentity;
 import com.project.benchmark.algorithm.core.tree.AlgorithmProbabilityTreeGenerator;
 import com.project.benchmark.algorithm.core.tree.ProbabilityTree;
+import com.project.benchmark.algorithm.exception.BenchmarkInitializationException;
 import com.project.benchmark.algorithm.internal.BenchmarkConfiguration;
 import com.project.benchmark.algorithm.internal.ResponseTO;
 import org.junit.Before;
@@ -27,7 +28,7 @@ public class BenchmarkEnvironmentTest {
     }
 
     @Test
-    public void runStop() throws InterruptedException {
+    public void runStop() throws InterruptedException, BenchmarkInitializationException {
         LinkedBlockingQueue<ResponseTO> queue = new LinkedBlockingQueue<>();
         BenchmarkEnvironment env = BenchmarkEnvironment.builder(queue)
                 .operations(10)
