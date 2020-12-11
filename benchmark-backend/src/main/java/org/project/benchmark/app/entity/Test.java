@@ -40,6 +40,10 @@ public class Test {
     @Column(nullable = false, name = "iterations")
     private Integer iterations;
 
+    @Column(nullable = false, name = "status")
+    @Enumerated(EnumType.STRING)
+    private TestStatus status = TestStatus.NEW;
+
     @JsonIgnore
     @OneToMany(targetEntity = Response.class, mappedBy = "test",
             cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH,CascadeType.REMOVE})

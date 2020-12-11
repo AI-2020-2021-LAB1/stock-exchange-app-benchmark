@@ -45,6 +45,16 @@ class BenchmarkEnvironment {
         return new BenchmarkEnvironmentBuilder(queue);
     }
 
+    public boolean isFinished() {
+        return runningThreads.get() == 0;
+    }
+
+    public double getProgress() {
+        return users.stream().mapToInt(UserIdentity::getRemainingIterations)
+                .mapToDouble(i -> (double)i / initialIterations)
+                .average().orElse(0.0);
+    }
+
     public void start() {
         IntStream.range(0, userExecutor.getMaximumPoolSize())
                 .forEach(i -> userExecutor.execute(() -> startThread(i)));

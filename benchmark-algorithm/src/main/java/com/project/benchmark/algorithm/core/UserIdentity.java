@@ -6,6 +6,7 @@ import com.project.benchmark.algorithm.service.UserService;
 
 import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class UserIdentity {
 
@@ -19,7 +20,7 @@ public class UserIdentity {
     private int operations;
     private final UserCache userCache;
     private final String tag;
-    private int iterationsLeft;
+    private AtomicInteger iterationsLeft;
 
     private String authenticationToken;
     private UserServiceContainer serviceContainer;
@@ -33,7 +34,7 @@ public class UserIdentity {
         this.queue = queue;
         this.initialOperations = initialOperations;
         this.tag = tag;
-        this.iterationsLeft = iterationsLeft;
+        this.iterationsLeft = new AtomicInteger(iterationsLeft);
         this.password = GLOBAL_PASSWORD;
         userService = new UserService(queue);
         userCache = new UserCache();
@@ -69,8 +70,11 @@ public class UserIdentity {
     }
 
     public boolean shouldDoNextIteration() {
-        iterationsLeft--;
-        return iterationsLeft > 0;
+        return iterationsLeft.decrementAndGet() > 0;
+    }
+
+    public int getRemainingIterations() {
+        return iterationsLeft.get();
     }
 
     public int getOperations() {
