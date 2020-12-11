@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.project.benchmark.app.entity.TestStatus;
 import org.project.benchmark.app.util.DateIsAfterNow;
 
 import javax.validation.constraints.FutureOrPresent;
@@ -43,4 +44,7 @@ public class TestDTO {
     @ApiModelProperty(notes = "iterations specified for test")
     @NotNull(message = "This field is required.")
     private Integer iterations;
+
+    @ApiModelProperty(notes = "current status of test (only for GET)")
+    private TestStatus status;
 }

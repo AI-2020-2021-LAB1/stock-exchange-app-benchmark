@@ -8,6 +8,7 @@ import com.project.benchmark.algorithm.internal.ResponseTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.project.benchmark.app.config.properties.CoreProperties;
+import org.project.benchmark.app.dto.TestProgressDTO;
 import org.project.benchmark.app.entity.*;
 import org.project.benchmark.app.repository.ResponseRepository;
 import org.project.benchmark.app.repository.TestRepository;
@@ -49,6 +50,17 @@ public class BenchmarkService {
     void preDestroy() {
         benchmarks.values().forEach(BenchmarkLauncher::forceStop);
         queues.forEach(this::saveSingleQueueResponses);
+    }
+
+    public List<TestProgressDTO> getTestsProgress() {
+        return benchmarks.entrySet().stream()
+                .filter(e -> !e.getValue().isFinished())
+                .map(e -> {
+                    var dto = new TestProgressDTO();
+                    dto.setId(e.getKey());
+                    dto.setProgress(e.getValue().getProgress());
+                    return dto;
+                }).collect(Collectors.toList());
     }
 
     void startBenchmark(Test test) {

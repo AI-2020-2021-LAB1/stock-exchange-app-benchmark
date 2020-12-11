@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import org.project.benchmark.app.dto.ErrorResponse;
 import org.project.benchmark.app.dto.ResponseDTO;
 import org.project.benchmark.app.dto.TestDTO;
+import org.project.benchmark.app.dto.TestProgressDTO;
 import org.project.benchmark.app.service.ResponseService;
 import org.project.benchmark.app.service.TestService;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/test")
@@ -32,6 +34,13 @@ public class TestController {
     public Page<TestDTO> getTests(@ApiIgnore Pageable pageable) {
         return testService.getTests(pageable)
                 .map(test -> mapper.convertValue(test,TestDTO.class));
+    }
+
+    @GetMapping("/progress")
+    @ApiOperation(value = "get progress of running by benchmark tests.")
+    @ApiResponses(@ApiResponse(code = 200, message = " Successfully paged tests."))
+    public List<TestProgressDTO> getTestsProgress() {
+        return testService.getRunningTests();
     }
 
     @PostMapping
