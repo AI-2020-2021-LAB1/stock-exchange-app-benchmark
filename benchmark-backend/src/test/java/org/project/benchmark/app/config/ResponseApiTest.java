@@ -143,9 +143,9 @@ public class ResponseApiTest {
         return org.project.benchmark.app.entity.Test.builder()
                 .id(id)
                 .startDate(OffsetDateTime.now())
-                .endDate(OffsetDateTime.now(ZoneId.of("UTC+03:00")))
                 .configuration(createCustomConf(1L))
                 .userCount(1)
+                .stockCount(1)
                 .build();
     }
 

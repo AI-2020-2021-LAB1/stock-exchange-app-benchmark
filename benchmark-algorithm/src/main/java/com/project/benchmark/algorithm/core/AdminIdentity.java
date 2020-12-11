@@ -2,6 +2,7 @@ package com.project.benchmark.algorithm.core;
 
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
 import com.project.benchmark.algorithm.internal.ResponseTO;
+import com.project.benchmark.algorithm.service.UserDetailsService;
 import com.project.benchmark.algorithm.service.UserService;
 import com.project.benchmark.algorithm.service.admin.AdminStockService;
 import com.project.benchmark.algorithm.service.admin.AdminTagService;
@@ -16,7 +17,7 @@ public class AdminIdentity {
     private final LinkedBlockingQueue<ResponseTO> queue;
     private String authenticationToken;
 
-    private UserService userService;
+    private final UserService userService;
     @Getter
     private AdminStockService stockService;
     @Getter
@@ -36,6 +37,8 @@ public class AdminIdentity {
         if (token != null) {
             stockService = new AdminStockService(authenticationToken, queue);
             tagService = new AdminTagService(authenticationToken, queue);
+            UserDetailsService detailsService = new UserDetailsService(authenticationToken, queue);
+            detailsService.logout();
         }
     }
 

@@ -143,9 +143,9 @@ public class TestApiTest {
         return Test.builder()
                 .id(id)
                 .startDate(OffsetDateTime.now())
-                .endDate(OffsetDateTime.now(ZoneId.of("UTC+03:00")))
                 .configuration(createCustomConf((long) 1))
                 .userCount(1)
+                .stockCount(1)
                 .build();
     }
 
@@ -210,8 +210,8 @@ public class TestApiTest {
     public static void assertTest(Test output, Test expected) {
         assertAll(() -> assertEquals(expected.getId(), output.getId()),
                 () -> assertEquals(expected.getStartDate(), output.getStartDate()),
-                () -> assertEquals(expected.getEndDate(), output.getEndDate()),
                 () -> assertEquals(expected.getConfiguration(), output.getConfiguration()),
-                () -> assertEquals(expected.getUserCount(), output.getUserCount()));
+                () -> assertEquals(expected.getUserCount(), output.getUserCount()),
+                () -> assertEquals(expected.getStockCount(), output.getStockCount()));
     }
 }
