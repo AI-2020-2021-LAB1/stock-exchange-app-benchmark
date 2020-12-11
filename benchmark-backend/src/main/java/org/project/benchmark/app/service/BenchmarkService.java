@@ -14,6 +14,7 @@ import org.project.benchmark.app.repository.ResponseRepository;
 import org.project.benchmark.app.repository.TestRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -63,6 +64,7 @@ public class BenchmarkService {
                 }).collect(Collectors.toList());
     }
 
+    @Transactional
     void startBenchmark(Test test) {
         test.setStatus(TestStatus.INIT);
         testRepository.save(test);
@@ -119,6 +121,7 @@ public class BenchmarkService {
     }
 
     @Scheduled(fixedDelay = 5000)
+    @Transactional
     void scheduleStartEnd() {
         if(benchmarks.isEmpty()) {
             List<Test> testsToStart = testRepository.findTestsToBegin(OffsetDateTime.now());

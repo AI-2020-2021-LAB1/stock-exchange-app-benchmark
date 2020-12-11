@@ -28,7 +28,6 @@ public class Test {
     private Configuration configuration;
 
     @Column(nullable = false, name = "start_date")
-    @FutureOrPresent
     private OffsetDateTime startDate;
 
     @Column(nullable = false, name = "user_count")

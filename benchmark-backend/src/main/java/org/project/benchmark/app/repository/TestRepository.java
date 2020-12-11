@@ -21,18 +21,11 @@ public interface TestRepository extends JpaRepository<Test, Long>,
     <S extends Test> S save(S s);
 
     @Query("SELECT t FROM Test t WHERE t.configuration.id = :configurationId ORDER BY t.startDate desc")
-    List<Test> findTestByConfigurationId(@Param("configurationId") Long configurationId);
-
-    @Query("SELECT t FROM Test t WHERE t.configuration.id = :configurationId ORDER BY t.startDate desc")
     Page<Test> findTestByConfigurationId(@Param("configurationId") Long configurationId, Pageable pa);
 
-    @Query("SELECT t FROM Test t WHERE t.id not in :ids and :date between t.startDate and t.endDate")
+    @Query("SELECT t FROM Test t WHERE t.id not in :ids and :date > t.startDate and t.status = 'NEW'")
     List<Test> findTestsToBegin(@Param("ids") Collection<Long> ids, @Param("date") OffsetDateTime date);
 
-    @Query("SELECT t FROM Test t WHERE :date between t.startDate and t.endDate")
+    @Query("SELECT t FROM Test t WHERE :date > t.startDate and t.status='NEW'")
     List<Test> findTestsToBegin(@Param("date") OffsetDateTime date);
-
-    @Query("SELECT t FROM Test t WHERE t.id in :ids and :date > t.endDate")
-    List<Test> findTestsToFinish(@Param("ids") Collection<Long> ids, @Param("date") OffsetDateTime date);
-
 }
