@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BenchmarkConfiguration {
-    private boolean registration;
     private BigDecimal certaintyLevel;
     private BigDecimal loginAllStocks;
     private BigDecimal loginOwnedStocks;
@@ -30,4 +29,5 @@ public class BenchmarkConfiguration {
     private Integer userThreads;
     private Integer backendMinThreads;
     private Integer backendMaxThreads;
+    private Integer iterationCount;
 }

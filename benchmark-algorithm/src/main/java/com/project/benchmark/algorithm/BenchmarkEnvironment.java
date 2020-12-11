@@ -19,6 +19,7 @@ import org.apache.commons.lang3.RandomUtils;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 class BenchmarkEnvironment {
@@ -30,10 +31,13 @@ class BenchmarkEnvironment {
     private final AdminIdentity adminIdentity;
     private ProbabilityTree<UserIdentity> tree;
     private final BenchmarkState state;
+    private final Integer initialIterations;
+    private final AtomicInteger runningThreads = new AtomicInteger(0);
 
-    private BenchmarkEnvironment(String tag, AdminIdentity adminIdentity) {
+    private BenchmarkEnvironment(String tag, AdminIdentity adminIdentity, Integer initialIterations) {
         this.tag = tag;
         this.adminIdentity = adminIdentity;
+        this.initialIterations = initialIterations;
         this.state = new BenchmarkState();
     }
 
@@ -47,6 +51,7 @@ class BenchmarkEnvironment {
     }
 
     private void startThread(int i) {
+        runningThreads.incrementAndGet();
         int size = users.size() / userExecutor.getMaximumPoolSize();
         int begin = size * i;
         int end = begin + size + 1;
@@ -63,14 +68,18 @@ class BenchmarkEnvironment {
             for(var e: futures.entrySet()) {
                 try {
                     e.getValue().get(50, TimeUnit.MILLISECONDS);
-                    if(!state.stopSignal.get()) {
-                        newFutures.put(e.getKey(), backendExecutor.submit(() -> tree.execute(e.getKey(), state)));
+                    UserIdentity ident = e.getKey();
+                    if(!state.stopSignal.get() || !ident.shouldDoNextIteration()) {
+                        newFutures.put(ident, backendExecutor.submit(() -> tree.execute(ident, state)));
                     }
                 } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
                 }
             }
             futures.putAll(newFutures);
         } while ((state.stopSignal.get() || state.forceStopSignal.get()) && futures.values().stream().allMatch(Future::isDone));
+        if(runningThreads.decrementAndGet() == 0) {
+            removeTag();
+        }
     }
 
     public void stop() {
@@ -82,7 +91,6 @@ class BenchmarkEnvironment {
             } catch (InterruptedException ignored) {
             }
         }
-        removeTag();
     }
 
     public void forceStop() {
@@ -94,7 +102,6 @@ class BenchmarkEnvironment {
             } catch (InterruptedException ignored) {
             }
         }
-        removeTag();
     }
 
     private void removeTag() {
@@ -120,6 +127,7 @@ class BenchmarkEnvironment {
         private Integer userThreads;
         private BenchmarkEnvironment environment;
         private ProbabilityTree<UserIdentity> tree;
+        private Integer iterationsCount;
 
         private BenchmarkEnvironmentBuilder(LinkedBlockingQueue<ResponseTO> queue) {
             adminIdentity = new AdminIdentity(queue);
@@ -153,6 +161,11 @@ class BenchmarkEnvironment {
             return this;
         }
 
+        BenchmarkEnvironmentBuilder iterationsCount(int count) {
+            this.iterationsCount = count;
+            return this;
+        }
+
         BenchmarkEnvironmentBuilder tree(ProbabilityTree<UserIdentity> tree) {
             this.tree = tree;
             return this;
@@ -171,6 +184,9 @@ class BenchmarkEnvironment {
             if(stockCount == null || stockCount <= 0) {
                 throw new BenchmarkInitializationException("Stock count must be positive");
             }
+            if(iterationsCount == null || iterationsCount <= 0) {
+                throw new BenchmarkInitializationException("Iteration count must be positive");
+            }
             return internalBuild();
         }
 
@@ -180,7 +196,7 @@ class BenchmarkEnvironment {
                 throw new BenchmarkInitializationException("Unable to login as admin");
             }
             createTag();
-            environment = new BenchmarkEnvironment(tag, adminIdentity);
+            environment = new BenchmarkEnvironment(tag, adminIdentity, iterationsCount);
             int executorThreads = userThreads > userCount ? userCount : userThreads;
             environment.userExecutor = new ThreadPoolExecutor(executorThreads, executorThreads, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
             int backendInitialThreads = userCount < 16 ? userCount : userCount * 2 / 5;
@@ -224,7 +240,7 @@ class BenchmarkEnvironment {
                 try {
                     var response = future.getValue().get();
                     if (response.isSuccess()) {
-                        UserIdentity identity = new UserIdentity(future.getKey(), queue, operations, tag);
+                        UserIdentity identity = new UserIdentity(future.getKey(), queue, operations, tag, iterationsCount);
                         environment.users.add(identity);
                     }
                 } catch (InterruptedException | ExecutionException ignored) {
@@ -275,6 +291,7 @@ class BenchmarkEnvironment {
             if(details != null) {
                 return details.getId();
             }
+            identity.logout();
             return null;
         }
 

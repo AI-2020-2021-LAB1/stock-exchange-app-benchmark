@@ -103,6 +103,7 @@ public class BenchmarkLauncher {
                 .operations(conf.getNoOfOperations().intValue())
                 .userCount(conf.getNoOfUsers())
                 .stockCount(conf.getNoOfStocks())
+                .iterationsCount(conf.getIterationCount())
                 .backendThreading(conf.getBackendMinThreads(), conf.getBackendMaxThreads())
                 .userThreading(conf.getUserThreads())
                 .build();

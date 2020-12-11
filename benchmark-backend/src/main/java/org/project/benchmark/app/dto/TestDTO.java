@@ -28,10 +28,6 @@ public class TestDTO {
     @FutureOrPresent
     private OffsetDateTime startDate;
 
-    @ApiModelProperty(notes = "The test's end date.")
-    @DateIsAfterNow
-    private OffsetDateTime endDate;
-
     @ApiModelProperty(notes = "Configuration's object related with this test.")
     @NotNull(message = "This field is required.")
     private ConfigurationDTO configuration;
@@ -43,4 +39,8 @@ public class TestDTO {
     @ApiModelProperty(notes = "Stock count specified for test")
     @NotNull(message = "This field is required.")
     private Integer stockCount;
+
+    @ApiModelProperty(notes = "iterations specified for test")
+    @NotNull(message = "This field is required.")
+    private Integer iterations;
 }

@@ -152,7 +152,6 @@ public class TestApiTest {
     private TestDTO createTestDTO() {
         return TestDTO.builder()
                 .startDate(OffsetDateTime.now())
-                .endDate(OffsetDateTime.now(ZoneId.of("UTC+03:00")))
                 .configuration(createCustomConfigurationDTO((long) 1))
                 .userCount(1)
                 .build();

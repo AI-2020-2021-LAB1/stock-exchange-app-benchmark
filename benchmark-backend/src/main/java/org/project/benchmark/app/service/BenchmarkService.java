@@ -61,6 +61,7 @@ public class BenchmarkService {
         benchmarkConf.setNoOfUsers(test.getUserCount());
         benchmarkConf.setNoOfStocks(test.getStockCount());
         benchmarkConf.setUserThreads(coreProperties.getCoreThreads());
+        benchmarkConf.setIterationCount(test.getIterations());
         benchmarkConf.setBackendMinThreads(coreProperties.getAlgorithmThreads().getMin());
         benchmarkConf.setBackendMaxThreads(coreProperties.getAlgorithmThreads().getMax());
         BenchmarkLauncher launcher = new BenchmarkLauncher(benchmarkConf);
