@@ -31,10 +31,6 @@ public class Test {
     @FutureOrPresent
     private OffsetDateTime startDate;
 
-    @Column(nullable = false, name = "end_date")
-    @FutureOrPresent
-    private OffsetDateTime endDate;
-
     @Column(nullable = false, name = "user_count")
     private Integer userCount;
 

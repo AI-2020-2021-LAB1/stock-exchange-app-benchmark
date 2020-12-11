@@ -49,7 +49,6 @@ public class TestServiceImpl implements TestService {
     @Transactional
     public void updateTest(TestDTO testDTO, Long id) {
         Test test = getTestByID(id);
-        test.setEndDate(testDTO.getEndDate());
         test.setStartDate(testDTO.getStartDate());
         test.setUserCount(testDTO.getUserCount());
         test.setStockCount(testDTO.getStockCount());
@@ -61,7 +60,6 @@ public class TestServiceImpl implements TestService {
     public void createTest(TestDTO testDTO) {
         Test test = mapper.convertValue(testDTO, Test.class);
         test.setConfiguration(mapper.convertValue(testDTO.getConfiguration(), Configuration.class));
-        test.setEndDate(testDTO.getEndDate());
         test.setStartDate(testDTO.getStartDate());
         test.setUserCount(testDTO.getUserCount());
         test.setStockCount(testDTO.getStockCount());
