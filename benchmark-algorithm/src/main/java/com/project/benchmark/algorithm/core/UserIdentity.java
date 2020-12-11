@@ -19,15 +19,21 @@ public class UserIdentity {
     private int operations;
     private final UserCache userCache;
     private final String tag;
+    private int iterationsLeft;
 
     private String authenticationToken;
     private UserServiceContainer serviceContainer;
 
-    public UserIdentity(String email, LinkedBlockingQueue<ResponseTO> queue, int initialOperations, String tag) {
+    public UserIdentity(String email,
+                        LinkedBlockingQueue<ResponseTO> queue,
+                        int initialOperations,
+                        String tag,
+                        int iterationsLeft) {
         this.email = email;
         this.queue = queue;
         this.initialOperations = initialOperations;
         this.tag = tag;
+        this.iterationsLeft = iterationsLeft;
         this.password = GLOBAL_PASSWORD;
         userService = new UserService(queue);
         userCache = new UserCache();
@@ -60,6 +66,11 @@ public class UserIdentity {
     public UserServiceContainer getServiceContainer() {
         operations--;
         return serviceContainer;
+    }
+
+    public boolean shouldDoNextIteration() {
+        iterationsLeft--;
+        return iterationsLeft > 0;
     }
 
     public int getOperations() {

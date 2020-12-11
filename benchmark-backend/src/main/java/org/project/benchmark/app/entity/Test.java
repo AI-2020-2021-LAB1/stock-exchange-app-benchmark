@@ -41,6 +41,9 @@ public class Test {
     @Column(nullable = false, name = "stock_count")
     private Integer stockCount;
 
+    @Column(nullable = false, name = "iterations")
+    private Integer iterations;
+
     @JsonIgnore
     @OneToMany(targetEntity = Response.class, mappedBy = "test",
             cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH,CascadeType.REMOVE})
