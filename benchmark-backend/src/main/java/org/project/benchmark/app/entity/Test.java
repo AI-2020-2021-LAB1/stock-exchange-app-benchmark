@@ -28,7 +28,6 @@ public class Test {
     private Configuration configuration;
 
     @Column(nullable = false, name = "start_date")
-    @FutureOrPresent
     private OffsetDateTime startDate;
 
     @Column(nullable = false, name = "user_count")
@@ -39,6 +38,10 @@ public class Test {
 
     @Column(nullable = false, name = "iterations")
     private Integer iterations;
+
+    @Column(nullable = false, name = "status")
+    @Enumerated(EnumType.STRING)
+    private TestStatus status = TestStatus.NEW;
 
     @JsonIgnore
     @OneToMany(targetEntity = Response.class, mappedBy = "test",

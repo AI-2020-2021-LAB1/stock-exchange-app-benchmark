@@ -94,6 +94,14 @@ public class BenchmarkLauncher {
         }
     }
 
+    public boolean isFinished() {
+        return environment.isFinished();
+    }
+
+    public double getProgress() {
+        return environment.getProgress();
+    }
+
     private void internalStart() throws BenchmarkInitializationException {
         ProbabilityTree<UserIdentity> tree = new AlgorithmProbabilityTreeGenerator()
                 .generate(conf);

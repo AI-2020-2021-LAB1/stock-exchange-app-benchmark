@@ -8,15 +8,13 @@ import com.project.benchmark.algorithm.internal.ResponseTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.project.benchmark.app.config.properties.CoreProperties;
-import org.project.benchmark.app.entity.Configuration;
-import org.project.benchmark.app.entity.MethodType;
-import org.project.benchmark.app.entity.Response;
-import org.project.benchmark.app.entity.Test;
+import org.project.benchmark.app.dto.TestProgressDTO;
+import org.project.benchmark.app.entity.*;
 import org.project.benchmark.app.repository.ResponseRepository;
 import org.project.benchmark.app.repository.TestRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -55,7 +53,21 @@ public class BenchmarkService {
         queues.forEach(this::saveSingleQueueResponses);
     }
 
+    public List<TestProgressDTO> getTestsProgress() {
+        return benchmarks.entrySet().stream()
+                .filter(e -> !e.getValue().isFinished())
+                .map(e -> {
+                    var dto = new TestProgressDTO();
+                    dto.setId(e.getKey());
+                    dto.setProgress(e.getValue().getProgress());
+                    return dto;
+                }).collect(Collectors.toList());
+    }
+
+    @Transactional
     void startBenchmark(Test test) {
+        test.setStatus(TestStatus.INIT);
+        testRepository.save(test);
         Configuration conf = test.getConfiguration();
         BenchmarkConfiguration benchmarkConf = mapper.convertValue(conf, BenchmarkConfiguration.class);
         benchmarkConf.setNoOfUsers(test.getUserCount());
@@ -71,9 +83,13 @@ public class BenchmarkService {
             if(success) {
                 benchmarks.put(test.getId(), launcher);
                 queues.put(test.getId(), queue);
+                test.setStatus(TestStatus.RUNNING);
+                testRepository.save(test);
             }
         } catch (BenchmarkInitializationException e) {
             log.error("Error starting benchmark", e);
+            test.setStatus(TestStatus.ERROR);
+            testRepository.save(test);
         }
     }
 
@@ -84,7 +100,6 @@ public class BenchmarkService {
         BenchmarkLauncher launcher = benchmarks.get(testId);
         boolean success = launcher.stop();
         if(success) {
-
             benchmarks.remove(testId);
             saveSingleQueueResponses(testId, queues.remove(testId));
         }
@@ -106,6 +121,7 @@ public class BenchmarkService {
     }
 
     @Scheduled(fixedDelay = 5000)
+    @Transactional
     void scheduleStartEnd() {
         if(benchmarks.isEmpty()) {
             List<Test> testsToStart = testRepository.findTestsToBegin(OffsetDateTime.now());
@@ -117,6 +133,10 @@ public class BenchmarkService {
                 Test test = tests.get(e.getKey());
                 if(test == null) {
                     stopBenchmark(e.getKey());
+                } else if (e.getValue().isFinished()) {
+                    test.setStatus(TestStatus.FINISHED);
+                    testRepository.save(test);
+                    saveSingleQueueResponses(test.getId(), queues.remove(test.getId()));
                 }
             }
             List<Test> testsToStart = testRepository.findTestsToBegin(benchmarks.keySet(), OffsetDateTime.now());

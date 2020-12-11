@@ -1,6 +1,7 @@
 package org.project.benchmark.app.service;
 
 import org.project.benchmark.app.dto.TestDTO;
+import org.project.benchmark.app.dto.TestProgressDTO;
 import org.project.benchmark.app.entity.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,8 @@ public interface TestService {
     Page<Test> getTests(Pageable pageable);
 
     Test getTestByID(Long id);
+
+    List<TestProgressDTO> getRunningTests();
 
     Test updateTest(Test test);
 

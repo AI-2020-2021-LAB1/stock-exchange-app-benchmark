@@ -3,6 +3,7 @@ package org.project.benchmark.app.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.project.benchmark.app.dto.TestDTO;
+import org.project.benchmark.app.dto.TestProgressDTO;
 import org.project.benchmark.app.entity.Configuration;
 import org.project.benchmark.app.entity.Test;
 import org.project.benchmark.app.repository.ConfigurationRepository;
@@ -22,6 +23,7 @@ public class TestServiceImpl implements TestService {
     private final TestRepository repository;
     private final ConfigurationRepository configurationRepository;
     private final ObjectMapper mapper;
+    private final BenchmarkService benchmarkService;
 
     @Override
     public List<Test> getAllTests() {
@@ -38,6 +40,11 @@ public class TestServiceImpl implements TestService {
     @Transactional(readOnly = true)
     public Test getTestByID(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Test Not Found"));
+    }
+
+    @Override
+    public List<TestProgressDTO> getRunningTests() {
+        return benchmarkService.getTestsProgress();
     }
 
     @Override
