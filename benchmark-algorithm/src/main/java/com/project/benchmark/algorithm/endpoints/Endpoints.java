@@ -2,13 +2,10 @@ package com.project.benchmark.algorithm.endpoints;
 
 public class Endpoints {
     //Adres do serwisu
-    public static final String address = "{host:port}";
+    public static final String address = "http://193.33.111.196:8000";
 
     //Token logowania [GET]
     public static final String OAUTH_TOKEN = "/oauth/token";
-
-    // oauth [POST]
-    public static final String OAUTH = "/oauth";
 
     //Endpoint do rejestracji nowego użytkownika [POST]
     public static final String API_REGISTER = "/api/register";
@@ -30,18 +27,4 @@ public class Endpoints {
     Pozostałe endpointy:
     /api/transaction/{id} - [GET] - pobranie konkretnej transakcji    */
     public static final String API_TRANSACTION = "/api/transaction";
-
-    /* Endpoint do listy użytkowników [GET]
-    Pozostałe endpointy:
-    /api/user/{id} - [GET] - pobranie konkretnego użytkownika
-    /api/user/{id}/order - [GET] - pobranie listy zleceń użytkownika
-    /api/user/{id}/stock - [GET] - pobranie listy akcji użytkownika
-     */
-    public static final String API_USER = "/api/user";
-
-    // Posiadane zlecenia uzytkownika [GET]
-    public static final String USER_OWNED_ORDERS = "/api/user/order/owned";
-
-    // Transakcje użytkownika [GET]
-    public static final String USER_OWNED_TRANSACTIONS = "/api/user/transaction/owned";
 }

@@ -83,8 +83,9 @@ public class BenchmarkService {
         BenchmarkLauncher launcher = benchmarks.get(testId);
         boolean success = launcher.stop();
         if(success) {
+
             benchmarks.remove(testId);
-            queues.remove(testId);
+            saveSingleQueueResponses(testId, queues.remove(testId));
         }
     }
 
@@ -114,9 +115,6 @@ public class BenchmarkService {
             for(var e: benchmarks.entrySet()) {
                 Test test = tests.get(e.getKey());
                 if(test == null) {
-                    stopBenchmark(e.getKey());
-                }
-                else if(test.getEndDate().isBefore(OffsetDateTime.now())) {
                     stopBenchmark(e.getKey());
                 }
             }
