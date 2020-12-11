@@ -43,7 +43,6 @@ public class TestController {
         testService.createTest(testDTO);
     }
 
-
     @GetMapping("/{id}")
     @ApiOperation(value = "Retrieve test by id", response = TestDTO.class)
     @ApiResponses({@ApiResponse(code = 200, message = "Test was successfully retrieved."),
