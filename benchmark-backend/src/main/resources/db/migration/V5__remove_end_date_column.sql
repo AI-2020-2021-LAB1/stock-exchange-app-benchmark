@@ -1,1 +1,1 @@
-alter table postgres.public.tests drop column end_date;
+alter table tests drop column end_date;
