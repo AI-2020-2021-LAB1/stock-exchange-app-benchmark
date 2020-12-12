@@ -57,6 +57,10 @@ public class ResponseController {
                     value = "Filtering criteria for field `operationTime`. (omitted if null)"),
             @ApiImplicitParam(name = "operationTime>", dataType = "integer", paramType = "query",
                     value = "Filtering criteria for field `operationTime`. (omitted if null)"),
+            @ApiImplicitParam(name = "dbQueryTime<", dataType = "integer", paramType = "query",
+                    value = "Filtering criteria for field `dbQueryTime`. (omitted if null)"),
+            @ApiImplicitParam(name = "dbQueryTime>", dataType = "integer", paramType = "query",
+                    value = "Filtering criteria for field `dbQueryTime`. (omitted if null)"),
     })
     public Page<ResponseDTO> getResponses(@ApiIgnore Pageable pageable, ResponseSpecification responseSpecification) {
         return responseService.getResponses(pageable,responseSpecification)

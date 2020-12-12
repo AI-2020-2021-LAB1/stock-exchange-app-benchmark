@@ -39,6 +39,7 @@ public abstract class BackendCoreService {
 
     final static AtomicInteger loggedInUsers = new AtomicInteger();
     private final static String BUSINESS_LOGIC_EXECUTION_TIME_HEADER = "Execution-Time-Business-Logic";
+    private final static String DB_QUERY_EXECUTION_TIME_HEADER = "Execution-Time-DB-Query";
 
     protected final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
@@ -119,6 +120,11 @@ public abstract class BackendCoreService {
         } else {
             response.setOperationTime(BigDecimal.ZERO);
         }
+        if (params.getDbQueryTime() != null) {
+            response.setDbQueryTime(BigDecimal.valueOf(params.getDbQueryTime()));
+        } else {
+            response.setDbQueryTime(BigDecimal.ZERO);
+        }
         response.setEndpoint(params.getEndpoint());
         response.setMethodType(params.getMethod());
         response.setUsersLoggedIn(loggedInUsers.get());
@@ -187,12 +193,16 @@ public abstract class BackendCoreService {
         params.setEndpoint(p.getEndpoint());
         params.setMethod(p.getMethod());
         try {
-            String header = res.getHeaderString(BUSINESS_LOGIC_EXECUTION_TIME_HEADER);
-            long nanos = Long.parseLong(header);
-            params.setOperationTime((double) nanos / 1000000);
+            String businessLogicHeader = res.getHeaderString(BUSINESS_LOGIC_EXECUTION_TIME_HEADER);
+            long businessLogicTimeNanos = Long.parseLong(businessLogicHeader);
+            params.setOperationTime((double) businessLogicTimeNanos / 1000000);
+            String dbQueryHeader = res.getHeaderString(DB_QUERY_EXECUTION_TIME_HEADER);
+            long dbQueryTimeNanos = Long.parseLong(dbQueryHeader);
+            params.setDbQueryTime((double) dbQueryTimeNanos / 1000000);
         } catch (Exception ignored) {
         }
         dto.setParams(params);
+
         return dto;
     }
 

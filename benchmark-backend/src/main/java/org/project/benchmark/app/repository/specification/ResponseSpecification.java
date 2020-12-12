@@ -21,6 +21,9 @@ import org.springframework.data.jpa.domain.Specification;
         @Spec(path = "requestResponseTime", spec = LessThanOrEqual.class, params = {"requestResponseTime<"}),
         @Spec(path = "operationTime", spec = GreaterThanOrEqual.class, params = {"operationTime>"}),
         @Spec(path = "operationTime", spec = LessThanOrEqual.class, params = {"operationTime<"}),
+        @Spec(path = "dbQueryTime", spec = LessThanOrEqual.class, params = {"dbQueryTime<"}),
+        @Spec(path = "dbQueryTime", spec = GreaterThanOrEqual.class, params = {"dbQueryTime>"}),
+
 })
 public interface ResponseSpecification extends Specification<Response> {
 

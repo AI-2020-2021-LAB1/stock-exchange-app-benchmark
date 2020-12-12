@@ -14,4 +14,5 @@ public class ParametersTO {
     private String endpoint;
     private Long requestResponseTime;
     private Double operationTime;
+    private Double dbQueryTime;
 }
