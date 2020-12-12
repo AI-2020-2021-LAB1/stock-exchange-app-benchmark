@@ -45,6 +45,9 @@ public class ResponseDTO {
     @ApiModelProperty(notes = "The response's operation time.")
     private BigDecimal operationTime;
 
+    @ApiModelProperty(notes = "The response's time of database query.")
+    private BigDecimal dbQueryTime;
+
     @ApiModelProperty(notes = "Test's object related with this response.")
     @NotNull(message = "This field is required.")
     private TestDTO test;

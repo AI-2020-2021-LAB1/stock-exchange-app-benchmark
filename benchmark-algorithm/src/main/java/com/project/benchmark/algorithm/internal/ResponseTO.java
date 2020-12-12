@@ -18,4 +18,5 @@ public class ResponseTO {
     private Integer usersLoggedIn;
     private BigDecimal requestResponseTime;
     private BigDecimal operationTime;
+    private BigDecimal dbQueryTime;
 }

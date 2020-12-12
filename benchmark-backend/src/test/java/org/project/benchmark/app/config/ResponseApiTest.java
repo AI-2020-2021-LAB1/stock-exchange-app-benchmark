@@ -23,7 +23,6 @@ import org.springframework.data.jpa.domain.Specification;
 import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -135,6 +134,7 @@ public class ResponseApiTest {
                 .responseDate(OffsetDateTime.now())
                 .usersLoggedIn(200)
                 .requestResponseTime(BigDecimal.ONE)
+                .dbQueryTime(BigDecimal.ONE)
                 .operationTime(BigDecimal.ONE)
                 .build();
     }
@@ -182,6 +182,7 @@ public class ResponseApiTest {
                 () -> assertEquals(expected.getUsersLoggedIn(), output.getUsersLoggedIn()),
                 () -> assertEquals(expected.getRequestResponseTime(), output.getRequestResponseTime()),
                 () -> assertEquals(expected.getOperationTime(), output.getOperationTime()),
+                () -> assertEquals(expected.getDbQueryTime(), output.getDbQueryTime()),
                 () -> assertEquals(expected.getTest(), output.getTest())
         );
     }

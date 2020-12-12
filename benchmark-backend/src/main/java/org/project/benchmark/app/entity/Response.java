@@ -44,4 +44,7 @@ public class Response {
 
     @Column(nullable = false,name = "operation_time")
     private BigDecimal operationTime;
+
+    @Column(nullable = false,name = "db_query_time")
+    private BigDecimal dbQueryTime;
 }

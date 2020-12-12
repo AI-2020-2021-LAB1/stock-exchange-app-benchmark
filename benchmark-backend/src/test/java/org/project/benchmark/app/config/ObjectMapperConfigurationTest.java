@@ -34,6 +34,7 @@ class ObjectMapperConfigurationTest {
         res.setEndpoint(RandomString.make());
         res.setEndpoint(RandomString.make());
         res.setOperationTime(BigDecimal.ONE);
+        res.setDbQueryTime(BigDecimal.ONE);
         res.setRequestResponseTime(BigDecimal.ONE);
         res.setResponseDate(OffsetDateTime.now());
         res.setStatusCode(200);
@@ -46,6 +47,7 @@ class ObjectMapperConfigurationTest {
         assertEquals(one.getOperationTime(), two.getOperationTime());
         assertEquals(one.getUsersLoggedIn(), two.getUsersLoggedIn());
         assertEquals(one.getStatusCode(), two.getStatusCode());
+        assertEquals(one.getDbQueryTime(),two.getDbQueryTime());
         assertEquals(two.getResponseDate().toInstant(), one.getResponseDate().toInstant());
         assertEquals(one.getRequestResponseTime(), two.getRequestResponseTime());
     }
