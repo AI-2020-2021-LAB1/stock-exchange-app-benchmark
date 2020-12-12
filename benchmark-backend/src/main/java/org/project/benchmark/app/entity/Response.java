@@ -15,7 +15,8 @@ import java.time.OffsetDateTime;
 public class Response {
 
     @Id
-    @GeneratedValue(generator = "RESPONSE_SEQUENCE")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "RESPONSE_SEQUENCE")
+    @SequenceGenerator(name="ID", sequenceName = "RESPONSE_SEQUENCE", allocationSize = 50)
     private Long id;
 
     @ManyToOne(targetEntity = Test.class, cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH})
