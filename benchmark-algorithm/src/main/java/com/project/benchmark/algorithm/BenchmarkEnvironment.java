@@ -88,6 +88,16 @@ class BenchmarkEnvironment {
             futures.putAll(newFutures);
         } while ((state.stopSignal.get() || state.forceStopSignal.get()) && futures.values().stream().allMatch(Future::isDone));
         if(runningThreads.decrementAndGet() == 0) {
+            if (state.forceStopSignal.get() || state.stopSignal.get()) {
+                backendExecutor.shutdown();
+            }
+            while (backendExecutor.getActiveCount() != 0) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+            }
             removeTag();
         }
     }
