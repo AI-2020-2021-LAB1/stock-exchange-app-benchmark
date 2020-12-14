@@ -66,7 +66,7 @@ public class TestServiceImpl implements TestService {
     @Override
     @Transactional
     public void createTest(TestDTO testDTO) {
-        Test test = mapper.convertValue(testDTO, Test.class);
+        Test test = new Test();
         test.setConfiguration(mapper.convertValue(testDTO.getConfiguration(), Configuration.class));
         test.setIterations(testDTO.getIterations());
         test.setStartDate(testDTO.getStartDate());

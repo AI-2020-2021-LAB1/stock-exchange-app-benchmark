@@ -79,7 +79,7 @@ class BenchmarkEnvironment {
                 try {
                     e.getValue().get(50, TimeUnit.MILLISECONDS);
                     UserIdentity ident = e.getKey();
-                    if(!state.stopSignal.get() || !ident.shouldDoNextIteration()) {
+                    if(!state.stopSignal.get() || ident.shouldDoNextIteration()) {
                         newFutures.put(ident, backendExecutor.submit(() -> tree.execute(ident, state)));
                     }
                 } catch (InterruptedException | ExecutionException | TimeoutException ignored) {

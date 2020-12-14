@@ -2,6 +2,7 @@ package org.project.benchmark.app.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.benchmark.algorithm.BenchmarkLauncher;
+import com.project.benchmark.algorithm.endpoints.Endpoints;
 import com.project.benchmark.algorithm.exception.BenchmarkInitializationException;
 import com.project.benchmark.algorithm.internal.BenchmarkConfiguration;
 import com.project.benchmark.algorithm.internal.ResponseTO;
@@ -45,6 +46,7 @@ public class BenchmarkService {
         if(!coreProperties.getAlgorithmThreads().isValid()) {
             throw new IllegalStateException("Property algorithm-threads.min must be lower or equal tha algorithm-threads.max");
         }
+        Endpoints.address = coreProperties.getStockBackendAddress();
     }
 
     @PreDestroy
@@ -102,6 +104,12 @@ public class BenchmarkService {
         if(success) {
             benchmarks.remove(testId);
             saveSingleQueueResponses(testId, queues.remove(testId));
+            try {
+                Test test = testRepository.getOne(testId);
+                test.setStatus(TestStatus.FINISHED);
+                testRepository.save(test);
+            } catch(EntityNotFoundException ignored){
+            }
         }
     }
 
@@ -134,9 +142,7 @@ public class BenchmarkService {
                 if(test == null) {
                     stopBenchmark(e.getKey());
                 } else if (e.getValue().isFinished()) {
-                    test.setStatus(TestStatus.FINISHED);
-                    testRepository.save(test);
-                    saveSingleQueueResponses(test.getId(), queues.remove(test.getId()));
+                    stopBenchmark(e.getKey());
                 }
             }
             List<Test> testsToStart = testRepository.findTestsToBegin(benchmarks.keySet(), OffsetDateTime.now());
@@ -146,7 +152,9 @@ public class BenchmarkService {
 
     private void saveSingleQueueResponses(Long testId, LinkedBlockingQueue<ResponseTO> queue) {
         List<ResponseTO> benchmarkResponses = new ArrayList<>();
-        queue.drainTo(benchmarkResponses);
+        if (queue != null) {
+            queue.drainTo(benchmarkResponses);
+        }
         var list = benchmarkResponses.stream()
                 .map(r -> buildResponse(r, testId))
                 .collect(Collectors.toList());
