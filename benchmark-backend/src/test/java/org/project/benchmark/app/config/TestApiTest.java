@@ -101,7 +101,7 @@ public class TestApiTest {
     void shouldCreateTest(){
         TestDTO testDTO = createTestDTO();
         Test test = new Test();
-        when(mapper.convertValue(testDTO, Test.class)).thenReturn(test);
+//        when(mapper.convertValue(testDTO, Test.class)).thenReturn(test);
         assertAll(() -> testService.createTest(testDTO));
     }
 
