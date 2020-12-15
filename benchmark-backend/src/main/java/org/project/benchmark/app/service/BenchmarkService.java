@@ -95,7 +95,8 @@ public class BenchmarkService {
         }
     }
 
-    void stopBenchmark(Long testId) {
+    @Transactional
+    public void stopBenchmark(Long testId) {
         if (!benchmarks.containsKey(testId) || !queues.containsKey(testId)) {
             throw new EntityNotFoundException("Test isn't running");
         }
@@ -131,7 +132,7 @@ public class BenchmarkService {
 
     @Scheduled(fixedDelay = 5000)
     @Transactional
-    void scheduleStartEnd() {
+    public void scheduleStartEnd() {
         if (benchmarks.isEmpty()) {
             List<Test> testsToStart = testRepository.findTestsToBegin(OffsetDateTime.now());
             testsToStart.forEach(this::startBenchmark);
