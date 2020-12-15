@@ -95,7 +95,6 @@ public class BenchmarkService {
         }
     }
 
-    @Transactional
     void stopBenchmark(Long testId) {
         if (!benchmarks.containsKey(testId) || !queues.containsKey(testId)) {
             throw new EntityNotFoundException("Test isn't running");
@@ -105,6 +104,13 @@ public class BenchmarkService {
         if (success) {
             benchmarks.remove(testId);
             saveSingleQueueResponses(testId, queues.remove(testId));
+            try {
+                Test test = testRepository.getOne(testId);
+                test.setStatus(TestStatus.FINISHED);
+                testRepository.save(test);
+                log.info("The test nr " + test.getId() + " has successfully ended");
+            } catch (EntityNotFoundException ignored) {
+            }
         }
     }
 
@@ -137,8 +143,6 @@ public class BenchmarkService {
                 if (test == null) {
                     stopBenchmark(e.getKey());
                 } else if (e.getValue().isFinished()) {
-                    test.setStatus(TestStatus.FINISHED);
-                    testRepository.save(test);
                     stopBenchmark(e.getKey());
                 }
             }
