@@ -43,7 +43,7 @@ public class BenchmarkService {
 
     @PostConstruct
     void init() {
-        if(!coreProperties.getAlgorithmThreads().isValid()) {
+        if (!coreProperties.getAlgorithmThreads().isValid()) {
             throw new IllegalStateException("Property algorithm-threads.min must be lower or equal tha algorithm-threads.max");
         }
         Endpoints.address = coreProperties.getStockBackendAddress();
@@ -82,7 +82,7 @@ public class BenchmarkService {
         LinkedBlockingQueue<ResponseTO> queue = new LinkedBlockingQueue<>();
         try {
             boolean success = launcher.start(queue);
-            if(success) {
+            if (success) {
                 benchmarks.put(test.getId(), launcher);
                 queues.put(test.getId(), queue);
                 test.setStatus(TestStatus.RUNNING);
@@ -95,21 +95,16 @@ public class BenchmarkService {
         }
     }
 
+    @Transactional
     void stopBenchmark(Long testId) {
-        if(!benchmarks.containsKey(testId) || !queues.containsKey(testId)) {
+        if (!benchmarks.containsKey(testId) || !queues.containsKey(testId)) {
             throw new EntityNotFoundException("Test isn't running");
         }
         BenchmarkLauncher launcher = benchmarks.get(testId);
         boolean success = launcher.stop();
-        if(success) {
+        if (success) {
             benchmarks.remove(testId);
             saveSingleQueueResponses(testId, queues.remove(testId));
-            try {
-                Test test = testRepository.getOne(testId);
-                test.setStatus(TestStatus.FINISHED);
-                testRepository.save(test);
-            } catch(EntityNotFoundException ignored){
-            }
         }
     }
 
@@ -119,11 +114,11 @@ public class BenchmarkService {
 
     @Scheduled(fixedDelayString = "${benchmark.algorithm.scheduler.save-interval}")
     void schedule() {
-        if(!queues.isEmpty()) {
-            for(Map.Entry<Long, LinkedBlockingQueue<ResponseTO>> e: queues.entrySet()) {
+        if (!queues.isEmpty()) {
+            for (Map.Entry<Long, LinkedBlockingQueue<ResponseTO>> e : queues.entrySet()) {
                 Long testId = e.getKey();
                 var queue = e.getValue();
-                saveSingleQueueResponses( testId, queue);
+                saveSingleQueueResponses(testId, queue);
             }
         }
     }
@@ -131,17 +126,19 @@ public class BenchmarkService {
     @Scheduled(fixedDelay = 5000)
     @Transactional
     void scheduleStartEnd() {
-        if(benchmarks.isEmpty()) {
+        if (benchmarks.isEmpty()) {
             List<Test> testsToStart = testRepository.findTestsToBegin(OffsetDateTime.now());
             testsToStart.forEach(this::startBenchmark);
         } else {
             List<Test> allTests = testRepository.findAllById(benchmarks.keySet());
             Map<Long, Test> tests = allTests.stream().collect(Collectors.toMap(Test::getId, t -> t));
-            for(var e: benchmarks.entrySet()) {
+            for (var e : benchmarks.entrySet()) {
                 Test test = tests.get(e.getKey());
-                if(test == null) {
+                if (test == null) {
                     stopBenchmark(e.getKey());
                 } else if (e.getValue().isFinished()) {
+                    test.setStatus(TestStatus.FINISHED);
+                    testRepository.save(test);
                     stopBenchmark(e.getKey());
                 }
             }
