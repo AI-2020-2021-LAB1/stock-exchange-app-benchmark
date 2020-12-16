@@ -2,6 +2,7 @@ package org.project.benchmark.app.config;
 
 
 import net.bytebuddy.utility.RandomString;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ResponseApiTest {
+public class ResponseServiceImplTest {
 
     @InjectMocks
     ResponseServiceImpl responseService;
@@ -42,8 +43,8 @@ public class ResponseApiTest {
     @Mock
     TestRepository testRepository;
 
-
     @Test
+    @DisplayName("Getting response by id")
     void shouldReturnResponseFromTestEntity() {
         Long id = 1L;
         Response response = createCustomResponse(id,id);
@@ -52,6 +53,7 @@ public class ResponseApiTest {
     }
 
     @Test
+    @DisplayName("Getting resposne by id when response not found")
     void shouldThrowEntityNotFoundWhenGettingResponseById() {
         Long id = 1L;
         when(responseRepository.findById(id)).thenReturn(Optional.empty());
@@ -59,6 +61,7 @@ public class ResponseApiTest {
     }
 
     @Test
+    @DisplayName("Getting all responses")
     void shouldReturnAllResponses() {
         List<Response> responseList = Arrays.asList(
                 createCustomResponse(1L,1L),
@@ -73,6 +76,7 @@ public class ResponseApiTest {
     }
 
     @Test
+    @DisplayName("Paging and filtering responses")
     void shouldPageAndFilterResponses() {
         List<Response> responseList = Arrays.asList(
                 createCustomResponse(1L,1L),
@@ -92,6 +96,7 @@ public class ResponseApiTest {
     }
 
     @Test
+    @DisplayName("Deleting response by id")
     void shouldDeleteResponse() {
         Long id = 1L;
         Response response = createCustomResponse(id,id);
@@ -100,6 +105,7 @@ public class ResponseApiTest {
     }
 
     @Test
+    @DisplayName("Deleting response by id when response not found")
     void shouldThrowEntityNotFoundExceptionWhenDeletingResponse() {
         Long id = 1L;
         when(responseRepository.findById(id)).thenReturn(Optional.empty());
@@ -107,6 +113,7 @@ public class ResponseApiTest {
     }
 
     @Test
+    @DisplayName("Getting response by test")
     void shouldPageResponsesFromTest() {
         org.project.benchmark.app.entity.Test test = createCustomTest(1L);
         when(testRepository.findById(1L)).thenReturn(Optional.of(test));
@@ -173,7 +180,7 @@ public class ResponseApiTest {
                 .build();
     }
 
-    public static void assertResponse(Response output, Response expected) {
+    private static void assertResponse(Response output, Response expected) {
         assertAll(() -> assertEquals(expected.getId(), output.getId()),
                 () -> assertEquals(expected.getEndpoint(), output.getEndpoint()),
                 () -> assertEquals(expected.getStatusCode(), output.getStatusCode()),
