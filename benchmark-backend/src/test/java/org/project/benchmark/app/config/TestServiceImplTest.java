@@ -2,6 +2,7 @@ package org.project.benchmark.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.bytebuddy.utility.RandomString;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -22,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class TestApiTest {
+public class TestServiceImplTest {
 
     @InjectMocks
     TestServiceImpl testService;
@@ -46,6 +46,7 @@ public class TestApiTest {
     ObjectMapper mapper;
 
     @org.junit.jupiter.api.Test
+    @DisplayName("Getting test by id")
     void shouldReturnTestFromTestEntity() {
         Long id = 1L;
         Test test = createCustomTest(id);
@@ -54,6 +55,7 @@ public class TestApiTest {
     }
 
     @org.junit.jupiter.api.Test
+    @DisplayName("Getting Test by id when test nof found")
     void shouldThrowEntityNotFoundWhenGettingTestById() {
         Long id = 1L;
         when(testRepository.findById(id)).thenReturn(Optional.empty());
@@ -61,6 +63,7 @@ public class TestApiTest {
     }
 
     @org.junit.jupiter.api.Test
+    @DisplayName("Getting tests list")
     void shouldReturnAllTests() {
         List<Test> testList = Arrays.asList(
                 createCustomTest(1L),
@@ -75,6 +78,7 @@ public class TestApiTest {
     }
 
     @org.junit.jupiter.api.Test
+    @DisplayName("Paging tests")
     void shouldPageTests() {
         List<Test> testList = Arrays.asList(
                 createCustomTest(1L),
@@ -91,6 +95,7 @@ public class TestApiTest {
     }
 
     @org.junit.jupiter.api.Test
+    @DisplayName("Updating test by id")
     void shouldUpdateTest() {
         Test test = createCustomTest(1L);
         when(testRepository.save(test)).thenReturn(test);
@@ -98,14 +103,15 @@ public class TestApiTest {
     }
 
     @org.junit.jupiter.api.Test
+    @DisplayName("Creating test")
     void shouldCreateTest(){
         TestDTO testDTO = createTestDTO();
         Test test = new Test();
-//        when(mapper.convertValue(testDTO, Test.class)).thenReturn(test);
         assertAll(() -> testService.createTest(testDTO));
     }
 
     @org.junit.jupiter.api.Test
+    @DisplayName("Deleting test by id")
     void shouldDeleteTest() {
         Long id = 1L;
         Test test = createCustomTest(id);
@@ -114,6 +120,7 @@ public class TestApiTest {
     }
 
     @org.junit.jupiter.api.Test
+    @DisplayName("Deleting test by id when test not found")
     void shouldThrowEntityNotFoundExceptionWhenDeletingTest() {
         Long id = 1L;
         when(testRepository.findById(id)).thenReturn(Optional.empty());
@@ -121,6 +128,7 @@ public class TestApiTest {
     }
 
     @org.junit.jupiter.api.Test
+    @DisplayName("Getting tests by configuration")
     void shouldPageTestsFromConfiguration() {
         Configuration configuration = createCustomConf(1L);
         when(configurationRepository.findById(1L)).thenReturn(Optional.of(configuration));
@@ -137,7 +145,6 @@ public class TestApiTest {
             assertTest(output.getContent().get(i), testList.get(i));
         }
     }
-
 
     private static Test createCustomTest(Long id) {
         return Test.builder()
@@ -181,7 +188,7 @@ public class TestApiTest {
                 .build();
     }
 
-    public static ConfigurationDTO createCustomConfigurationDTO(Long id) {
+    private static ConfigurationDTO createCustomConfigurationDTO(Long id) {
         return ConfigurationDTO.builder()
                 .id(id)
                 .name(RandomString.make())
@@ -206,7 +213,7 @@ public class TestApiTest {
                 .build();
     }
 
-    public static void assertTest(Test output, Test expected) {
+    private static void assertTest(Test output, Test expected) {
         assertAll(() -> assertEquals(expected.getId(), output.getId()),
                 () -> assertEquals(expected.getStartDate(), output.getStartDate()),
                 () -> assertEquals(expected.getConfiguration(), output.getConfiguration()),

@@ -2,6 +2,7 @@ package org.project.benchmark.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.bytebuddy.utility.RandomString;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ConfigurationApiTest {
+public class ConfigurationServiceImplTest {
 
     @InjectMocks
     ConfigurationServiceImpl configurationService;
@@ -40,6 +41,7 @@ public class ConfigurationApiTest {
     ObjectMapper mapper;
 
     @Test
+    @DisplayName("Getting Configuration by id")
     void shouldReturnConfiguration() {
         Long id = 1L;
         Configuration configuration = createCustomConf(id);
@@ -48,6 +50,7 @@ public class ConfigurationApiTest {
     }
 
     @Test
+    @DisplayName("Getting configuration by id when configuration nof found")
     void shouldThrowEntityNotFoundWhenGettingConfigurationById() {
         Long id = 1L;
         when(configurationRepository.findById(id)).thenReturn(Optional.empty());
@@ -55,6 +58,7 @@ public class ConfigurationApiTest {
     }
 
     @Test
+    @DisplayName("Listing all configuration")
     void shouldReturnAllConfigurations() {
         List<Configuration> configurationList = Arrays.asList(
                 createCustomConf(1L),
@@ -69,6 +73,7 @@ public class ConfigurationApiTest {
     }
 
     @Test
+    @DisplayName("Paging configuration")
     void shouldPageConfigurations() {
         List<Configuration> configurations = Arrays.asList(
                 createCustomConf(1L),
@@ -85,6 +90,7 @@ public class ConfigurationApiTest {
     }
 
     @Test
+    @DisplayName("Updating configuration")
     void shouldUpdateConfiguration() {
         Configuration configuration = createCustomConf(1L);
         when(configurationRepository.save(configuration)).thenReturn(configuration);
@@ -92,6 +98,7 @@ public class ConfigurationApiTest {
     }
 
     @Test
+    @DisplayName("Creating configuration")
     void shouldCreateConfiguration(){
         ConfigurationDTO configurationDTO = createCustomConfigurationDTO("ASD");
         Configuration configuration = createCustomConf(null, configurationDTO.getName());
@@ -101,6 +108,7 @@ public class ConfigurationApiTest {
     }
 
     @Test
+    @DisplayName("Deleting configuration")
     void shouldDeleteConfiguration() {
         Long id = 1L;
         Configuration configuration = createCustomConf(id);
@@ -109,6 +117,7 @@ public class ConfigurationApiTest {
     }
 
     @Test
+    @DisplayName("Deleting configuration by id when configuration nof found")
     void shouldThrowEntityNotFoundExceptionWhenDeletingConfiguration() {
         Long id = 1L;
         when(configurationRepository.findById(id)).thenReturn(Optional.empty());
@@ -163,7 +172,7 @@ public class ConfigurationApiTest {
                 .build();
     }
 
-    public static ConfigurationDTO createCustomConfigurationDTO(String name) {
+    private static ConfigurationDTO createCustomConfigurationDTO(String name) {
         return ConfigurationDTO.builder()
                 .name(name)
                 .createdAt(OffsetDateTime.now())
@@ -187,7 +196,7 @@ public class ConfigurationApiTest {
                 .build();
     }
 
-    public static void assertConfiguration(Configuration output, Configuration expected) {
+    private static void assertConfiguration(Configuration output, Configuration expected) {
         assertAll(() -> assertEquals(expected.getId(), output.getId()),
                 () -> assertEquals(expected.getName(), output.getName()),
                 () -> assertEquals(expected.getCreatedAt(), output.getCreatedAt()),
