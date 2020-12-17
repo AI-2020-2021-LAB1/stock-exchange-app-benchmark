@@ -9,13 +9,12 @@ import java.lang.annotation.Target;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Target(ElementType.FIELD)
+@Target(ElementType.TYPE)
 @Retention(RUNTIME)
-@Constraint(validatedBy = DateIsAfterNowValidation.class)
+@Constraint(validatedBy = ConfigurationPercentageValidation.class)
 @Documented
-public @interface DateIsAfterNow {
-
-    String message() default "Given datetime must be later than current datetime.";
+public @interface ConfigurationPercentage {
+    String message() default "Given values are not valid parameters for configuration.";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
