@@ -5,12 +5,13 @@ import com.project.benchmark.algorithm.dto.stock.StockTO;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 public class UserCache {
-    private List<StockTO> stocks;
-    private List<StockTO> ownedStocks;
-    private List<OrderTO> ownedOrders;
+    private List<StockTO> stocks = new ArrayList<>();
+    private List<StockTO> ownedStocks = new ArrayList<>();
+    private List<OrderTO> ownedOrders = new ArrayList<>();
 }

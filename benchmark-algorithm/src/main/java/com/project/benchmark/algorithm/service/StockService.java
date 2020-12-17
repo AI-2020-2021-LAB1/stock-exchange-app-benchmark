@@ -51,25 +51,11 @@ public class StockService extends BackendCoreService {
 
         return manageInvocation(
                 url,
+                STOCK_SINGLE,
                 HttpMethod.GET,
                 StockTO.class,
                 target -> target.request()
                         .accept(MediaType.APPLICATION_JSON)//return data
-                        .header(HttpHeaders.AUTHORIZATION, fullAuth)//token
-                        .buildGet()
-        );
-    }
-
-    public ResponseDataTO<List<StockIndexTO>> getStockIndexes(Integer stockId, StockIndexFiltersTO filters) throws IOException {
-        String url = this.pathParam(STOCK_INDEX, "id", stockId.toString());
-        return manageInvocation(
-                url,
-                HttpMethod.GET,
-                new TypeReference<>() {},
-                target -> target
-                        .queryParams(this.convertToMap(filters, StockIndexFiltersTO.class))
-                        .request()
-                        .accept(MediaType.APPLICATION_JSON_TYPE)
                         .header(HttpHeaders.AUTHORIZATION, fullAuth)//token
                         .buildGet()
         );

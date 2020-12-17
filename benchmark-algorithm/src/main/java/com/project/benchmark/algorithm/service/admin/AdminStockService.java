@@ -46,6 +46,7 @@ public class AdminStockService extends BackendCoreService {
 
         return manageInvocation(
                 url,
+                STOCK_DELETE,
                 HttpMethod.DELETE,
                 Void.class,
                 target -> target.request()

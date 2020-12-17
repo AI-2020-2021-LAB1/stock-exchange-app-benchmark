@@ -56,6 +56,7 @@ public class OrderService extends BackendCoreService {
         String url = pathParam(ORDER_SINGLE, "id", id.toString());
         return manageInvocation(
                 url,
+                ORDER_SINGLE,
                 HttpMethod.GET,
                 OrderTO.class,
                 target -> target.request()
@@ -98,6 +99,7 @@ public class OrderService extends BackendCoreService {
         String json = mapper.writeValueAsString(orderId);
         return manageInvocation(
                 url,
+                ORDER_DEACTIVATE,
                 HttpMethod.POST,
                 Void.class,
                 target -> target.request()

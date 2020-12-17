@@ -51,7 +51,8 @@ class BenchmarkEnvironment {
 
     public double getProgress() {
         return users.stream().mapToInt(UserIdentity::getRemainingIterations)
-                .mapToDouble(i -> (double)i / initialIterations)
+                .map(i -> Math.max(i, 0))
+                .mapToDouble(i -> (double)(initialIterations - i) / initialIterations)
                 .average().orElse(0.0);
     }
 
@@ -62,11 +63,15 @@ class BenchmarkEnvironment {
 
     private void startThread(int i) {
         runningThreads.incrementAndGet();
-        int size = users.size() / userExecutor.getMaximumPoolSize();
+        int size = users.size() / userExecutor.getMaximumPoolSize() + 1;
         int begin = size * i;
         int end = begin + size + 1;
         if(end > users.size()) {
             end = users.size();
+        }
+        if (end <= begin) {
+            runningThreads.decrementAndGet();
+            return;
         }
         List<UserIdentity> threadUsers = users.subList(begin, end);
         Map<UserIdentity, Future<?>> futures = new HashMap<>();
@@ -75,18 +80,29 @@ class BenchmarkEnvironment {
         }
         do {
             Map<UserIdentity, Future<?>> newFutures = new HashMap<>();
+            List<UserIdentity> toDelete = new ArrayList<>();
             for(var e: futures.entrySet()) {
                 try {
                     e.getValue().get(50, TimeUnit.MILLISECONDS);
                     UserIdentity ident = e.getKey();
-                    if(!state.stopSignal.get() || ident.shouldDoNextIteration()) {
+                    if(ident.shouldDoNextIteration() && !state.stopSignal.get()) {
                         newFutures.put(ident, backendExecutor.submit(() -> tree.execute(ident, state)));
+                    } else {
+                        toDelete.add(ident);
                     }
-                } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
+                } catch (InterruptedException | TimeoutException ignored) {
+                } catch (ExecutionException ignored) {
+                    UserIdentity ident = e.getKey();
+                    if(ident.shouldDoNextIteration() && !state.stopSignal.get()) {
+                        newFutures.put(ident, backendExecutor.submit(() -> tree.execute(ident, state)));
+                    } else {
+                        toDelete.add(ident);
+                    }
                 }
             }
             futures.putAll(newFutures);
-        } while ((state.stopSignal.get() || state.forceStopSignal.get()) && futures.values().stream().allMatch(Future::isDone));
+            toDelete.forEach(futures::remove);
+        } while ((!state.stopSignal.get() || !state.forceStopSignal.get()) && !futures.isEmpty());
         if(runningThreads.decrementAndGet() == 0) {
             if (state.forceStopSignal.get() || state.stopSignal.get()) {
                 backendExecutor.shutdown();
