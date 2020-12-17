@@ -57,10 +57,10 @@ public class UserIdentity {
     }
 
     public void logout() {
-        authenticationToken = null;
         if(isAuthenticated()) {
             serviceContainer.getDetailsService().logout();
         }
+        authenticationToken = null;
         serviceContainer = null;
     }
 

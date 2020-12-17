@@ -26,6 +26,7 @@ public class AdminTagService extends BackendCoreService {
         String url = pathParam(DELETE_TAG, "name", tag);
         return manageInvocation(
                 url,
+                DELETE_TAG,
                 HttpMethod.DELETE,
                 Void.class,
                 target -> target.request()

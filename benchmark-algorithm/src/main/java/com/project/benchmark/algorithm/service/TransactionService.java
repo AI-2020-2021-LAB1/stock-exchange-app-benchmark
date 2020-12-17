@@ -49,6 +49,7 @@ public class TransactionService extends BackendCoreService {
 
         return manageInvocation(
                 url,
+                TRANSACTION_SINGLE,
                 HttpMethod.GET,
                 TransactionTO.class,
                 target -> target.request()
