@@ -87,7 +87,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     private void configurationDTOToConfiguration(ConfigurationDTO configurationDTO, Configuration configuration) {
         configuration.setName(configurationDTO.getName().trim());
-        configuration.setCertaintyLevel(configurationDTO.getCertaintyLevel());
         configuration.setLoginAllStocks(configurationDTO.getLoginAllStocks());
         configuration.setLoginMakeOrder(configurationDTO.getLoginMakeOrder());
         configuration.setLoginOwnedStocks(configurationDTO.getLoginOwnedStocks());

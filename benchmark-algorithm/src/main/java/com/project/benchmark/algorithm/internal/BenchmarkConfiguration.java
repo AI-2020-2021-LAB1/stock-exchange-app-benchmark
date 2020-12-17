@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BenchmarkConfiguration {
-    private BigDecimal certaintyLevel;
     private BigDecimal loginAllStocks;
     private BigDecimal loginOwnedStocks;
     private BigDecimal loginUserOrders;

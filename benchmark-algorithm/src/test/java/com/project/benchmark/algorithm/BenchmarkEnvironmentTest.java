@@ -12,8 +12,6 @@ import org.junit.Test;
 import java.math.BigDecimal;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static org.junit.Assert.*;
-
 public class BenchmarkEnvironmentTest {
 
     ProbabilityTree<UserIdentity> tree;
@@ -22,7 +20,6 @@ public class BenchmarkEnvironmentTest {
     @Before
     public void init() {
         conf = new BenchmarkConfiguration();
-        conf.setCertaintyLevel(BigDecimal.ONE);
         conf.setNoOfOperations(BigDecimal.valueOf(10));
         tree = new AlgorithmProbabilityTreeGenerator().generate(conf);
     }

@@ -33,9 +33,6 @@ public class Configuration {
     @Column(nullable = false, name = "archived")
     private boolean archived;
 
-    @Column(nullable = false, name = "certainty_level")
-    private BigDecimal certaintyLevel;
-
     @Column(nullable = false, name = "login_all_stocks")
     private BigDecimal loginAllStocks;
 
