@@ -21,12 +21,7 @@ public class ConfigurationPercentageValidation implements ConstraintValidator<Co
         BigDecimal percent4 = conf.getUserOrderDeleteOrder().add(conf.getUserOrdersMakeOrder().add(conf.getUserOrdersEnd()));
         BigDecimal percent5 = conf.getMakeOrderBuyOrder().add(conf.getMakeOrderSellOrder());
 
-        if (conf.getCertaintyLevel().compareTo(BigDecimal.valueOf(3)) > 0) {
-            if (percent1.equals(percent2) && percent1.equals(percent3) && percent1.equals(percent4) && percent1.equals(percent5)
-                    && percent1.equals(BigDecimal.valueOf(100))) {
-                return true;
-            } else return false;
-        }
-        return true;
+        return percent1.equals(percent2) && percent1.equals(percent3) && percent1.equals(percent4) && percent1.equals(percent5)
+                && percent1.equals(BigDecimal.valueOf(100));
     }
 }

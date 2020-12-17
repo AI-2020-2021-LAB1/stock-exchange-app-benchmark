@@ -81,17 +81,7 @@ public class AlgorithmProbabilityTreeGenerator {
     }
 
     private BenchmarkProbabilityTreeParams generateInternalConfiguration(BenchmarkConfiguration conf) {
-        int level = conf.getCertaintyLevel().intValue();
-        switch(level) {
-            case 1:
-                return LEVEL_1_PARAMS;
-            case 2:
-                return LEVEL_2_PARAMS;
-            case 3:
-                return LEVEL_3_PARAMS;
-            default:
                 return generateFromOutsideConfiguration(conf);
-        }
     }
 
     private BenchmarkProbabilityTreeParams generateFromOutsideConfiguration(BenchmarkConfiguration conf) {
@@ -114,54 +104,5 @@ public class AlgorithmProbabilityTreeGenerator {
 
     private static final BigDecimal MULTIPLIER = BigDecimal.valueOf(100);
 
-    private static final BenchmarkProbabilityTreeParams LEVEL_1_PARAMS = BenchmarkProbabilityTreeParams
-            .builder()
-            .loginAllStocks(33)
-            .loginOwnedStocks(33)
-            .loginUserOrders(24)
-            .loginMakeOrder(10)
-            .allStocksMakeOrder(30)
-            .allStocksEnd(70)
-            .ownedStocksMakeOrder(30)
-            .ownedStocksEnd(70)
-            .userOrdersMakeOrder(15)
-            .userOrdersEnd(70)
-            .userOrderDeleteOrder(15)
-            .makeOrderBuyOrder(50)
-            .makeOrderSellOrder(50)
-            .build();
 
-    private static final BenchmarkProbabilityTreeParams LEVEL_2_PARAMS = BenchmarkProbabilityTreeParams
-            .builder()
-            .loginAllStocks(30)
-            .loginOwnedStocks(30)
-            .loginUserOrders(20)
-            .loginMakeOrder(20)
-            .allStocksMakeOrder(50)
-            .allStocksEnd(50)
-            .ownedStocksMakeOrder(50)
-            .ownedStocksEnd(50)
-            .userOrdersMakeOrder(25)
-            .userOrdersEnd(50)
-            .userOrderDeleteOrder(25)
-            .makeOrderBuyOrder(50)
-            .makeOrderSellOrder(50)
-            .build();
-
-    private static final BenchmarkProbabilityTreeParams LEVEL_3_PARAMS = BenchmarkProbabilityTreeParams
-            .builder()
-            .loginAllStocks(25)
-            .loginOwnedStocks(25)
-            .loginUserOrders(10)
-            .loginMakeOrder(40)
-            .allStocksMakeOrder(70)
-            .allStocksEnd(30)
-            .ownedStocksMakeOrder(70)
-            .ownedStocksEnd(30)
-            .userOrdersMakeOrder(35)
-            .userOrdersEnd(30)
-            .userOrderDeleteOrder(35)
-            .makeOrderBuyOrder(50)
-            .makeOrderSellOrder(50)
-            .build();
 }

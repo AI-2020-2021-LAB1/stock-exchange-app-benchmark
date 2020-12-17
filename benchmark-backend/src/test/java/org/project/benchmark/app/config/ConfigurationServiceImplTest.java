@@ -129,7 +129,6 @@ public class ConfigurationServiceImplTest {
                 .id(id).name(RandomString.make())
                 .createdAt(OffsetDateTime.now())
                 .archived(false)
-                .certaintyLevel(BigDecimal.ONE)
                 .loginAllStocks(BigDecimal.ONE)
                 .loginOwnedStocks(BigDecimal.ONE)
                 .loginUserOrders(BigDecimal.ONE)
@@ -153,7 +152,6 @@ public class ConfigurationServiceImplTest {
                 .id(id).name(name)
                 .createdAt(OffsetDateTime.now())
                 .archived(false)
-                .certaintyLevel(BigDecimal.ONE)
                 .loginAllStocks(BigDecimal.ONE)
                 .loginOwnedStocks(BigDecimal.ONE)
                 .loginUserOrders(BigDecimal.ONE)
@@ -177,7 +175,6 @@ public class ConfigurationServiceImplTest {
                 .name(name)
                 .createdAt(OffsetDateTime.now())
                 .archived(false)
-                .certaintyLevel(BigDecimal.ONE)
                 .loginAllStocks(BigDecimal.ONE)
                 .loginOwnedStocks(BigDecimal.ONE)
                 .loginUserOrders(BigDecimal.ONE)
@@ -201,7 +198,6 @@ public class ConfigurationServiceImplTest {
                 () -> assertEquals(expected.getName(), output.getName()),
                 () -> assertEquals(expected.getCreatedAt(), output.getCreatedAt()),
                 () -> assertEquals(expected.isArchived(), output.isArchived()),
-                () -> assertEquals(expected.getCertaintyLevel(), output.getCertaintyLevel()),
                 () -> assertEquals(expected.getLoginAllStocks(), output.getLoginAllStocks()),
                 () -> assertEquals(expected.getLoginOwnedStocks(), output.getLoginOwnedStocks()),
                 () -> assertEquals(expected.getLoginUserOrders(), output.getLoginUserOrders()),
