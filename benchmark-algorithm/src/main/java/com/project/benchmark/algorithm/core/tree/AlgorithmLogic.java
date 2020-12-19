@@ -98,6 +98,9 @@ class AlgorithmLogic {
             return;
         }
         List<OrderTO> orders = identity.getUserCache().getOwnedOrders();
+        if(orders.isEmpty()) {
+            return;
+        }
         int index = random.nextInt(orders.size());
         try {
             container.getOrderService().deactivateOrder(orders.get(index).getId());

@@ -24,10 +24,11 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
+
+import static org.project.benchmark.app.entity.TestStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 public class BenchmarkService {
     private final Map<Long, BenchmarkLauncher> benchmarks = new ConcurrentHashMap<>();
     private final Map<Long, LinkedBlockingQueue<ResponseTO>> queues = new ConcurrentHashMap<>();
+    private final Map<Long, TestStatus> benchmarkStatuses = new ConcurrentHashMap<>();
 
     private final TestRepository testRepository;
     private final ObjectMapper mapper;
@@ -57,19 +59,19 @@ public class BenchmarkService {
 
     public List<TestProgressDTO> getTestsProgress() {
         return benchmarks.entrySet().stream()
-                .filter(e -> !e.getValue().isFinished())
                 .map(e -> {
                     var dto = new TestProgressDTO();
                     dto.setId(e.getKey());
                     dto.setProgress(e.getValue().getProgress());
+                    dto.setStatus(benchmarkStatuses.getOrDefault(e.getKey(), NEW));
                     return dto;
                 }).collect(Collectors.toList());
     }
 
     @Transactional
     void startBenchmark(Test test) {
-        test.setStatus(TestStatus.INIT);
-        testRepository.save(test);
+        cleanFinishedBenchmarks();
+        changeState(test, INIT);
         Configuration conf = test.getConfiguration();
         BenchmarkConfiguration benchmarkConf = mapper.convertValue(conf, BenchmarkConfiguration.class);
         benchmarkConf.setNoOfUsers(test.getUserCount());
@@ -85,38 +87,43 @@ public class BenchmarkService {
             if (success) {
                 benchmarks.put(test.getId(), launcher);
                 queues.put(test.getId(), queue);
-                test.setStatus(TestStatus.RUNNING);
-                testRepository.save(test);
+                changeState(test, RUNNING);
+                log.info("The test nr " + test.getId() + " has successfully started");
             }
         } catch (BenchmarkInitializationException e) {
             log.error("Error starting benchmark", e);
-            test.setStatus(TestStatus.ERROR);
-            testRepository.save(test);
+            changeState(test, ERROR);
         }
+    }
+
+    private void cleanFinishedBenchmarks() {
+        final List<Long> finished = new ArrayList<>();
+        benchmarks.forEach((id, b) -> { if(b.isFinished()) finished.add(id); });
+        finished.forEach(benchmarks::remove);
+    }
+
+    private void changeState(Test test, TestStatus status) {
+        test.setStatus(status);
+        testRepository.saveAndFlush(test);
+        benchmarkStatuses.put(test.getId(), status);
     }
 
     @Transactional
     public void stopBenchmark(Long testId) {
-        if (!benchmarks.containsKey(testId) || !queues.containsKey(testId)) {
+        if (!queues.containsKey(testId)) {
             throw new EntityNotFoundException("Test isn't running");
         }
         BenchmarkLauncher launcher = benchmarks.get(testId);
         boolean success = launcher.stop();
         if (success) {
-            benchmarks.remove(testId);
             saveSingleQueueResponses(testId, queues.remove(testId));
             try {
                 Test test = testRepository.getOne(testId);
-                test.setStatus(TestStatus.FINISHED);
-                testRepository.save(test);
+                changeState(test, FINISHED);
                 log.info("The test nr " + test.getId() + " has successfully ended");
             } catch (EntityNotFoundException ignored) {
             }
         }
-    }
-
-    public Set<Long> getRunningTests() {
-        return benchmarks.keySet();
     }
 
     @Scheduled(fixedDelayString = "${benchmark.algorithm.scheduler.save-interval}")
@@ -137,9 +144,12 @@ public class BenchmarkService {
             List<Test> testsToStart = testRepository.findTestsToBegin(OffsetDateTime.now());
             testsToStart.forEach(this::startBenchmark);
         } else {
-            List<Test> allTests = testRepository.findAllById(benchmarks.keySet());
+            List<Test> allTests = testRepository.findAllById(queues.keySet());
             Map<Long, Test> tests = allTests.stream().collect(Collectors.toMap(Test::getId, t -> t));
             for (var e : benchmarks.entrySet()) {
+                if(!queues.containsKey(e.getKey())) {
+                    continue;
+                }
                 Test test = tests.get(e.getKey());
                 if (test == null) {
                     stopBenchmark(e.getKey());

@@ -80,11 +80,19 @@ public abstract class BackendCoreService {
         }
     }
 
+    protected <T> ResponseDataTO<T> manageInvocation(String url, String genericUrl, String method, Class<T> clazz, Function<ResteasyWebTarget, Invocation> func) {
+        return manageInvocation(url, genericUrl, method, clazz, func, null);
+    }
+
     protected <T> ResponseDataTO<T> manageInvocation(String url, String method, Class<T> clazz, Function<ResteasyWebTarget, Invocation> func) {
-        return manageInvocation(url, method, clazz, func, null);
+        return manageInvocation(url, null, method, clazz, func, null);
     }
 
     protected <T> ResponseDataTO<T> manageInvocation(String url, String method, Class<T> clazz, Function<ResteasyWebTarget, Invocation> func, String tag) {
+        return manageInvocation(url, null, method, clazz, func, tag);
+    }
+
+    protected <T> ResponseDataTO<T> manageInvocation(String url, String genericUrl, String method, Class<T> clazz, Function<ResteasyWebTarget, Invocation> func, String tag) {
         Client client = ClientBuilder.newClient();
         ResteasyWebTarget target = (ResteasyWebTarget) client.target(url);
         if (tag != null) {
@@ -95,7 +103,7 @@ public abstract class BackendCoreService {
         try (Response response = inv.invoke()) {
             Instant end = Instant.now();//stop measuring time
             long time = Duration.between(begin, end).toMillis();//calculate time
-            var params = new EndpointParameters(url, time, method);//additional info
+            var params = new EndpointParameters(genericUrl != null ? genericUrl : url, time, method);//additional info
             ResponseDataTO<T> res = resolveData(response, params, clazz);//get full data
             try {
                 queue.put(buildResponse(res));
