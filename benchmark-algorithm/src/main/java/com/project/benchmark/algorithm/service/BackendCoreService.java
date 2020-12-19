@@ -164,7 +164,16 @@ public abstract class BackendCoreService {
                 dto.setSuccess(false);
                 dto.setError(mapper.readValue(json, ErrorTO.class));
             } catch (JsonProcessingException e) { //not authorized or access denied or server error (!)
-                ErrorTO error = resolveAuthenticationError(res);
+                ErrorTO error;
+                if (res.getStatus() == HttpResponseCodes.SC_INTERNAL_SERVER_ERROR) {
+                    String message = String.format("Unexpected server error on request: %s", p.getEndpoint());
+                    error = new ErrorTO();
+                    error.setStatus(res.getStatus());
+                    error.setMessage(message);
+                    System.err.println(message);
+                } else {
+                    error = resolveAuthenticationError(res);
+                }
                 dto.setError(error);
             }
         }
