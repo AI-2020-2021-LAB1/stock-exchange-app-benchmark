@@ -5,6 +5,7 @@ import com.project.benchmark.algorithm.internal.ResponseTO;
 import com.project.benchmark.algorithm.service.UserDetailsService;
 import com.project.benchmark.algorithm.service.UserService;
 import com.project.benchmark.algorithm.service.admin.AdminStockService;
+import com.project.benchmark.algorithm.service.admin.AdminSystemService;
 import com.project.benchmark.algorithm.service.admin.AdminTagService;
 import lombok.Getter;
 
@@ -22,6 +23,8 @@ public class AdminIdentity {
     private AdminStockService stockService;
     @Getter
     private AdminTagService tagService;
+    @Getter
+    private AdminSystemService systemService;
 
     public AdminIdentity(LinkedBlockingQueue<ResponseTO> queue) {
         this.queue = queue;
@@ -37,6 +40,7 @@ public class AdminIdentity {
         if (token != null) {
             stockService = new AdminStockService(authenticationToken, queue);
             tagService = new AdminTagService(authenticationToken, queue);
+            systemService = new AdminSystemService(authenticationToken, queue);
             UserDetailsService detailsService = new UserDetailsService(authenticationToken, queue);
             detailsService.logout();
         }

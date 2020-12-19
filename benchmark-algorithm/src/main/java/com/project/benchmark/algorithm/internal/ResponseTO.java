@@ -19,4 +19,7 @@ public class ResponseTO {
     private BigDecimal requestResponseTime;
     private BigDecimal operationTime;
     private BigDecimal dbQueryTime;
+    private BigDecimal memoryUsed;
+    private BigDecimal memoryUsage;
+    private BigDecimal cpuUsage;
 }

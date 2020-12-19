@@ -47,4 +47,13 @@ public class Response {
 
     @Column(nullable = false,name = "db_query_time")
     private BigDecimal dbQueryTime;
+
+    @Column(nullable = false, name = "memory_used")
+    private BigDecimal memoryUsed;
+
+    @Column(nullable = false, name = "memory_usage")
+    private BigDecimal memoryUsage;
+
+    @Column(nullable = false, name = "cpu_usage")
+    private BigDecimal cpuUsage;
 }
