@@ -1,8 +1,11 @@
 package com.project.benchmark.algorithm.core;
 
+import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
 import com.project.benchmark.algorithm.dto.user.LoginUserTO;
+import com.project.benchmark.algorithm.exception.BenchmarkExecutionException;
 import com.project.benchmark.algorithm.internal.ResponseTO;
 import com.project.benchmark.algorithm.service.UserService;
+import org.jboss.resteasy.util.HttpResponseCodes;
 
 import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -11,6 +14,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class UserIdentity {
 
     public static final String GLOBAL_PASSWORD = "P@ssword3";
+
+    public String getEmail() {
+        return email;
+    }
 
     private final String email;
     private final String password;
@@ -44,7 +51,14 @@ public class UserIdentity {
         LoginUserTO user = new LoginUserTO();
         user.setUsername(email);
         user.setPassword(password);
-        String token = userService.login(user).getData();
+        ResponseDataTO<String> res = userService.login(user);
+        if (res.getParams().getStatus().equals(HttpResponseCodes.SC_INTERNAL_SERVER_ERROR)) {
+            throw new BenchmarkExecutionException("Couldn't log in. Unexpected error", true);
+        }
+        if (res.getParams().getStatus().equals(HttpResponseCodes.SC_BAD_REQUEST)) {
+            throw new BenchmarkExecutionException("User login failed", true);
+        }
+        String token = res.getData();
         if(!Objects.isNull(token)) {
             authenticationToken = token;
             serviceContainer = new UserServiceContainer(authenticationToken, queue);
