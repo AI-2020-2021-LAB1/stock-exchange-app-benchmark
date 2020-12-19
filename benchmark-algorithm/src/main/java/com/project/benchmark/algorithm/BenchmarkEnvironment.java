@@ -9,10 +9,12 @@ import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
 import com.project.benchmark.algorithm.dto.stock.NewStockTO;
 import com.project.benchmark.algorithm.dto.stock.StockOwnerTO;
 import com.project.benchmark.algorithm.dto.stock.StockUserTO;
+import com.project.benchmark.algorithm.dto.system.SystemUsageTO;
 import com.project.benchmark.algorithm.dto.tag.TagTO;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
 import com.project.benchmark.algorithm.exception.BenchmarkInitializationException;
 import com.project.benchmark.algorithm.internal.ResponseTO;
+import com.project.benchmark.algorithm.service.BackendCoreService;
 import com.project.benchmark.algorithm.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -20,6 +22,7 @@ import org.apache.commons.lang3.RandomUtils;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 class BenchmarkEnvironment {
@@ -27,6 +30,7 @@ class BenchmarkEnvironment {
     private final List<UserIdentity> users = new ArrayList<>();
     private ThreadPoolExecutor backendExecutor;
     private ThreadPoolExecutor userExecutor;
+    private final ScheduledThreadPoolExecutor scheduledExecutor;
     private final String tag;
     private final AdminIdentity adminIdentity;
     private ProbabilityTree<UserIdentity> tree;
@@ -39,6 +43,8 @@ class BenchmarkEnvironment {
         this.adminIdentity = adminIdentity;
         this.initialIterations = initialIterations;
         this.state = new BenchmarkState();
+        scheduledExecutor = new ScheduledThreadPoolExecutor(1);
+        scheduledExecutor.schedule(this::systemUsageScheduler, 500, TimeUnit.MILLISECONDS);
     }
 
     static BenchmarkEnvironmentBuilder builder(LinkedBlockingQueue<ResponseTO> queue) {
@@ -114,6 +120,7 @@ class BenchmarkEnvironment {
                         e.printStackTrace();
                     }
             }
+            scheduledExecutor.shutdown();
             removeTag();
         }
     }
@@ -146,6 +153,32 @@ class BenchmarkEnvironment {
             throw new IllegalStateException("Cannot stop test. Unable to login to admin account.");
         }
         adminIdentity.getTagService().removeTag(tag);
+    }
+
+    private void systemUsageScheduler() {
+        ResponseDataTO<List<SystemUsageTO>> res = adminIdentity.getSystemService().getSystemUsage();
+        List<SystemUsageTO> data = res.getData();
+        if (data == null) {
+            adminIdentity.authenticate();
+            res = adminIdentity.getSystemService().getSystemUsage();
+            data = res.getData();
+            if (data != null) {
+                setParameters(data);
+            }
+        } else {
+            setParameters(data);
+        }
+    }
+
+    private void setParameters(List<SystemUsageTO> data) {
+        if(data.isEmpty()) {
+            return;
+        }
+        data.sort(Comparator.comparing(SystemUsageTO::getTimestamp).reversed());
+        SystemUsageTO latest = data.get(0);
+        BackendCoreService.cpuUsage.set(latest.getCpuUsage());
+        BackendCoreService.memoryUsage.set(latest.getMemoryUsage());
+        BackendCoreService.memoryUsed.set(latest.getMemoryUsed());
     }
 
     static class BenchmarkEnvironmentBuilder {

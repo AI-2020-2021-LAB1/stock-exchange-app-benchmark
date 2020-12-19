@@ -32,12 +32,16 @@ import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class BackendCoreService {
 
     final static AtomicInteger loggedInUsers = new AtomicInteger();
+    public final static AtomicReference<Double> cpuUsage = new AtomicReference<>(0.0);
+    public final static AtomicReference<Double> memoryUsage = new AtomicReference<>(0.0);
+    public final static AtomicReference<Double> memoryUsed = new AtomicReference<>(0.0);
     private final static String BUSINESS_LOGIC_EXECUTION_TIME_HEADER = "Execution-Time-Business-Logic";
     private final static String DB_QUERY_EXECUTION_TIME_HEADER = "Execution-Time-DB-Query";
 
@@ -136,6 +140,9 @@ public abstract class BackendCoreService {
         response.setEndpoint(params.getEndpoint());
         response.setMethodType(params.getMethod());
         response.setUsersLoggedIn(loggedInUsers.get());
+        response.setMemoryUsage(BigDecimal.valueOf(memoryUsage.get()));
+        response.setMemoryUsed(BigDecimal.valueOf(memoryUsed.get()));
+        response.setCpuUsage(BigDecimal.valueOf(cpuUsage.get()));
         return response;
     }
 
