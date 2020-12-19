@@ -11,12 +11,14 @@ import com.project.benchmark.algorithm.dto.stock.StockOwnerTO;
 import com.project.benchmark.algorithm.dto.stock.StockUserTO;
 import com.project.benchmark.algorithm.dto.tag.TagTO;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
+import com.project.benchmark.algorithm.exception.BenchmarkExecutionException;
 import com.project.benchmark.algorithm.exception.BenchmarkInitializationException;
 import com.project.benchmark.algorithm.internal.ResponseTO;
 import com.project.benchmark.algorithm.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 
+import javax.ws.rs.core.Response;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -90,10 +92,16 @@ class BenchmarkEnvironment {
                     } else {
                         toDelete.add(ident);
                     }
-                } catch (InterruptedException | TimeoutException ignored) {
-                } catch (ExecutionException ignored) {
+                } catch (TimeoutException ignored) {
+                } catch (InterruptedException | ExecutionException exc) {
                     UserIdentity ident = e.getKey();
-                    if(ident.shouldDoNextIteration() && !state.stopSignal.get()) {
+                    System.err.printf("Error during algorithm iteration for email %s. Cause: %s%n", ident.getEmail(), exc.getCause().toString());
+                    if(exc.getCause() instanceof BenchmarkExecutionException
+                            && ((BenchmarkExecutionException)exc.getCause()).isCriticalError()) {
+                        System.err.printf("User execution critical error for email %s, disabling user . . .%n", ident.getEmail());
+                        toDelete.add(ident);
+                    }
+                    else if(ident.shouldDoNextIteration() && !state.stopSignal.get()) {
                         newFutures.put(ident, backendExecutor.submit(() -> tree.execute(ident, state)));
                     } else {
                         toDelete.add(ident);
@@ -104,18 +112,22 @@ class BenchmarkEnvironment {
             toDelete.forEach(futures::remove);
         } while ((!state.stopSignal.get() || !state.forceStopSignal.get()) && !futures.isEmpty());
         if(runningThreads.decrementAndGet() == 0) {
-            if (state.forceStopSignal.get() || state.stopSignal.get()) {
-                backendExecutor.shutdown();
-            }
-            while (backendExecutor.getActiveCount() != 0) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-            }
-            removeTag();
+            cleanBenchmark();
         }
+    }
+
+    private void cleanBenchmark() {
+        if (state.forceStopSignal.get() || state.stopSignal.get()) {
+            backendExecutor.shutdown();
+        }
+        while (backendExecutor.getActiveCount() != 0) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        removeTag();
     }
 
     public void stop() {
@@ -265,7 +277,7 @@ class BenchmarkEnvironment {
             throw new BenchmarkInitializationException("Unable to create tag");
         }
 
-        private void createUsers() {
+        private void createUsers() throws BenchmarkInitializationException {
             int bound = userCount + 1;
             Map<String, Future<ResponseDataTO<?>>> futures = new HashMap<>();
             for (int i = 1; i < bound; i++) {
@@ -275,6 +287,9 @@ class BenchmarkEnvironment {
             for (var future : futures.entrySet()) {
                 try {
                     var response = future.getValue().get();
+                    if(response.getParams().getStatus().equals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())) {
+                        throw new BenchmarkInitializationException("500 status from backend when creating user. See details in stock backend");
+                    }
                     if (response.isSuccess()) {
                         UserIdentity identity = new UserIdentity(future.getKey(), queue, operations, tag, iterationsCount);
                         environment.users.add(identity);
@@ -303,8 +318,11 @@ class BenchmarkEnvironment {
                     if (userId != null) {
                         NewStockTO stock = generateStock(userId);
                         try {
-                            adminIdentity.getStockService().createStock(stock, tag);
-                        } catch (JsonProcessingException ignored) {
+                            ResponseDataTO<Void> res = adminIdentity.getStockService().createStock(stock, tag);
+                            if(res.getParams().getStatus().equals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())) {
+                                throw new BenchmarkInitializationException("500 status from backend when creating stock. See details in stock backend");
+                            }
+                        } catch (JsonProcessingException | BenchmarkInitializationException ignored) {
                         }
                     }
                 }));

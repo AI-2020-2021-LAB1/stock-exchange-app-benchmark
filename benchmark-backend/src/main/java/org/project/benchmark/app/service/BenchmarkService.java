@@ -3,6 +3,7 @@ package org.project.benchmark.app.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.benchmark.algorithm.BenchmarkLauncher;
 import com.project.benchmark.algorithm.endpoints.Endpoints;
+import com.project.benchmark.algorithm.exception.BenchmarkExecutionException;
 import com.project.benchmark.algorithm.exception.BenchmarkInitializationException;
 import com.project.benchmark.algorithm.internal.BenchmarkConfiguration;
 import com.project.benchmark.algorithm.internal.ResponseTO;
@@ -58,14 +59,24 @@ public class BenchmarkService {
     }
 
     public List<TestProgressDTO> getTestsProgress() {
-        return benchmarks.entrySet().stream()
+        List<TestProgressDTO> tests = benchmarkStatuses.entrySet()
+                .stream()
                 .map(e -> {
                     var dto = new TestProgressDTO();
                     dto.setId(e.getKey());
-                    dto.setProgress(e.getValue().getProgress());
-                    dto.setStatus(benchmarkStatuses.getOrDefault(e.getKey(), NEW));
+                    dto.setProgress(
+                            benchmarks.containsKey(e.getKey())
+                                    ? benchmarks.get(e.getKey()).getProgress()
+                                    : 0.0
+                    );
+                    dto.setStatus(e.getValue());
                     return dto;
                 }).collect(Collectors.toList());
+        List<TestProgressDTO> waitingTests = testRepository.findTestsWaitingForStart()
+                .stream().map(i -> new TestProgressDTO(i, 0.0, NEW))
+                .collect(Collectors.toList());
+        tests.addAll(waitingTests);
+        return tests;
     }
 
     @Transactional
@@ -90,7 +101,7 @@ public class BenchmarkService {
                 changeState(test, RUNNING);
                 log.info("The test nr " + test.getId() + " has successfully started");
             }
-        } catch (BenchmarkInitializationException e) {
+        } catch (BenchmarkInitializationException | BenchmarkExecutionException e) {
             log.error("Error starting benchmark", e);
             changeState(test, ERROR);
         }

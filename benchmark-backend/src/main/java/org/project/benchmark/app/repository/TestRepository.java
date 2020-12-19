@@ -28,4 +28,7 @@ public interface TestRepository extends JpaRepository<Test, Long>,
 
     @Query("SELECT t FROM Test t WHERE :date > t.startDate and t.status='NEW'")
     List<Test> findTestsToBegin(@Param("date") OffsetDateTime date);
+
+    @Query("SELECT t.id FROM Test t WHERE t.status='NEW'")
+    List<Long> findTestsWaitingForStart();
 }
