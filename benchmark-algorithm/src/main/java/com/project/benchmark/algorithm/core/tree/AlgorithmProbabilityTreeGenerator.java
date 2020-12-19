@@ -86,19 +86,19 @@ public class AlgorithmProbabilityTreeGenerator {
 
     private BenchmarkProbabilityTreeParams generateFromOutsideConfiguration(BenchmarkConfiguration conf) {
         return BenchmarkProbabilityTreeParams.builder()
-                .loginAllStocks(conf.getLoginAllStocks().multiply(MULTIPLIER).intValue())
-                .loginOwnedStocks(conf.getLoginOwnedStocks().multiply(MULTIPLIER).intValue())
-                .loginUserOrders(conf.getLoginUserOrders().multiply(MULTIPLIER).intValue())
-                .loginMakeOrder(conf.getLoginMakeOrder().multiply(MULTIPLIER).intValue())
-                .allStocksMakeOrder(conf.getAllStocksMakeOrder().multiply(MULTIPLIER).intValue())
-                .allStocksEnd(conf.getAllStocksEnd().multiply(MULTIPLIER).intValue())
-                .ownedStocksMakeOrder(conf.getOwnedStocksMakeOrder().multiply(MULTIPLIER).intValue())
-                .ownedStocksEnd(conf.getOwnedStocksEnd().multiply(MULTIPLIER).intValue())
-                .userOrdersMakeOrder(conf.getUserOrdersMakeOrder().multiply(MULTIPLIER).intValue())
-                .userOrdersEnd(conf.getUserOrdersEnd().multiply(MULTIPLIER).intValue())
-                .userOrderDeleteOrder(conf.getUserOrderDeleteOrder().multiply(MULTIPLIER).intValue())
-                .makeOrderBuyOrder(conf.getMakeOrderBuyOrder().multiply(MULTIPLIER).intValue())
-                .makeOrderSellOrder(conf.getMakeOrderSellOrder().multiply(MULTIPLIER).intValue())
+                .loginAllStocks(conf.getLoginAllStocks().intValue())
+                .loginOwnedStocks(conf.getLoginOwnedStocks().intValue())
+                .loginUserOrders(conf.getLoginUserOrders().intValue())
+                .loginMakeOrder(conf.getLoginMakeOrder().intValue())
+                .allStocksMakeOrder(conf.getAllStocksMakeOrder().intValue())
+                .allStocksEnd(conf.getAllStocksEnd().intValue())
+                .ownedStocksMakeOrder(conf.getOwnedStocksMakeOrder().intValue())
+                .ownedStocksEnd(conf.getOwnedStocksEnd().intValue())
+                .userOrdersMakeOrder(conf.getUserOrdersMakeOrder().intValue())
+                .userOrdersEnd(conf.getUserOrdersEnd().intValue())
+                .userOrderDeleteOrder(conf.getUserOrderDeleteOrder().intValue())
+                .makeOrderBuyOrder(conf.getMakeOrderBuyOrder().intValue())
+                .makeOrderSellOrder(conf.getMakeOrderSellOrder().intValue())
                 .build();
     }
 
