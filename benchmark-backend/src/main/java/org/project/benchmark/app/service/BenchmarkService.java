@@ -58,12 +58,17 @@ public class BenchmarkService {
     }
 
     public List<TestProgressDTO> getTestsProgress() {
-        List<TestProgressDTO> tests = benchmarks.entrySet().stream()
+        List<TestProgressDTO> tests = benchmarkStatuses.entrySet()
+                .stream()
                 .map(e -> {
                     var dto = new TestProgressDTO();
                     dto.setId(e.getKey());
-                    dto.setProgress(e.getValue().getProgress());
-                    dto.setStatus(benchmarkStatuses.getOrDefault(e.getKey(), NEW));
+                    dto.setProgress(
+                            benchmarks.containsKey(e.getKey())
+                                    ? benchmarks.get(e.getKey()).getProgress()
+                                    : 0.0
+                    );
+                    dto.setStatus(e.getValue());
                     return dto;
                 }).collect(Collectors.toList());
         List<TestProgressDTO> waitingTests = testRepository.findTestsWaitingForStart()
