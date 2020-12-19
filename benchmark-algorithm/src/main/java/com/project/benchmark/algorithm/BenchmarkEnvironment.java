@@ -11,6 +11,7 @@ import com.project.benchmark.algorithm.dto.stock.StockOwnerTO;
 import com.project.benchmark.algorithm.dto.stock.StockUserTO;
 import com.project.benchmark.algorithm.dto.tag.TagTO;
 import com.project.benchmark.algorithm.dto.user.RegisterUserTO;
+import com.project.benchmark.algorithm.exception.BenchmarkExecutionException;
 import com.project.benchmark.algorithm.exception.BenchmarkInitializationException;
 import com.project.benchmark.algorithm.internal.ResponseTO;
 import com.project.benchmark.algorithm.service.UserService;
@@ -91,10 +92,16 @@ class BenchmarkEnvironment {
                     } else {
                         toDelete.add(ident);
                     }
-                } catch (InterruptedException | TimeoutException ignored) {
-                } catch (ExecutionException ignored) {
+                } catch (TimeoutException ignored) {
+                } catch (InterruptedException | ExecutionException exc) {
                     UserIdentity ident = e.getKey();
-                    if(ident.shouldDoNextIteration() && !state.stopSignal.get()) {
+                    System.err.printf("Error during algorithm iteration for email %s. Cause: %s%n", ident.getEmail(), exc.getCause().toString());
+                    if(exc.getCause() instanceof BenchmarkExecutionException
+                            && ((BenchmarkExecutionException)exc.getCause()).isCriticalError()) {
+                        System.err.printf("User execution critical error for email %s, disabling user . . .%n", ident.getEmail());
+                        toDelete.add(ident);
+                    }
+                    else if(ident.shouldDoNextIteration() && !state.stopSignal.get()) {
                         newFutures.put(ident, backendExecutor.submit(() -> tree.execute(ident, state)));
                     } else {
                         toDelete.add(ident);
@@ -105,18 +112,22 @@ class BenchmarkEnvironment {
             toDelete.forEach(futures::remove);
         } while ((!state.stopSignal.get() || !state.forceStopSignal.get()) && !futures.isEmpty());
         if(runningThreads.decrementAndGet() == 0) {
-            if (state.forceStopSignal.get() || state.stopSignal.get()) {
-                backendExecutor.shutdown();
-            }
-            while (backendExecutor.getActiveCount() != 0) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-            }
-            removeTag();
+            cleanBenchmark();
         }
+    }
+
+    private void cleanBenchmark() {
+        if (state.forceStopSignal.get() || state.stopSignal.get()) {
+            backendExecutor.shutdown();
+        }
+        while (backendExecutor.getActiveCount() != 0) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        removeTag();
     }
 
     public void stop() {

@@ -10,6 +10,7 @@ import com.project.benchmark.algorithm.dto.base.PageParams;
 import com.project.benchmark.algorithm.dto.response.ErrorTO;
 import com.project.benchmark.algorithm.dto.response.ParametersTO;
 import com.project.benchmark.algorithm.dto.response.ResponseDataTO;
+import com.project.benchmark.algorithm.exception.BenchmarkExecutionException;
 import com.project.benchmark.algorithm.internal.ResponseTO;
 import com.project.benchmark.algorithm.utils.QueryString;
 import org.apache.http.HttpStatus;
@@ -174,11 +175,7 @@ public abstract class BackendCoreService {
             } catch (JsonProcessingException e) { //not authorized or access denied or server error (!)
                 ErrorTO error;
                 if (res.getStatus() == HttpResponseCodes.SC_INTERNAL_SERVER_ERROR) {
-                    String message = String.format("Unexpected server error on request: %s", p.getEndpoint());
-                    error = new ErrorTO();
-                    error.setStatus(res.getStatus());
-                    error.setMessage(message);
-                    System.err.println(message);
+                    throw new BenchmarkExecutionException(String.format("Unexpected server error on request: %s", p.getEndpoint()));
                 } else {
                     error = resolveAuthenticationError(res);
                 }

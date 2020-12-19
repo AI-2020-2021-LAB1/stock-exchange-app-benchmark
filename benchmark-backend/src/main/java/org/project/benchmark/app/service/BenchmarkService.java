@@ -3,6 +3,7 @@ package org.project.benchmark.app.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.benchmark.algorithm.BenchmarkLauncher;
 import com.project.benchmark.algorithm.endpoints.Endpoints;
+import com.project.benchmark.algorithm.exception.BenchmarkExecutionException;
 import com.project.benchmark.algorithm.exception.BenchmarkInitializationException;
 import com.project.benchmark.algorithm.internal.BenchmarkConfiguration;
 import com.project.benchmark.algorithm.internal.ResponseTO;
@@ -100,7 +101,7 @@ public class BenchmarkService {
                 changeState(test, RUNNING);
                 log.info("The test nr " + test.getId() + " has successfully started");
             }
-        } catch (BenchmarkInitializationException e) {
+        } catch (BenchmarkInitializationException | BenchmarkExecutionException e) {
             log.error("Error starting benchmark", e);
             changeState(test, ERROR);
         }
