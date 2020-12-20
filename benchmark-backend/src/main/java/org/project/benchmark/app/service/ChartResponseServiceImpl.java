@@ -28,37 +28,37 @@ public class ChartResponseServiceImpl implements ChartResponseService {
 
     @Override
     @Transactional(readOnly = true)
-    public ChartResponseDTO getChartResponseForAllEndpoints(){
-        List<String> endpoints = getEndpoints();
+    public ChartResponseDTO getChartResponseForAllEndpoints(Long testId){
+        List<String> endpoints = getEndpoints(testId);
         clearTimes();
         for(String endpoint:endpoints){
-            minDBQueryTime.add(responseRepository.findMinDBQueryTimeForEndpoint(endpoint).setScale(2, RoundingMode.HALF_EVEN));
-            avgDBQueryTime.add(responseRepository.findAvgDBQueryTimeForEndpoint(endpoint).setScale(2,RoundingMode.HALF_EVEN));
-            maxDBQueryTime.add(responseRepository.findMaxDBQueryTimeForEndpoint(endpoint).setScale(2,RoundingMode.HALF_EVEN));
-            minOperationTime.add(responseRepository.findMinOperationTimeForEndpoint(endpoint).setScale(2,RoundingMode.HALF_EVEN));
-            avgOperationTime.add(responseRepository.findAvgOperationTimeForEndpoint(endpoint).setScale(2,RoundingMode.HALF_EVEN));
-            maxOperationTime.add(responseRepository.findMaxOperationTimeForEndpoint(endpoint).setScale(2,RoundingMode.HALF_EVEN));
+            minDBQueryTime.add(responseRepository.findMinDBQueryTimeForEndpoint(endpoint,testId).setScale(2, RoundingMode.HALF_EVEN));
+            avgDBQueryTime.add(responseRepository.findAvgDBQueryTimeForEndpoint(endpoint,testId).setScale(2,RoundingMode.HALF_EVEN));
+            maxDBQueryTime.add(responseRepository.findMaxDBQueryTimeForEndpoint(endpoint,testId).setScale(2,RoundingMode.HALF_EVEN));
+            minOperationTime.add(responseRepository.findMinOperationTimeForEndpoint(endpoint,testId).setScale(2,RoundingMode.HALF_EVEN));
+            avgOperationTime.add(responseRepository.findAvgOperationTimeForEndpoint(endpoint,testId).setScale(2,RoundingMode.HALF_EVEN));
+            maxOperationTime.add(responseRepository.findMaxOperationTimeForEndpoint(endpoint,testId).setScale(2,RoundingMode.HALF_EVEN));
         }
-        return new ChartResponseDTO(endpoints,
+        return new ChartResponseDTO(testId,endpoints,
                 minOperationTime,avgOperationTime,maxOperationTime,
                 minDBQueryTime,avgDBQueryTime,maxDBQueryTime);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ChartResponseDTO getChartResponseForAllMethod() {
-        List<MethodType> methodList = getMethods();
+    public ChartResponseDTO getChartResponseForAllMethod(Long testId) {
+        List<MethodType> methodList = getMethods(testId);
         clearTimes();
         List<String> methods = Collections.singletonList(methodList.toString());
         for(MethodType method:methodList){
-            minDBQueryTime.add(responseRepository.findMinDBQueryTimeForMethod(method).setScale(2,RoundingMode.HALF_EVEN));
-            avgDBQueryTime.add(responseRepository.findAvgDBQueryTimeForMethod(method).setScale(2,RoundingMode.HALF_EVEN));
-            maxDBQueryTime.add(responseRepository.findMaxDBQueryTimeForMethod(method).setScale(2,RoundingMode.HALF_EVEN));
-            minOperationTime.add(responseRepository.findMinOperationTimeForMethod(method).setScale(2,RoundingMode.HALF_EVEN));
-            avgOperationTime.add(responseRepository.findAvgOperationTimeForMethod(method).setScale(2,RoundingMode.HALF_EVEN));
-            maxOperationTime.add(responseRepository.findMaxOperationTimeForMethod(method).setScale(2,RoundingMode.HALF_EVEN));
+            minDBQueryTime.add(responseRepository.findMinDBQueryTimeForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
+            avgDBQueryTime.add(responseRepository.findAvgDBQueryTimeForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
+            maxDBQueryTime.add(responseRepository.findMaxDBQueryTimeForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
+            minOperationTime.add(responseRepository.findMinOperationTimeForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
+            avgOperationTime.add(responseRepository.findAvgOperationTimeForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
+            maxOperationTime.add(responseRepository.findMaxOperationTimeForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
         }
-        return new ChartResponseDTO(methods,
+        return new ChartResponseDTO(testId,methods,
                 minOperationTime,avgOperationTime,maxOperationTime,
                 minDBQueryTime,avgDBQueryTime,maxDBQueryTime);
     }
@@ -72,11 +72,11 @@ public class ChartResponseServiceImpl implements ChartResponseService {
         maxOperationTime.clear();
     }
 
-    private List<String> getEndpoints() {
-        return responseRepository.findEndpointsList();
+    private List<String> getEndpoints(Long test_id) {
+        return responseRepository.findEndpointsList(test_id);
     }
 
-    private List<MethodType> getMethods() {
-        return responseRepository.findMethodTypeList();
+    private List<MethodType> getMethods(Long test_id) {
+        return responseRepository.findMethodTypeList(test_id);
     }
 }

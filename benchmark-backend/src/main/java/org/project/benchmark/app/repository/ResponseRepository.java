@@ -31,45 +31,45 @@ public interface ResponseRepository extends JpaRepository<Response, Long>,
     @Query("SELECT r FROM Response r WHERE r.test.id = :testId ORDER BY r.responseDate desc")
     Page<Response> findResponseByTestId(@Param("testId") Long testId, Pageable pageable);
 
-    @Query("Select MIN(r.operationTime) FROM Response r WHERE r.methodType =:methodType")
-    BigDecimal findMinOperationTimeForMethod(@Param("methodType")MethodType methodType);
+    @Query("Select MIN(r.operationTime) FROM Response r WHERE r.methodType =:methodType and r.test.id = :test")
+    BigDecimal findMinOperationTimeForMethod(@Param("methodType")MethodType methodType, @Param("test") Long testId );
 
-    @Query("Select AVG(r.operationTime) FROM Response r WHERE r.methodType =:methodType")
-    BigDecimal findAvgOperationTimeForMethod(@Param("methodType")MethodType methodType);
+    @Query("Select AVG(r.operationTime) FROM Response r WHERE r.methodType =:methodType and r.test.id = :test")
+    BigDecimal findAvgOperationTimeForMethod(@Param("methodType")MethodType methodType, @Param("test") Long testId );
 
-    @Query("Select MAX(r.operationTime) FROM Response r WHERE r.methodType =:methodType")
-    BigDecimal findMaxOperationTimeForMethod(@Param("methodType")MethodType methodType);
+    @Query("Select MAX(r.operationTime) FROM Response r WHERE r.methodType =:methodType and r.test.id = :test")
+    BigDecimal findMaxOperationTimeForMethod(@Param("methodType")MethodType methodType, @Param("test") Long testId );
 
-    @Query("Select MIN(r.dbQueryTime) FROM Response r WHERE r.methodType = :methodType")
-    BigDecimal findMinDBQueryTimeForMethod(@Param("methodType")MethodType methodType);
+    @Query("Select MIN(r.dbQueryTime) FROM Response r WHERE r.methodType = :methodType and r.test.id = :test")
+    BigDecimal findMinDBQueryTimeForMethod(@Param("methodType")MethodType methodType, @Param("test") Long testId );
 
-    @Query("Select AVG(r.dbQueryTime) FROM Response r WHERE r.methodType =:methodType")
-    BigDecimal findAvgDBQueryTimeForMethod(@Param("methodType")MethodType methodType);
+    @Query("Select AVG(r.dbQueryTime) FROM Response r WHERE r.methodType =:methodType and r.test.id = :test")
+    BigDecimal findAvgDBQueryTimeForMethod(@Param("methodType")MethodType methodType, @Param("test") Long testId );
 
-    @Query("Select MAX(r.dbQueryTime) FROM Response r WHERE r.methodType =:methodType")
-    BigDecimal findMaxDBQueryTimeForMethod(@Param("methodType")MethodType methodType);
+    @Query("Select MAX(r.dbQueryTime) FROM Response r WHERE r.methodType =:methodType and r.test.id = :test")
+    BigDecimal findMaxDBQueryTimeForMethod(@Param("methodType")MethodType methodType, @Param("test") Long testId );
 
-    @Query("Select MIN(r.operationTime) FROM Response r WHERE r.endpoint =:endpoint")
-    BigDecimal findMinOperationTimeForEndpoint(@Param("endpoint")String endpoint);
+    @Query("Select MIN(r.operationTime) FROM Response r WHERE r.endpoint =:endpoint and r.test.id = :test")
+    BigDecimal findMinOperationTimeForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
 
-    @Query("Select AVG(r.operationTime) FROM Response r WHERE r.endpoint =:endpoint")
-    BigDecimal findAvgOperationTimeForEndpoint(@Param("endpoint")String endpoint);
+    @Query("Select AVG(r.operationTime) FROM Response r WHERE r.endpoint =:endpoint and r.test.id = :test")
+    BigDecimal findAvgOperationTimeForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
 
-    @Query("Select MAX(r.operationTime) FROM Response r WHERE r.endpoint =:endpoint")
-    BigDecimal findMaxOperationTimeForEndpoint(@Param("endpoint")String endpoint);
+    @Query("Select MAX(r.operationTime) FROM Response r WHERE r.endpoint =:endpoint and r.test.id = :test")
+    BigDecimal findMaxOperationTimeForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
 
-    @Query("Select MIN(r.dbQueryTime) FROM Response r WHERE r.endpoint = :endpoint")
-    BigDecimal findMinDBQueryTimeForEndpoint(@Param("endpoint")String endpoint);
+    @Query("Select MIN(r.dbQueryTime) FROM Response r WHERE r.endpoint = :endpoint and r.test.id = :test")
+    BigDecimal findMinDBQueryTimeForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
 
-    @Query("Select AVG(r.dbQueryTime) FROM Response r WHERE r.endpoint =:endpoint")
-    BigDecimal findAvgDBQueryTimeForEndpoint(@Param("endpoint")String endpoint);
+    @Query("Select AVG(r.dbQueryTime) FROM Response r WHERE r.endpoint =:endpoint and r.test.id = :test")
+    BigDecimal findAvgDBQueryTimeForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
 
-    @Query("Select MAX(r.dbQueryTime) FROM Response r WHERE r.endpoint =:endpoint")
-    BigDecimal findMaxDBQueryTimeForEndpoint(@Param("endpoint")String endpoint);
+    @Query("Select MAX(r.dbQueryTime) FROM Response r WHERE r.endpoint =:endpoint and r.test.id = :test")
+    BigDecimal findMaxDBQueryTimeForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
 
-    @Query("Select DISTINCT r.endpoint FROM Response r")
-    List<String> findEndpointsList();
+    @Query("Select DISTINCT r.endpoint FROM Response r WHERE r.test.id = :test")
+    List<String> findEndpointsList(@Param("test") Long testId);
 
-    @Query("Select DISTINCT r.methodType FROM Response r")
-    List<MethodType> findMethodTypeList();
+    @Query("Select DISTINCT r.methodType FROM Response r WHERE r.test.id = :test")
+    List<MethodType> findMethodTypeList(@Param("test") Long testId);
 }
