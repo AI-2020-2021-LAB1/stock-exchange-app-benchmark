@@ -49,6 +49,33 @@ public interface ResponseRepository extends JpaRepository<Response, Long>,
     @Query("Select MAX(r.dbQueryTime) FROM Response r WHERE r.methodType =:methodType and r.test.id = :test")
     BigDecimal findMaxDBQueryTimeForMethod(@Param("methodType")MethodType methodType, @Param("test") Long testId );
 
+    @Query("Select MIN(r.memoryUsed) FROM Response r WHERE r.methodType =:methodType and r.test.id = :test")
+    BigDecimal findMinMemoryUsedForMethod(@Param("methodType")MethodType methodType, @Param("test") Long testId );
+
+    @Query("Select AVG(r.memoryUsed) FROM Response r WHERE r.methodType =:methodType and r.test.id = :test")
+    BigDecimal findAvgMemoryUsedForMethod(@Param("methodType")MethodType methodType, @Param("test") Long testId );
+
+    @Query("Select MAX(r.memoryUsed) FROM Response r WHERE r.methodType =:methodType and r.test.id = :test")
+    BigDecimal findMaxMemoryUsedForMethod(@Param("methodType")MethodType methodType, @Param("test") Long testId );
+
+    @Query("Select MIN(r.memoryUsage) FROM Response r WHERE r.methodType =:methodType and r.test.id = :test")
+    BigDecimal findMinMemoryUsageForMethod(@Param("methodType")MethodType methodType, @Param("test") Long testId );
+
+    @Query("Select AVG(r.memoryUsage) FROM Response r WHERE r.methodType =:methodType and r.test.id = :test")
+    BigDecimal findAvgMemoryUsageForMethod(@Param("methodType")MethodType methodType, @Param("test") Long testId );
+
+    @Query("Select MAX(r.memoryUsage) FROM Response r WHERE r.methodType =:methodType and r.test.id = :test")
+    BigDecimal findMaxMemoryUsageForMethod(@Param("methodType")MethodType methodType, @Param("test") Long testId );
+
+    @Query("Select MIN(r.cpuUsage) FROM Response r WHERE r.methodType =:methodType and r.test.id = :test")
+    BigDecimal findMinCPUUsageForMethod(@Param("methodType")MethodType methodType, @Param("test") Long testId );
+
+    @Query("Select AVG(r.cpuUsage) FROM Response r WHERE r.methodType =:methodType and r.test.id = :test")
+    BigDecimal findAvgCPUUsageForMethod(@Param("methodType")MethodType methodType, @Param("test") Long testId );
+
+    @Query("Select MAX(r.cpuUsage) FROM Response r WHERE r.methodType =:methodType and r.test.id = :test")
+    BigDecimal findMaxCPUUsageForMethod(@Param("methodType")MethodType methodType, @Param("test") Long testId );
+
     @Query("Select MIN(r.operationTime) FROM Response r WHERE r.endpoint =:endpoint and r.test.id = :test")
     BigDecimal findMinOperationTimeForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
 
@@ -66,6 +93,33 @@ public interface ResponseRepository extends JpaRepository<Response, Long>,
 
     @Query("Select MAX(r.dbQueryTime) FROM Response r WHERE r.endpoint =:endpoint and r.test.id = :test")
     BigDecimal findMaxDBQueryTimeForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
+
+    @Query("Select MIN(r.memoryUsed) FROM Response r WHERE r.endpoint = :endpoint and r.test.id = :test")
+    BigDecimal findMinMemoryUsedForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
+
+    @Query("Select AVG(r.memoryUsed) FROM Response r WHERE r.endpoint =:endpoint and r.test.id = :test")
+    BigDecimal findAvgMemoryUsedForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
+
+    @Query("Select MAX(r.memoryUsed) FROM Response r WHERE r.endpoint =:endpoint and r.test.id = :test")
+    BigDecimal findMaxMemoryUsedForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
+
+    @Query("Select MIN(r.memoryUsage) FROM Response r WHERE r.endpoint = :endpoint and r.test.id = :test")
+    BigDecimal findMinMemoryUsageForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
+
+    @Query("Select AVG(r.memoryUsage) FROM Response r WHERE r.endpoint =:endpoint and r.test.id = :test")
+    BigDecimal findAvgMemoryUsageForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
+
+    @Query("Select MAX(r.memoryUsage) FROM Response r WHERE r.endpoint =:endpoint and r.test.id = :test")
+    BigDecimal findMaxMemoryUsageForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
+
+    @Query("Select MIN(r.cpuUsage) FROM Response r WHERE r.endpoint = :endpoint and r.test.id = :test")
+    BigDecimal findMinCPUUsageForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
+
+    @Query("Select AVG(r.cpuUsage) FROM Response r WHERE r.endpoint =:endpoint and r.test.id = :test")
+    BigDecimal findAvgCPUUsageForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
+
+    @Query("Select MAX(r.cpuUsage) FROM Response r WHERE r.endpoint =:endpoint and r.test.id = :test")
+    BigDecimal findMaxCPUUsageForEndpoint(@Param("endpoint")String endpoint, @Param("test") Long testId );
 
     @Query("Select DISTINCT r.endpoint FROM Response r WHERE r.test.id = :test")
     List<String> findEndpointsList(@Param("test") Long testId);

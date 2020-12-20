@@ -48,10 +48,6 @@ public class ResponseDTO {
     @ApiModelProperty(notes = "The response's time of database query.")
     private BigDecimal dbQueryTime;
 
-    @ApiModelProperty(notes = "Test's object related with this response.")
-    @NotNull(message = "This field is required.")
-    private TestDTO test;
-
     @ApiModelProperty(notes = "The response's backend memory used.")
     private BigDecimal memoryUsed;
 
@@ -60,4 +56,8 @@ public class ResponseDTO {
 
     @ApiModelProperty(notes = "The response's backend cpu usage.")
     private BigDecimal cpuUsage;
+
+    @ApiModelProperty(notes = "Test's object related with this response.")
+    @NotNull(message = "This field is required.")
+    private TestDTO test;
 }
