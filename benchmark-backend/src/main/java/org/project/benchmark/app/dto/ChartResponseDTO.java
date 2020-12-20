@@ -12,6 +12,8 @@ import java.util.List;
 @Setter
 public class ChartResponseDTO {
 
+    private Long testId;
+
     private List<String> label;
 
     private List<BigDecimal> operationTimeMin;

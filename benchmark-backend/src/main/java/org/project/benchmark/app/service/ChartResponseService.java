@@ -4,8 +4,8 @@ import org.project.benchmark.app.dto.ChartResponseDTO;
 
 public interface ChartResponseService {
 
-    ChartResponseDTO getChartResponseForAllEndpoints();
+    ChartResponseDTO getChartResponseForAllEndpoints(Long testId);
 
-    ChartResponseDTO getChartResponseForAllMethod();
+    ChartResponseDTO getChartResponseForAllMethod(Long testId);
 
 }

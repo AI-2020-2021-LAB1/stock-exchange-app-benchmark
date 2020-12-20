@@ -1,39 +1,35 @@
 package org.project.benchmark.app.rest;
 
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import org.project.benchmark.app.dto.ChartResponseDTO;
 import org.project.benchmark.app.service.ChartResponseServiceImpl;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/chartResponse")
 @AllArgsConstructor
-@Api(value = "ChartResponses", description = "REST API for chart response's management", tags = " Chart responses")
+@Api(value = "ChartResponses", description = "REST API for chart response's management by test ID", tags = " Chart responses")
 @CrossOrigin("*")
 public class ChartResponseController {
 
     private final ChartResponseServiceImpl chartResponseService;
 
-    @GetMapping("/endpoint")
+    @GetMapping("/{testId}/endpoint")
     @ApiOperation(value = "Successfully retrieve chart Responses for all endpoints")
     @ApiResponses(@ApiResponse(code = 200, message = " Successfully get list of endpoints."))
-    public ChartResponseDTO getResponseTimeForAllEndpoints() {
-        return chartResponseService.getChartResponseForAllEndpoints();
+    public ChartResponseDTO getResponseTimeForAllEndpoints(@ApiParam(value = "Id of desired Response",
+            required = true)@PathVariable Long testId) {
+        return chartResponseService.getChartResponseForAllEndpoints(testId);
     }
 
-    @GetMapping("/method")
+    @GetMapping("/{testId}/method")
     @ApiOperation(value = "Successfully retrieve chart Responses for all methods")
     @ApiResponses(@ApiResponse(code = 200, message = " Successfully get list of method."))
-    public ChartResponseDTO getResponsesTimeForAllMethod() {
-        return chartResponseService.getChartResponseForAllMethod();
+    public ChartResponseDTO getResponsesTimeForAllMethod(@ApiParam(value = "Id of desired Response",
+            required = true) @PathVariable Long testId) {
+        return chartResponseService.getChartResponseForAllMethod(testId);
     }
 
 }
