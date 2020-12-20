@@ -34,9 +34,6 @@ public class ConfigurationDTO {
     @ApiModelProperty(notes = "The configuration's creation date.")
     private OffsetDateTime createdAt;
 
-    @ApiModelProperty(notes = "The configuration's archiving status")
-    private boolean archived;
-
     @Min(value=1, message="must be equal or greater than 1")
     @Max(value=100, message="must be equal or lower than 100")
     @ApiModelProperty(notes = "The configuration's loginAllStocks value")
@@ -105,8 +102,4 @@ public class ConfigurationDTO {
     @Min(value=1, message="must be equal or greater than 1")
     @ApiModelProperty(notes = "The configuration's noOfOperations value")
     private BigDecimal noOfOperations;
-
-    @Min(value=1, message="must be equal or greater than 1")
-    @ApiModelProperty(notes = "The configuration's noOfMoney value")
-    private BigDecimal noOfMoney;
 }

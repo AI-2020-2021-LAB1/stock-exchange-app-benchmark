@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.project.benchmark.app.dto.ConfigurationDTO;
 import org.project.benchmark.app.entity.Configuration;
 import org.project.benchmark.app.repository.ConfigurationRepository;
+import org.project.benchmark.app.util.NullAwareBeanUtilsBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +25,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     private final ConfigurationRepository repository;
     private final ObjectMapper mapper;
+    private final Validator validator;
+    private final NullAwareBeanUtilsBean beanUtilsBean;
 
     @Override
     @Transactional(readOnly = true)
@@ -48,13 +54,26 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Transactional
     public void updateConfiguration(ConfigurationDTO configurationDTO, Long id) {
         Configuration configuration = getConfigurationByID(id);
-        Optional<Configuration> existingConfiguration = repository
-                .findByName(configurationDTO.getName().trim());
-        if (existingConfiguration.isPresent() &&
-                !configuration.getId().equals(existingConfiguration.get().getId())) {
-            throw new EntityExistsException("Configuration with given name already exists.");
+        if(configurationDTO.getName() != null) {
+            Optional<Configuration> existingConfiguration = repository
+                    .findByName(configurationDTO.getName().trim());
+            if (existingConfiguration.isPresent() &&
+                    !configuration.getId().equals(existingConfiguration.get().getId())) {
+                throw new EntityExistsException("Configuration with given name already exists.");
+            }
         }
-        configurationDTOToConfiguration(configurationDTO, configuration);
+        ConfigurationDTO copy = new ConfigurationDTO();
+        try {
+            beanUtilsBean.copyProperties(copy, configuration);
+            beanUtilsBean.copyProperties(copy, configurationDTO);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException("Error when copying data");
+        }
+        var violations = validator.validate(copy);
+        if(!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+        configurationDTOToConfiguration(copy, configuration);
         repository.save(configuration);
     }
 
@@ -100,7 +119,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         configuration.setUserOrdersMakeOrder(configurationDTO.getUserOrdersMakeOrder());
         configuration.setMakeOrderBuyOrder(configurationDTO.getMakeOrderBuyOrder());
         configuration.setMakeOrderSellOrder(configurationDTO.getMakeOrderSellOrder());
-        configuration.setNoOfMoney(configurationDTO.getNoOfMoney());
         configuration.setNoOfOperations(configurationDTO.getNoOfOperations());
     }
 }

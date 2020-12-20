@@ -62,7 +62,7 @@ public class ConfigurationController {
                     response = ErrorResponse.class)})
     public void updateConfiguration(
             @ApiParam(value = "Configuration object to update.",
-                    required = true) @Valid @RequestBody ConfigurationDTO configurationDTO,
+                    required = true) @RequestBody ConfigurationDTO configurationDTO,
             @ApiParam(value = "Id of desired configuration", required = true) @PathVariable Long id) {
         configurationService.updateConfiguration(configurationDTO, id);
     }

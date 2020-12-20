@@ -128,7 +128,6 @@ public class ConfigurationServiceImplTest {
         return Configuration.builder()
                 .id(id).name(RandomString.make())
                 .createdAt(OffsetDateTime.now())
-                .archived(false)
                 .loginAllStocks(BigDecimal.ONE)
                 .loginOwnedStocks(BigDecimal.ONE)
                 .loginUserOrders(BigDecimal.ONE)
@@ -143,7 +142,6 @@ public class ConfigurationServiceImplTest {
                 .makeOrderBuyOrder(BigDecimal.ONE)
                 .makeOrderSellOrder(BigDecimal.ONE)
                 .noOfOperations(BigDecimal.ONE)
-                .noOfMoney(BigDecimal.ONE)
                 .build();
     }
 
@@ -151,7 +149,6 @@ public class ConfigurationServiceImplTest {
         return Configuration.builder()
                 .id(id).name(name)
                 .createdAt(OffsetDateTime.now())
-                .archived(false)
                 .loginAllStocks(BigDecimal.ONE)
                 .loginOwnedStocks(BigDecimal.ONE)
                 .loginUserOrders(BigDecimal.ONE)
@@ -166,7 +163,6 @@ public class ConfigurationServiceImplTest {
                 .makeOrderBuyOrder(BigDecimal.ONE)
                 .makeOrderSellOrder(BigDecimal.ONE)
                 .noOfOperations(BigDecimal.ONE)
-                .noOfMoney(BigDecimal.ONE)
                 .build();
     }
 
@@ -174,7 +170,6 @@ public class ConfigurationServiceImplTest {
         return ConfigurationDTO.builder()
                 .name(name)
                 .createdAt(OffsetDateTime.now())
-                .archived(false)
                 .loginAllStocks(BigDecimal.ONE)
                 .loginOwnedStocks(BigDecimal.ONE)
                 .loginUserOrders(BigDecimal.ONE)
@@ -189,7 +184,6 @@ public class ConfigurationServiceImplTest {
                 .makeOrderBuyOrder(BigDecimal.ONE)
                 .makeOrderSellOrder(BigDecimal.ONE)
                 .noOfOperations(BigDecimal.ONE)
-                .noOfMoney(BigDecimal.ONE)
                 .build();
     }
 
@@ -197,7 +191,6 @@ public class ConfigurationServiceImplTest {
         assertAll(() -> assertEquals(expected.getId(), output.getId()),
                 () -> assertEquals(expected.getName(), output.getName()),
                 () -> assertEquals(expected.getCreatedAt(), output.getCreatedAt()),
-                () -> assertEquals(expected.isArchived(), output.isArchived()),
                 () -> assertEquals(expected.getLoginAllStocks(), output.getLoginAllStocks()),
                 () -> assertEquals(expected.getLoginOwnedStocks(), output.getLoginOwnedStocks()),
                 () -> assertEquals(expected.getLoginUserOrders(), output.getLoginUserOrders()),
@@ -211,7 +204,6 @@ public class ConfigurationServiceImplTest {
                 () -> assertEquals(expected.getUserOrderDeleteOrder(), output.getUserOrderDeleteOrder()),
                 () -> assertEquals(expected.getMakeOrderBuyOrder(), output.getMakeOrderBuyOrder()),
                 () -> assertEquals(expected.getMakeOrderSellOrder(), output.getMakeOrderSellOrder()),
-                () -> assertEquals(expected.getNoOfOperations(), output.getNoOfOperations()),
-                () -> assertEquals(expected.getNoOfMoney(), output.getNoOfMoney()));
+                () -> assertEquals(expected.getNoOfOperations(), output.getNoOfOperations()));
     }
 }
