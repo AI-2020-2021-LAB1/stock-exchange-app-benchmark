@@ -12,6 +12,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,27 +20,25 @@ public class ChartResponseServiceImpl implements ChartResponseService {
 
     private final ResponseRepository responseRepository;
 
-    List<BigDecimal> minDBQueryTime = new ArrayList<>();
-    List<BigDecimal> avgDBQueryTime = new ArrayList<>();
-    List<BigDecimal> maxDBQueryTime = new ArrayList<>();
-    List<BigDecimal> minOperationTime = new ArrayList<>();
-    List<BigDecimal> avgOperationTime = new ArrayList<>();
-    List<BigDecimal> maxOperationTime = new ArrayList<>();
-    List<BigDecimal> minMemoryUsed = new ArrayList<>();
-    List<BigDecimal> avgMemoryUsed = new ArrayList<>();
-    List<BigDecimal> maxMemoryUsed = new ArrayList<>();
-    List<BigDecimal> minMemoryUsage = new ArrayList<>();
-    List<BigDecimal> avgMemoryUsage = new ArrayList<>();
-    List<BigDecimal> maxMemoryUsage = new ArrayList<>();
-    List<BigDecimal> minCPUUsage = new ArrayList<>();
-    List<BigDecimal> avgCPUUsage = new ArrayList<>();
-    List<BigDecimal> maxCPUUsage = new ArrayList<>();
-
     @Override
     @Transactional(readOnly = true)
     public ChartResponseDTO getChartResponseForAllEndpoints(Long testId){
         List<String> endpoints = getEndpoints(testId);
-        clearTimes();
+        List<BigDecimal> minDBQueryTime = new ArrayList<>();
+        List<BigDecimal> avgDBQueryTime = new ArrayList<>();
+        List<BigDecimal> maxDBQueryTime = new ArrayList<>();
+        List<BigDecimal> minOperationTime = new ArrayList<>();
+        List<BigDecimal> avgOperationTime = new ArrayList<>();
+        List<BigDecimal> maxOperationTime = new ArrayList<>();
+        List<BigDecimal> minMemoryUsed = new ArrayList<>();
+        List<BigDecimal> avgMemoryUsed = new ArrayList<>();
+        List<BigDecimal> maxMemoryUsed = new ArrayList<>();
+        List<BigDecimal> minMemoryUsage = new ArrayList<>();
+        List<BigDecimal> avgMemoryUsage = new ArrayList<>();
+        List<BigDecimal> maxMemoryUsage = new ArrayList<>();
+        List<BigDecimal> minCPUUsage = new ArrayList<>();
+        List<BigDecimal> avgCPUUsage = new ArrayList<>();
+        List<BigDecimal> maxCPUUsage = new ArrayList<>();
         for(String endpoint:endpoints){
             minDBQueryTime.add(responseRepository.findMinDBQueryTimeForEndpoint(endpoint,testId).setScale(2, RoundingMode.HALF_EVEN));
             avgDBQueryTime.add(responseRepository.findAvgDBQueryTimeForEndpoint(endpoint,testId).setScale(2,RoundingMode.HALF_EVEN));
@@ -69,8 +68,22 @@ public class ChartResponseServiceImpl implements ChartResponseService {
     @Transactional(readOnly = true)
     public ChartResponseDTO getChartResponseForAllMethod(Long testId) {
         List<MethodType> methodList = getMethods(testId);
-        clearTimes();
-        List<String> methods = Collections.singletonList(methodList.toString());
+        List<BigDecimal> minDBQueryTime = new ArrayList<>();
+        List<BigDecimal> avgDBQueryTime = new ArrayList<>();
+        List<BigDecimal> maxDBQueryTime = new ArrayList<>();
+        List<BigDecimal> minOperationTime = new ArrayList<>();
+        List<BigDecimal> avgOperationTime = new ArrayList<>();
+        List<BigDecimal> maxOperationTime = new ArrayList<>();
+        List<BigDecimal> minMemoryUsed = new ArrayList<>();
+        List<BigDecimal> avgMemoryUsed = new ArrayList<>();
+        List<BigDecimal> maxMemoryUsed = new ArrayList<>();
+        List<BigDecimal> minMemoryUsage = new ArrayList<>();
+        List<BigDecimal> avgMemoryUsage = new ArrayList<>();
+        List<BigDecimal> maxMemoryUsage = new ArrayList<>();
+        List<BigDecimal> minCPUUsage = new ArrayList<>();
+        List<BigDecimal> avgCPUUsage = new ArrayList<>();
+        List<BigDecimal> maxCPUUsage = new ArrayList<>();
+        List<String> methods = methodList.stream().map(Enum::name).collect(Collectors.toList());
         for(MethodType method:methodList){
             minDBQueryTime.add(responseRepository.findMinDBQueryTimeForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
             avgDBQueryTime.add(responseRepository.findAvgDBQueryTimeForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
@@ -94,24 +107,6 @@ public class ChartResponseServiceImpl implements ChartResponseService {
                 minMemoryUsed,avgMemoryUsed,maxMemoryUsed,
                 minMemoryUsage,avgMemoryUsage,maxMemoryUsage,
                 minCPUUsage,avgCPUUsage,maxCPUUsage);
-    }
-
-    private void clearTimes() {
-        minDBQueryTime.clear();
-        avgDBQueryTime.clear();
-        maxDBQueryTime.clear();
-        minOperationTime.clear();
-        avgOperationTime.clear();
-        maxOperationTime.clear();
-        minMemoryUsed.clear();
-        avgMemoryUsed.clear();
-        maxMemoryUsed.clear();
-        minMemoryUsage.clear();
-        avgMemoryUsage.clear();
-        maxMemoryUsage.clear();
-        minCPUUsage.clear();
-        avgCPUUsage.clear();
-        maxCPUUsage.clear();
     }
 
     private List<String> getEndpoints(Long test_id) {
