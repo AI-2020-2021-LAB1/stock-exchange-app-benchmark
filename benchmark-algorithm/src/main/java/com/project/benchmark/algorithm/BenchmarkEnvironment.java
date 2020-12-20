@@ -45,7 +45,7 @@ class BenchmarkEnvironment {
         this.initialIterations = initialIterations;
         this.state = new BenchmarkState();
         scheduledExecutor = new ScheduledThreadPoolExecutor(1);
-        scheduledExecutor.schedule(this::systemUsageScheduler, 500, TimeUnit.MILLISECONDS);
+        scheduledExecutor.scheduleWithFixedDelay(this::systemUsageScheduler, 500, 500, TimeUnit.MILLISECONDS);
     }
 
     static BenchmarkEnvironmentBuilder builder(LinkedBlockingQueue<ResponseTO> queue) {
