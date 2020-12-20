@@ -28,4 +28,21 @@ public class ChartResponseDTO {
 
     private List<BigDecimal> dbQueryTimeMax;
 
+    private List<BigDecimal> memoryUsedMin;
+
+    private List<BigDecimal> memoryUsedAvg;
+
+    private List<BigDecimal> memoryUsedMax;
+
+    private List<BigDecimal> memoryUsageMin;
+
+    private List<BigDecimal> memoryUsageAvg;
+
+    private List<BigDecimal> memoryUsageMax;
+
+    private List<BigDecimal> cpuUsageMin;
+
+    private List<BigDecimal> cpuUsageAvg;
+
+    private List<BigDecimal> cpuUsageMax;
 }
