@@ -12,10 +12,13 @@ import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolv
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class CustomExceptionMapper extends DefaultHandlerExceptionResolver {
@@ -47,6 +50,19 @@ public class CustomExceptionMapper extends DefaultHandlerExceptionResolver {
                     errors.putIfAbsent(error.getField(), new ArrayList<>());
                     errors.get(error.getField()).add(error.getDefaultMessage());
                 });
+        return ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message("Validation error")
+                .errors(errors)
+                .build();
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse methodConstraintViolationException(ConstraintViolationException ex) {
+        String errors = ex.getConstraintViolations()
+                .stream().map(ConstraintViolation::getMessage)
+                .collect(Collectors.joining(", "));
         return ErrorResponse.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message("Validation error")

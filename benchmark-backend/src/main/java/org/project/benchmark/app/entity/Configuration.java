@@ -30,9 +30,6 @@ public class Configuration {
     @Column(nullable = false, name = "created_at")
     private OffsetDateTime createdAt;
 
-    @Column(nullable = false, name = "archived")
-    private boolean archived;
-
     @Column(nullable = false, name = "login_all_stocks")
     private BigDecimal loginAllStocks;
 
@@ -74,9 +71,6 @@ public class Configuration {
 
     @Column(nullable = false, name = "no_of_operations")
     private BigDecimal noOfOperations;
-
-    @Column(nullable = false, name = "no_of_money")
-    private BigDecimal noOfMoney;
 
     @JsonIgnore
     @OneToMany(targetEntity = Test.class, mappedBy = "configuration",

@@ -168,7 +168,6 @@ public class TestServiceImplTest {
         return Configuration.builder()
                 .id(id).name(RandomString.make())
                 .createdAt(OffsetDateTime.now())
-                .archived(false)
                 .loginAllStocks(BigDecimal.ONE)
                 .loginOwnedStocks(BigDecimal.ONE)
                 .loginUserOrders(BigDecimal.ONE)
@@ -183,7 +182,6 @@ public class TestServiceImplTest {
                 .makeOrderBuyOrder(BigDecimal.ONE)
                 .makeOrderSellOrder(BigDecimal.ONE)
                 .noOfOperations(BigDecimal.ONE)
-                .noOfMoney(BigDecimal.ONE)
                 .build();
     }
 
@@ -192,7 +190,6 @@ public class TestServiceImplTest {
                 .id(id)
                 .name(RandomString.make())
                 .createdAt(OffsetDateTime.now())
-                .archived(false)
                 .loginAllStocks(BigDecimal.ONE)
                 .loginOwnedStocks(BigDecimal.ONE)
                 .loginUserOrders(BigDecimal.ONE)
@@ -207,7 +204,6 @@ public class TestServiceImplTest {
                 .makeOrderBuyOrder(BigDecimal.ONE)
                 .makeOrderSellOrder(BigDecimal.ONE)
                 .noOfOperations(BigDecimal.ONE)
-                .noOfMoney(BigDecimal.ONE)
                 .build();
     }
 
