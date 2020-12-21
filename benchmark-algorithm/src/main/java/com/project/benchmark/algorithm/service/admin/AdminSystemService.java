@@ -12,11 +12,13 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class AdminSystemService extends BackendCoreService {
 
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSXXXXX");
     private final String SYSTEM_DETAILS = Endpoints.address + "/api/system/resources";
 
     public AdminSystemService(String authorization, LinkedBlockingQueue<ResponseTO> queue) {
@@ -30,7 +32,7 @@ public class AdminSystemService extends BackendCoreService {
                 new TypeReference<>() {
                 },
                 target -> target
-//                        .queryParam("datetime>", OffsetDateTime.now().minusDays(1).atZoneSameInstant(ZoneId.of("+00:00")))
+                        .queryParam("datetime>", OffsetDateTime.now().minusSeconds(5).format(formatter))
                         .request()
                         .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, fullAuth)//token

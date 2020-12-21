@@ -111,6 +111,7 @@ public class BenchmarkService {
         final List<Long> finished = new ArrayList<>();
         benchmarks.forEach((id, b) -> { if(b.isFinished()) finished.add(id); });
         finished.forEach(benchmarks::remove);
+        finished.forEach(benchmarkStatuses::remove);
     }
 
     private void changeState(Test test, TestStatus status) {

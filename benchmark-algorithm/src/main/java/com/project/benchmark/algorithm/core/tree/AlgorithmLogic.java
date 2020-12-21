@@ -120,6 +120,9 @@ class AlgorithmLogic {
         int index = random.nextInt(stocks.size());
         StockTO stock = stocks.get(index);
         var order = createOrder(stock, "BUYING_ORDER");
+        if(order == null) {
+            return;
+        }
         try {
             container.getOrderService().createOrder(order);
         } catch (JsonProcessingException ignored) {
@@ -138,6 +141,9 @@ class AlgorithmLogic {
         int index = random.nextInt(stocks.size());
         StockTO stock = stocks.get(index);
         var order = createOrder(stock, "SELLING_ORDER");
+        if(order == null) {
+            return;
+        }
         try {
             container.getOrderService().createOrder(order);
         } catch (JsonProcessingException ignored) {
@@ -146,6 +152,9 @@ class AlgorithmLogic {
 
     private static NewOrderTO createOrder(StockTO stock, String type) {
         NewOrderTO newOrder = new NewOrderTO();
+        if(stock.getAmount().intValue() <= 0) {
+            return null;
+        }
         long amount = random.nextInt(stock.getAmount().intValue()) + 1;
         newOrder.setAmount(amount);
         newOrder.setRemainingAmount(amount);
