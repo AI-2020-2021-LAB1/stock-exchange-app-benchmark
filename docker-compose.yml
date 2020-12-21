@@ -1,0 +1,39 @@
+version: '3'
+services:
+  ai2020-bench:
+    build: .
+    restart: always
+    container_name: ai2020-bench
+    networks:
+      - ai2020-network
+    ports:
+      - 8080:8080
+    environment:
+      POSTGRES_URL: ai2020-benchdb:5432
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: postgres
+      ALGORITHM_SAVE_INTERVAL: 5000
+      ALGORITHM_SAVE_THREADS: 1
+      ALGORITHM_SAVE_LIMIT: 100
+      ALGORITHM_THREADS_MIN: 256
+      ALGORITHM_THREADS_MAX: 512
+      ALGORITHM_CORE_THREADS: 8
+      STOCK_BACKEND_URL: http://localhost:8000
+  ai2020-benchdb:
+    image: postgres:12.4
+    restart: always
+    container_name: ai2020-benchdb
+    networks:
+      - ai2020-network
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - ./postgres/back:/var/lib/postgresql/data
+
+networks:
+  ai2020-network:
+    driver: bridge

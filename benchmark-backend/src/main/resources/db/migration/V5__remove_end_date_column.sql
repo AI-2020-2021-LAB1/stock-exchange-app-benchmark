@@ -1,0 +1,1 @@
+alter table tests drop column end_date;
