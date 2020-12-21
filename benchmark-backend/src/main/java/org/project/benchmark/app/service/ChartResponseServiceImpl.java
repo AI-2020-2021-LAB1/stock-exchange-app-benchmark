@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,9 +45,9 @@ public class ChartResponseServiceImpl implements ChartResponseService {
             minOperationTime.add(responseRepository.findMinOperationTimeForEndpoint(endpoint,testId).setScale(2,RoundingMode.HALF_EVEN));
             avgOperationTime.add(responseRepository.findAvgOperationTimeForEndpoint(endpoint,testId).setScale(2,RoundingMode.HALF_EVEN));
             maxOperationTime.add(responseRepository.findMaxOperationTimeForEndpoint(endpoint,testId).setScale(2,RoundingMode.HALF_EVEN));
-            minMemoryUsed.add(responseRepository.findMinMemoryUsedForEndpoint(endpoint,testId).setScale(2,RoundingMode.HALF_EVEN));
-            avgMemoryUsed.add(responseRepository.findAvgMemoryUsedForEndpoint(endpoint,testId).setScale(2,RoundingMode.HALF_EVEN));
-            maxMemoryUsed.add(responseRepository.findMaxMemoryUsedForEndpoint(endpoint,testId).setScale(2,RoundingMode.HALF_EVEN));
+            minMemoryUsed.add((responseRepository.findMinMemoryUsedForEndpoint(endpoint,testId).divide(BigDecimal.valueOf(1048576)).setScale(2,RoundingMode.HALF_EVEN)));
+            avgMemoryUsed.add((responseRepository.findAvgMemoryUsedForEndpoint(endpoint,testId).divide(BigDecimal.valueOf(1048576)).setScale(2,RoundingMode.HALF_EVEN)));
+            maxMemoryUsed.add((responseRepository.findMaxMemoryUsedForEndpoint(endpoint,testId).divide(BigDecimal.valueOf(1048576)).setScale(2,RoundingMode.HALF_EVEN)));
             minMemoryUsage.add(responseRepository.findMinMemoryUsageForEndpoint(endpoint,testId).setScale(2,RoundingMode.HALF_EVEN));
             avgMemoryUsage.add(responseRepository.findAvgMemoryUsageForEndpoint(endpoint,testId).setScale(2,RoundingMode.HALF_EVEN));
             maxMemoryUsage.add(responseRepository.findMaxMemoryUsageForEndpoint(endpoint,testId).setScale(2,RoundingMode.HALF_EVEN));
@@ -91,9 +90,9 @@ public class ChartResponseServiceImpl implements ChartResponseService {
             minOperationTime.add(responseRepository.findMinOperationTimeForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
             avgOperationTime.add(responseRepository.findAvgOperationTimeForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
             maxOperationTime.add(responseRepository.findMaxOperationTimeForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
-            minMemoryUsed.add(responseRepository.findMinMemoryUsedForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
-            avgMemoryUsed.add(responseRepository.findAvgMemoryUsedForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
-            maxMemoryUsed.add(responseRepository.findMaxMemoryUsedForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
+            minMemoryUsed.add((responseRepository.findMinMemoryUsedForMethod(method,testId).divide(BigDecimal.valueOf(1048576)).setScale(2,RoundingMode.HALF_EVEN)));
+            avgMemoryUsed.add((responseRepository.findAvgMemoryUsedForMethod(method,testId).divide(BigDecimal.valueOf(1048576)).setScale(2,RoundingMode.HALF_EVEN)));
+            maxMemoryUsed.add((responseRepository.findMaxMemoryUsedForMethod(method,testId).divide(BigDecimal.valueOf(1048576)).setScale(2,RoundingMode.HALF_EVEN)));
             minMemoryUsage.add(responseRepository.findMinMemoryUsageForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
             avgMemoryUsage.add(responseRepository.findAvgMemoryUsageForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
             maxMemoryUsage.add(responseRepository.findMaxMemoryUsageForMethod(method,testId).setScale(2,RoundingMode.HALF_EVEN));
